@@ -2,8 +2,21 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// CI/CD環境用のService Role Keyを使用したクライアント
+export const supabaseAdmin = createClient(
+  supabaseUrl, 
+  supabaseServiceKey || supabaseAnonKey,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+)
 
 // 型定義
 export interface Category {
@@ -47,7 +60,12 @@ export interface Profile {
 
 // データ取得関数
 export async function getCategories() {
-  const { data, error } = await supabase
+  // CI/CD環境ではadminクライアントを使用
+  const client = process.env.NODE_ENV === 'production' && process.env.SUPABASE_SERVICE_KEY 
+    ? supabaseAdmin 
+    : supabase
+    
+  const { data, error } = await client
     .from('categories')
     .select('*')
     .eq('is_active', true)
@@ -58,7 +76,12 @@ export async function getCategories() {
 }
 
 export async function getLearningContents() {
-  const { data, error } = await supabase
+  // CI/CD環境ではadminクライアントを使用
+  const client = process.env.NODE_ENV === 'production' && process.env.SUPABASE_SERVICE_KEY 
+    ? supabaseAdmin 
+    : supabase
+    
+  const { data, error } = await client
     .from('learning_contents')
     .select(`
       *,
