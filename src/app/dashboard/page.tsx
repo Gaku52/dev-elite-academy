@@ -93,12 +93,20 @@ export default function Dashboard() {
               <TrendingUp className="w-8 h-8 text-purple-400 mr-3" />
               <h1 className="text-xl font-semibold text-white">学習ダッシュボード</h1>
             </div>
-            <Link
-              href="/"
-              className="text-purple-400 hover:text-purple-300 transition-colors"
-            >
-              ← ホームに戻る
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/db-test"
+                className="text-green-400 hover:text-green-300 transition-colors"
+              >
+                🧪 DB接続テスト
+              </Link>
+              <Link
+                href="/"
+                className="text-purple-400 hover:text-purple-300 transition-colors"
+              >
+                ← ホームに戻る
+              </Link>
+            </div>
           </div>
         </div>
       </div>
