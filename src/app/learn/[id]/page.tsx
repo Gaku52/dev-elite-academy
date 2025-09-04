@@ -1,5 +1,9 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   Clock, 
   CheckCircle, 
@@ -9,59 +13,195 @@ import {
   Target,
   ChevronLeft,
   ChevronRight,
-  Award
+  Award,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
-// 学習コンテンツ詳細取得
-async function getLearningContent(id: string) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-
-  try {
-    const { data, error } = await supabaseAdmin
-      .from('learning_contents')
-      .select(`
-        *,
-        categories (
-          id,
-          name,
-          icon,
-          color
-        )
-      `)
-      .eq('id', id)
-      .single();
-
-    if (error || !data) {
-      return null;
-    }
-
-    return data;
-  } catch (err) {
-    console.error('Error fetching content:', err);
-    return null;
-  }
+interface LearnPageProps {
+  params: Promise<{ id: string }>;
 }
 
-export default async function LearnPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const content = await getLearningContent(resolvedParams.id);
+export default function LearnPage({ params }: LearnPageProps) {
+  const [content, setContent] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [loading, setLoading] = useState(true);
+  const [contentId, setContentId] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  const [userProgress] = useState<any>(null);
+  const [completedSections, setCompletedSections] = useState<number[]>([]);
+  const [sessionStart] = useState<Date>(new Date());
+  const [updatingSection, setUpdatingSection] = useState<number | null>(null);
+  
+  const { user } = useAuth();
+  const router = useRouter();
+
+  // ユーザー進捗取得
+  const fetchUserProgress = useCallback(async () => {
+    if (!user || !contentId) return;
+
+    try {
+      const response = await fetch(`/api/learning/progress?userId=${user.id}&contentId=${contentId}`);
+      if (response.ok) {
+        const progressData = await response.json();
+        if (progressData.length > 0) {
+          // setUserProgress(progressData[0]);
+        }
+      }
+
+      // セクション別進捗も取得
+      const sectionsResponse = await fetch(`/api/learning/sections?userId=${user.id}&contentId=${contentId}`);
+      if (sectionsResponse.ok) {
+        const sectionsData = await sectionsResponse.json();
+        const completedIds = sectionsData
+          .filter((section: any) => section.is_completed) // eslint-disable-line @typescript-eslint/no-explicit-any
+          .map((section: any) => section.section_number); // eslint-disable-line @typescript-eslint/no-explicit-any
+        setCompletedSections(completedIds);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user progress:', error);
+    }
+  }, [user, contentId]);
+
+  // パラメータ解決
+  useEffect(() => {
+    params.then(resolved => {
+      setContentId(resolved.id);
+    });
+  }, [params]);
+
+  // 認証チェック
+  useEffect(() => {
+    if (!user && !loading) {
+      router.push('/auth');
+    }
+  }, [user, loading, router]);
+
+  // コンテンツ取得
+  useEffect(() => {
+    if (!contentId) return;
+
+    const fetchContent = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('learning_contents')
+          .select(`
+            *,
+            categories (
+              id,
+              name,
+              icon,
+              color
+            )
+          `)
+          .eq('id', contentId)
+          .single();
+
+        if (error || !data) {
+          notFound();
+          return;
+        }
+
+        setContent(data);
+        
+        // ユーザーの進捗も取得
+        if (user) {
+          fetchUserProgress();
+        }
+      } catch (err) {
+        console.error('Error fetching content:', err);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContent();
+  }, [contentId, user, fetchUserProgress]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="flex items-center space-x-3 text-white">
+          <Loader2 className="w-8 h-8 animate-spin" />
+          <span>読み込み中...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-white mb-4">ログインが必要です</h1>
+          <Link 
+            href="/auth"
+            className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            ログインページへ
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!content) {
-    notFound();
+    return notFound();
   }
+
+  // セクション完了処理
+  const handleSectionComplete = async (sectionId: number, sectionType: string) => {
+    if (!user || updatingSection === sectionId) return;
+
+    setUpdatingSection(sectionId);
+    
+    const isCompleted = completedSections.includes(sectionId);
+    const newCompletedSections = isCompleted 
+      ? completedSections.filter(id => id !== sectionId)
+      : [...completedSections, sectionId];
+
+    // 楽観的UI更新
+    setCompletedSections(newCompletedSections);
+
+    try {
+      const sessionDuration = Math.round((new Date().getTime() - sessionStart.getTime()) / 60000);
+      
+      const response = await fetch('/api/learning/progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          contentId: contentId,
+          sessionDurationMinutes: sessionDuration,
+          completedSections: [{
+            type: sectionType,
+            number: sectionId,
+            completed: !isCompleted,
+            duration: 0
+          }],
+          progressPercentage: Math.round((newCompletedSections.length / learningSections.length) * 100),
+          status: newCompletedSections.length === learningSections.length ? 'completed' : 'in_progress'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update progress');
+      }
+
+      // 進捗データを再取得
+      await fetchUserProgress();
+    } catch (error) {
+      console.error('Failed to update progress:', error);
+      // エラー時は状態を戻す
+      setCompletedSections(completedSections);
+    } finally {
+      setUpdatingSection(null);
+    }
+  };
 
   // 学習セクション（実際のコンテンツに応じて動的に生成）
   const learningSections = [
@@ -71,7 +211,7 @@ export default async function LearnPage({ params }: { params: Promise<{ id: stri
       title: '概要動画',
       duration: 10,
       icon: <PlayCircle className="w-5 h-5" />,
-      completed: false
+      completed: completedSections.includes(1)
     },
     {
       id: 2,
@@ -79,7 +219,7 @@ export default async function LearnPage({ params }: { params: Promise<{ id: stri
       title: '基礎知識',
       duration: 15,
       icon: <BookOpen className="w-5 h-5" />,
-      completed: false
+      completed: completedSections.includes(2)
     },
     {
       id: 3,
@@ -87,7 +227,7 @@ export default async function LearnPage({ params }: { params: Promise<{ id: stri
       title: 'ハンズオン演習',
       duration: 30,
       icon: <Code className="w-5 h-5" />,
-      completed: false
+      completed: completedSections.includes(3)
     },
     {
       id: 4,
@@ -95,13 +235,13 @@ export default async function LearnPage({ params }: { params: Promise<{ id: stri
       title: '理解度チェック',
       duration: 5,
       icon: <Target className="w-5 h-5" />,
-      completed: false
+      completed: completedSections.includes(4)
     }
   ];
 
   const totalDuration = learningSections.reduce((sum, section) => sum + section.duration, 0);
-  const completedSections = learningSections.filter(s => s.completed).length;
-  const progressPercentage = (completedSections / learningSections.length) * 100;
+  const completedCount = learningSections.filter(s => s.completed).length;
+  const progressPercentage = (completedCount / learningSections.length) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -170,7 +310,7 @@ export default async function LearnPage({ params }: { params: Promise<{ id: stri
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="w-4 h-4 mr-1" />
-                  <span>完了: {completedSections}/{learningSections.length}</span>
+                  <span>完了: {completedCount}/{learningSections.length}</span>
                 </div>
               </div>
             </div>
@@ -200,8 +340,23 @@ export default async function LearnPage({ params }: { params: Promise<{ id: stri
                         </p>
                       </div>
                     </div>
-                    <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
-                      {section.completed ? '復習する' : '開始'}
+                    <button 
+                      onClick={() => handleSectionComplete(section.id, section.type)}
+                      disabled={updatingSection === section.id}
+                      className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium flex items-center ${
+                        updatingSection === section.id
+                          ? 'bg-gray-600 cursor-not-allowed'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                      }`}
+                    >
+                      {updatingSection === section.id ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                          更新中...
+                        </>
+                      ) : (
+                        section.completed ? '完了を取り消す' : '完了にする'
+                      )}
                     </button>
                   </div>
                 </div>
