@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing Supabase environment variables');
   }
-});
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+}
 
 // GET: ユーザーの進捗を取得
 export async function GET(request: NextRequest) {
@@ -22,6 +28,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     let query = supabaseAdmin
       .from('user_progress')
       .select('*, learning_contents(title, description)')
@@ -52,6 +59,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     // 既存の進捗をチェック
     const { data: existingProgress } = await supabaseAdmin
       .from('user_progress')
@@ -64,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     if (existingProgress) {
       // 更新
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         status: status || existingProgress.status,
         progress_percentage: progressPercentage ?? existingProgress.progress_percentage,
         last_accessed_at: new Date().toISOString()
@@ -119,6 +127,7 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     // セクション進捗を更新
     const { data: sectionData, error: sectionError } = await supabaseAdmin
       .from('section_progress')

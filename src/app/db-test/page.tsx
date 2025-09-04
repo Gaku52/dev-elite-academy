@@ -1,33 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 
-// 型定義
-interface Category {
-  id: number;
-  name: string;
-  description: string | null;
-  icon: string | null;
-  color: string | null;
-  sort_order: number;
-  is_active: boolean;
-  created_at: string;
-}
-
-interface LearningContent {
-  id: number;
-  category_id: number;
-  title: string;
-  description: string | null;
-  content_type: 'ARTICLE' | 'VIDEO' | 'QUIZ' | 'EXERCISE' | 'FLASHCARD';
-  content_body: Record<string, unknown>;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  estimated_time: number;
-  tags: string[];
-  is_published: boolean;
-  created_at: string;
-  updated_at: string;
-  category?: Category;
-}
+// 型定義は実際のSupabaseレスポンスから推論
 
 // サーバーサイドでのデータ取得
 async function getServerData() {

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { 
   Database, 
-  CheckCircle, 
   AlertTriangle, 
   PlayCircle,
   Loader2
@@ -12,7 +11,15 @@ import {
 
 export default function SetupProgressTablesPage() {
   const [isCreating, setIsCreating] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{
+    idType?: string;
+    results?: {
+      created?: string[];
+      existing?: string[];
+      errors?: Array<{ table: string; error: string }>;
+    };
+    sqlForManualExecution?: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const createTables = async () => {
@@ -32,8 +39,8 @@ export default function SetupProgressTablesPage() {
       }
 
       setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setIsCreating(false);
     }
@@ -105,7 +112,7 @@ export default function SetupProgressTablesPage() {
             </div>
 
             {/* 作成済みテーブル */}
-            {result.results?.created?.length > 0 && (
+            {result.results?.created && result.results.created.length > 0 && (
               <div className="bg-green-800/30 border border-green-700/50 rounded-lg p-4">
                 <h3 className="text-green-300 font-semibold mb-2">✅ 作成成功</h3>
                 <ul className="text-green-200 text-sm">
@@ -117,7 +124,7 @@ export default function SetupProgressTablesPage() {
             )}
 
             {/* 既存テーブル */}
-            {result.results?.existing?.length > 0 && (
+            {result.results?.existing && result.results.existing.length > 0 && (
               <div className="bg-yellow-800/30 border border-yellow-700/50 rounded-lg p-4">
                 <h3 className="text-yellow-300 font-semibold mb-2">⚠️ 既に存在</h3>
                 <ul className="text-yellow-200 text-sm">
@@ -129,11 +136,11 @@ export default function SetupProgressTablesPage() {
             )}
 
             {/* エラー */}
-            {result.results?.errors?.length > 0 && (
+            {result.results?.errors && result.results.errors.length > 0 && (
               <div className="bg-red-800/30 border border-red-700/50 rounded-lg p-4">
                 <h3 className="text-red-300 font-semibold mb-2">❌ エラー</h3>
                 <div className="space-y-2">
-                  {result.results.errors.map((error: any, index: number) => (
+                  {result.results.errors.map((error, index) => (
                     <div key={index}>
                       <p className="text-red-200 text-sm">• {error.table}: {error.error}</p>
                     </div>

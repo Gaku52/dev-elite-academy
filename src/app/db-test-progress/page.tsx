@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 
 async function testProgressTables() {
@@ -25,7 +26,7 @@ async function testProgressTables() {
       'learning_sessions'
     ];
 
-    const results: any = {};
+    const results: Record<string, { exists: boolean; error?: string; count: number }> = {};
 
     for (const table of tables) {
       const { count, error } = await supabaseAdmin
@@ -59,7 +60,7 @@ export default async function DBTestProgressPage() {
           <h2 className="text-xl font-semibold text-white mb-4">テーブル確認結果</h2>
           
           <div className="space-y-3">
-            {Object.entries(testResults).map(([table, result]: [string, any]) => (
+            {Object.entries(testResults).map(([table, result]) => (
               <div
                 key={table}
                 className={`p-4 rounded-lg border ${
@@ -102,18 +103,18 @@ export default async function DBTestProgressPage() {
         </div>
 
         <div className="mt-8 flex space-x-4">
-          <a
+          <Link
             href="/"
             className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
           >
             ← ホームに戻る
-          </a>
-          <a
+          </Link>
+          <Link
             href="/dashboard"
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             📊 ダッシュボードへ
-          </a>
+          </Link>
         </div>
       </div>
     </div>

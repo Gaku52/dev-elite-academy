@@ -2,9 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { 
   Database, 
-  Activity, 
-  Users, 
-  Calendar,
+  Activity,
   AlertTriangle,
   CheckCircle,
   TrendingUp,
