@@ -140,6 +140,14 @@ export default function Home() {
                       📊 使用状況
                     </Link>
                   </div>
+                  <div>
+                    <Link
+                      href="/setup-progress-tables"
+                      className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-yellow-100 bg-yellow-800/50 hover:bg-yellow-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
+                    >
+                      🔧 進捗テーブル作成
+                    </Link>
+                  </div>
                 </motion.div>
               </div>
             </main>
