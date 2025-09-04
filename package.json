@@ -7,17 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:integration": "jest --config jest.integration.config.js",
-    "test:e2e": "playwright test",
-    "test:production": "playwright test --config playwright.production.config.ts",
-    "db:reset:test": "node scripts/reset-test-db.js",
-    "db:seed:test": "node scripts/seed-test-db.js",
-    "db:migrate:test": "node scripts/migrate-test-db.js",
-    "db:verify:test": "node scripts/verify-test-db.js"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
