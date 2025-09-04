@@ -16,7 +16,7 @@ export default function CreateProgressTablesPage() {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [idType, setIdType] = useState('');
-  const [tableStatus, setTableStatus] = useState(null);
+  const [tableStatus, setTableStatus] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [statusLoading, setStatusLoading] = useState(false);
 
   const fetchSql = (type: 'simple' | 'full' | 'user_master' | 'auth_integration') => {
@@ -146,7 +146,7 @@ export default function CreateProgressTablesPage() {
               <div className="bg-black/30 rounded-lg p-4">
                 <h3 className="text-green-300 font-semibold mb-2">コアテーブル ({tableStatus.summary.coreAppTablesCount}/2)</h3>
                 <div className="text-sm text-gray-300">
-                  {tableStatus.tables.coreApp.map(table => (
+                  {tableStatus.tables.coreApp.map((table: string) => (
                     <div key={table}>✅ {table}</div>
                   ))}
                   {tableStatus.summary.coreAppTablesCount < 2 && (
@@ -158,7 +158,7 @@ export default function CreateProgressTablesPage() {
               <div className="bg-black/30 rounded-lg p-4">
                 <h3 className="text-purple-300 font-semibold mb-2">進捗テーブル ({tableStatus.summary.progressTablesCount}/3)</h3>
                 <div className="text-sm text-gray-300">
-                  {tableStatus.tables.progress.map(table => (
+                  {tableStatus.tables.progress.map((table: string) => (
                     <div key={table}>✅ {table}</div>
                   ))}
                   {tableStatus.summary.progressTablesCount === 0 && (
@@ -173,7 +173,7 @@ export default function CreateProgressTablesPage() {
             <div className="mt-4 p-4 bg-yellow-800/30 border border-yellow-700/50 rounded-lg">
               <h4 className="text-yellow-300 font-semibold mb-2">推奨アクション</h4>
               <ul className="text-yellow-200 text-sm space-y-1">
-                {tableStatus.recommendations.map((rec, index) => (
+                {tableStatus.recommendations.map((rec: any, index: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                   <li key={index}>• {rec.message}</li>
                 ))}
               </ul>

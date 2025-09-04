@@ -29,7 +29,7 @@ export async function GET() {
       .order('table_name');
 
     // 2. 各テーブルの詳細情報取得
-    const tableDetails = {};
+    const tableDetails: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
     
     for (const table of (tables || [])) {
       const tableName = table.table_name;
@@ -71,7 +71,8 @@ export async function GET() {
     // 4. ID型の判定
     let idType = 'UUID';
     if (tableDetails['learning_contents']?.columns) {
-      const idColumn = tableDetails['learning_contents'].columns.find(c => c.column_name === 'id');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const idColumn = tableDetails['learning_contents'].columns.find((c: any) => c.column_name === 'id');
       if (idColumn?.data_type === 'integer' || idColumn?.data_type === 'bigint') {
         idType = 'INTEGER';
       }
