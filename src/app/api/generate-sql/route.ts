@@ -98,35 +98,95 @@ CREATE TABLE IF NOT EXISTS learning_sessions (
 );
 
 -- ========================================
--- インデックス作成（検索パフォーマンス向上）
 -- ========================================
-CREATE INDEX IF NOT EXISTS idx_user_progress_email ON user_progress(user_email);
-CREATE INDEX IF NOT EXISTS idx_user_progress_content ON user_progress(content_id);
-CREATE INDEX IF NOT EXISTS idx_user_progress_status ON user_progress(status);
-CREATE INDEX IF NOT EXISTS idx_section_progress_email ON section_progress(user_email);
-CREATE INDEX IF NOT EXISTS idx_learning_sessions_date ON learning_sessions(session_date);
-CREATE INDEX IF NOT EXISTS idx_quiz_results_email ON quiz_results(user_email);
-CREATE INDEX IF NOT EXISTS idx_learning_notes_email ON learning_notes(user_email);
+-- インデックス作成（検索パフォーマンス向上）
+-- 注意: テーブル作成後に実行すること
+-- ========================================
+
+-- user_progressテーブルのインデックス
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'user_progress') THEN
+        CREATE INDEX IF NOT EXISTS idx_user_progress_email ON user_progress(user_email);
+        CREATE INDEX IF NOT EXISTS idx_user_progress_content ON user_progress(content_id);
+        CREATE INDEX IF NOT EXISTS idx_user_progress_status ON user_progress(status);
+    END IF;
+END $$;
+
+-- section_progressテーブルのインデックス
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'section_progress') THEN
+        CREATE INDEX IF NOT EXISTS idx_section_progress_email ON section_progress(user_email);
+    END IF;
+END $$;
+
+-- その他のテーブルのインデックス
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'learning_sessions') THEN
+        CREATE INDEX IF NOT EXISTS idx_learning_sessions_date ON learning_sessions(session_date);
+    END IF;
+    
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'quiz_results') THEN
+        CREATE INDEX IF NOT EXISTS idx_quiz_results_email ON quiz_results(user_email);
+    END IF;
+    
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'learning_notes') THEN
+        CREATE INDEX IF NOT EXISTS idx_learning_notes_email ON learning_notes(user_email);
+    END IF;
+END $$;
 
 -- ========================================
 -- Row Level Security (RLS) を有効化
+-- 注意: テーブル存在確認後に実行
 -- ========================================
-ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE section_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE learning_notes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE quiz_results ENABLE ROW LEVEL SECURITY;
-ALTER TABLE learning_sessions ENABLE ROW LEVEL SECURITY;
 
--- RLSポリシー（現時点では全アクセス許可）
-CREATE POLICY "Allow all access to user_progress" ON user_progress FOR ALL USING (true);
-CREATE POLICY "Allow all access to section_progress" ON section_progress FOR ALL USING (true);
-CREATE POLICY "Allow all access to learning_notes" ON learning_notes FOR ALL USING (true);
-CREATE POLICY "Allow all access to quiz_results" ON quiz_results FOR ALL USING (true);
-CREATE POLICY "Allow all access to learning_sessions" ON learning_sessions FOR ALL USING (true);
+-- RLSとポリシーを安全に設定
+DO $$
+BEGIN
+    -- user_progressテーブル
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'user_progress') THEN
+        ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
+        DROP POLICY IF EXISTS "Allow all access to user_progress" ON user_progress;
+        CREATE POLICY "Allow all access to user_progress" ON user_progress FOR ALL USING (true);
+    END IF;
+    
+    -- section_progressテーブル  
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'section_progress') THEN
+        ALTER TABLE section_progress ENABLE ROW LEVEL SECURITY;
+        DROP POLICY IF EXISTS "Allow all access to section_progress" ON section_progress;
+        CREATE POLICY "Allow all access to section_progress" ON section_progress FOR ALL USING (true);
+    END IF;
+    
+    -- learning_notesテーブル
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'learning_notes') THEN
+        ALTER TABLE learning_notes ENABLE ROW LEVEL SECURITY;
+        DROP POLICY IF EXISTS "Allow all access to learning_notes" ON learning_notes;
+        CREATE POLICY "Allow all access to learning_notes" ON learning_notes FOR ALL USING (true);
+    END IF;
+    
+    -- quiz_resultsテーブル
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'quiz_results') THEN
+        ALTER TABLE quiz_results ENABLE ROW LEVEL SECURITY;
+        DROP POLICY IF EXISTS "Allow all access to quiz_results" ON quiz_results;
+        CREATE POLICY "Allow all access to quiz_results" ON quiz_results FOR ALL USING (true);
+    END IF;
+    
+    -- learning_sessionsテーブル
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'learning_sessions') THEN
+        ALTER TABLE learning_sessions ENABLE ROW LEVEL SECURITY;
+        DROP POLICY IF EXISTS "Allow all access to learning_sessions" ON learning_sessions;
+        CREATE POLICY "Allow all access to learning_sessions" ON learning_sessions FOR ALL USING (true);
+    END IF;
+END $$;
 
 -- ========================================
 -- 更新日時自動更新用トリガー
+-- 注意: テーブル存在確認後に実行
 -- ========================================
+
+-- 更新日時関数の作成
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -135,13 +195,25 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_user_progress_updated_at 
-  BEFORE UPDATE ON user_progress
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_learning_notes_updated_at 
-  BEFORE UPDATE ON learning_notes
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- トリガーを安全に作成
+DO $$
+BEGIN
+    -- user_progressテーブルのトリガー
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'user_progress') THEN
+        DROP TRIGGER IF EXISTS update_user_progress_updated_at ON user_progress;
+        CREATE TRIGGER update_user_progress_updated_at 
+            BEFORE UPDATE ON user_progress
+            FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    END IF;
+    
+    -- learning_notesテーブルのトリガー
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'learning_notes') THEN
+        DROP TRIGGER IF EXISTS update_learning_notes_updated_at ON learning_notes;
+        CREATE TRIGGER update_learning_notes_updated_at 
+            BEFORE UPDATE ON learning_notes
+            FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    END IF;
+END $$;
 
 -- ========================================
 -- 実行確認用クエリ
