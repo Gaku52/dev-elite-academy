@@ -132,6 +132,14 @@ export default function Home() {
                       🧪 DB接続テスト
                     </Link>
                   </div>
+                  <div className="mt-3 sm:mt-0 sm:ml-3">
+                    <Link
+                      href="/usage"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-100 bg-blue-800/50 hover:bg-blue-700/50 md:py-4 md:text-lg md:px-10 transition-all duration-300"
+                    >
+                      📊 使用状況監視
+                    </Link>
+                  </div>
                 </motion.div>
               </div>
             </main>
