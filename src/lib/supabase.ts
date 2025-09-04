@@ -3,10 +3,18 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase環境変数が設定されていません。.env.localファイルを確認してください。');
-  console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? '設定済み' : '未設定');
-  console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '設定済み' : '未設定');
+if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'your-supabase-url' || supabaseAnonKey === 'your-supabase-anon-key') {
+  console.error('❌ Supabase環境変数が正しく設定されていません！');
+  console.error('📝 .env.localファイルに実際のSupabaseの値を設定してください。');
+  console.error('');
+  console.error('1. Supabaseダッシュボード (https://app.supabase.com) にアクセス');
+  console.error('2. Settings → API から以下をコピー:');
+  console.error('   - Project URL → NEXT_PUBLIC_SUPABASE_URL');
+  console.error('   - anon public → NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  console.error('');
+  console.error('現在の設定:');
+  console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl || '未設定');
+  console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? supabaseAnonKey.substring(0, 20) + '...' : '未設定');
 }
 
 export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
