@@ -1,7 +1,5 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
 
 // 型定義
 interface Category {
@@ -31,87 +29,76 @@ interface LearningContent {
   category?: Category;
 }
 
-// API呼び出し関数（文字化け防止対応）
-async function fetchCategories(): Promise<Category[]> {
-  const response = await fetch('/api/categories', {
-    headers: {
-      'Accept': 'application/json; charset=utf-8',
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`Categories API error: ${response.status} ${response.statusText}`);
+// サーバーサイドでのデータ取得
+async function getServerData() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return { categories: [], learningContents: [], error: '環境変数が設定されていません' };
   }
-  return response.json();
-}
 
-async function fetchLearningContents(): Promise<LearningContent[]> {
-  const response = await fetch('/api/learning-contents', {
-    headers: {
-      'Accept': 'application/json; charset=utf-8',
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`Learning Contents API error: ${response.status} ${response.statusText}`);
-  }
-  return response.json();
-}
-
-export default function DbTestPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [learningContents, setLearningContents] = useState<LearningContent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [testResults, setTestResults] = useState({
-    categoriesSuccess: false,
-    learningContentsSuccess: false,
-  });
-
-  useEffect(() => {
-    async function testDbConnection() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // 環境変数の状況をデバッグ
-        console.log('🔧 環境変数チェック:');
-        console.log('NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? '設定済み' : '未設定');
-        console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '設定済み' : '未設定');
-        console.log('NODE_ENV:', process.env.NODE_ENV);
-
-        // Categories API テスト
-        try {
-          const categoriesData = await fetchCategories();
-          setCategories(categoriesData);
-          setTestResults(prev => ({ ...prev, categoriesSuccess: true }));
-          console.log('✅ Categories API成功:', categoriesData);
-        } catch (err) {
-          console.error('❌ Categories API失敗:', err);
-          setError(prev => prev ? `${prev}\nCategories API: ${err}` : `Categories API: ${err}`);
-        }
-
-        // Learning Contents API テスト
-        try {
-          const contentsData = await fetchLearningContents();
-          setLearningContents(contentsData);
-          setTestResults(prev => ({ ...prev, learningContentsSuccess: true }));
-          console.log('✅ Learning Contents API成功:', contentsData);
-        } catch (err) {
-          console.error('❌ Learning Contents API失敗:', err);
-          setError(prev => prev ? `${prev}\nLearning Contents API: ${err}` : `Learning Contents API: ${err}`);
-        }
-
-      } catch (err) {
-        console.error('❌ DB接続テスト失敗:', err);
-        setError(`DB接続エラー: ${err}`);
-      } finally {
-        setLoading(false);
-      }
+  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
     }
+  });
 
-    testDbConnection();
-  }, []);
+  try {
+    // Categoriesを並行取得
+    const categoriesPromise = supabaseAdmin
+      .from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order');
+
+    // Learning Contentsを並行取得
+    const contentsPromise = supabaseAdmin
+      .from('learning_contents')
+      .select(`
+        *,
+        category:categories(*)
+      `)
+      .eq('is_published', true)
+      .order('created_at', { ascending: false });
+
+    // 並行実行で高速化
+    const [categoriesResult, contentsResult] = await Promise.all([
+      categoriesPromise,
+      contentsPromise
+    ]);
+
+    const categories = categoriesResult.data || [];
+    const learningContents = contentsResult.data || [];
+
+    return {
+      categories,
+      learningContents,
+      error: categoriesResult.error || contentsResult.error ? 'データ取得エラー' : null
+    };
+  } catch (err) {
+    return { categories: [], learningContents: [], error: `サーバーエラー: ${err}` };
+  }
+}
+
+// Server Component（高速表示）
+export default async function DbTestPage() {
+  const { categories, learningContents, error } = await getServerData();
+
+  const difficultyColors = {
+    EASY: 'bg-green-100 text-green-800 border-green-200',
+    MEDIUM: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
+    HARD: 'bg-red-100 text-red-800 border-red-200'
+  };
+
+  const contentTypeIcons = {
+    ARTICLE: '📖',
+    VIDEO: '📺',
+    QUIZ: '❓',
+    EXERCISE: '💪',
+    FLASHCARD: '🃏'
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
@@ -121,19 +108,19 @@ export default function DbTestPage() {
             🧪 Database Connection Test
           </h1>
           <p className="text-gray-300">
-            🔒 API Routes経由でのSecureなSupabase接続テスト - Categories & Learning Contentsデータ表示
+            🚀 Server Component - 高速なデータベース接続とレンダリング
           </p>
         </div>
 
         {/* テスト結果サマリー */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className={`p-6 rounded-lg border-2 ${
-            testResults.categoriesSuccess 
+            categories.length > 0
               ? 'bg-green-800/20 border-green-500' 
               : 'bg-red-800/20 border-red-500'
           }`}>
             <h3 className="text-xl font-semibold text-white mb-2">
-              {testResults.categoriesSuccess ? '✅' : '❌'} Categories テーブル
+              {categories.length > 0 ? '✅' : '❌'} Categories テーブル
             </h3>
             <p className="text-gray-300">
               データ件数: {categories.length}件
@@ -141,12 +128,12 @@ export default function DbTestPage() {
           </div>
 
           <div className={`p-6 rounded-lg border-2 ${
-            testResults.learningContentsSuccess 
+            learningContents.length > 0
               ? 'bg-green-800/20 border-green-500' 
               : 'bg-red-800/20 border-red-500'
           }`}>
             <h3 className="text-xl font-semibold text-white mb-2">
-              {testResults.learningContentsSuccess ? '✅' : '❌'} Learning Contents テーブル
+              {learningContents.length > 0 ? '✅' : '❌'} Learning Contents テーブル
             </h3>
             <p className="text-gray-300">
               データ件数: {learningContents.length}件
@@ -154,161 +141,133 @@ export default function DbTestPage() {
           </div>
         </div>
 
-        {/* ローディング状態 */}
-        {loading && (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-            <p className="text-white">データベース接続テスト中...</p>
-          </div>
-        )}
-
         {/* エラー表示 */}
         {error && (
           <div className="bg-red-800/20 border border-red-500 rounded-lg p-6 mb-8">
             <h3 className="text-xl font-semibold text-red-400 mb-2">❌ エラーが発生しました</h3>
-            <pre className="text-red-300 whitespace-pre-wrap">{error}</pre>
+            <p className="text-red-300">{error}</p>
           </div>
         )}
 
-        {!loading && (
-          <>
-            {/* Categories データ表示 */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">📚 Categories データ</h2>
-              {categories.length > 0 ? (
-                <div className="bg-slate-800/50 rounded-lg p-6">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr className="border-b border-slate-600">
-                          <th className="text-purple-400 pb-2">ID</th>
-                          <th className="text-purple-400 pb-2">名前</th>
-                          <th className="text-purple-400 pb-2">説明</th>
-                          <th className="text-purple-400 pb-2">アイコン</th>
-                          <th className="text-purple-400 pb-2">色</th>
-                          <th className="text-purple-400 pb-2">順序</th>
-                          <th className="text-purple-400 pb-2">有効</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {categories.map((category) => (
-                          <tr key={category.id} className="border-b border-slate-700">
-                            <td className="text-white py-2">{category.id}</td>
-                            <td className="text-white py-2">{category.name}</td>
-                            <td className="text-gray-300 py-2">{category.description}</td>
-                            <td className="text-yellow-400 py-2">{category.icon}</td>
-                            <td className="text-white py-2">
-                              <div 
-                                className="w-4 h-4 rounded-full inline-block mr-2" 
-                                style={{ backgroundColor: category.color || '#gray' }}
-                              ></div>
-                              {category.color}
-                            </td>
-                            <td className="text-white py-2">{category.sort_order}</td>
-                            <td className="text-white py-2">
-                              {category.is_active ? '✅' : '❌'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-slate-800/50 rounded-lg p-6">
-                  <p className="text-gray-400">データが見つかりません</p>
-                </div>
-              )}
-            </div>
-
-            {/* Learning Contents データ表示 */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">📖 Learning Contents データ</h2>
-              {learningContents.length > 0 ? (
-                <div className="bg-slate-800/50 rounded-lg p-6">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr className="border-b border-slate-600">
-                          <th className="text-purple-400 pb-2">ID</th>
-                          <th className="text-purple-400 pb-2">タイトル</th>
-                          <th className="text-purple-400 pb-2">タイプ</th>
-                          <th className="text-purple-400 pb-2">難易度</th>
-                          <th className="text-purple-400 pb-2">時間(分)</th>
-                          <th className="text-purple-400 pb-2">タグ</th>
-                          <th className="text-purple-400 pb-2">公開</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {learningContents.map((content) => (
-                          <tr key={content.id} className="border-b border-slate-700">
-                            <td className="text-white py-2">{content.id}</td>
-                            <td className="text-white py-2">{content.title}</td>
-                            <td className="text-blue-400 py-2">{content.content_type}</td>
-                            <td className="text-yellow-400 py-2">{content.difficulty}</td>
-                            <td className="text-white py-2">{content.estimated_time}</td>
-                            <td className="text-gray-300 py-2">
-                              {content.tags.slice(0, 3).join(', ')}
-                              {content.tags.length > 3 && '...'}
-                            </td>
-                            <td className="text-white py-2">
-                              {content.is_published ? '✅' : '❌'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-slate-800/50 rounded-lg p-6">
-                  <p className="text-gray-400">データが見つかりません</p>
-                </div>
-              )}
-            </div>
-
-            {/* 接続情報 */}
+        {/* Categories データ表示 */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">📚 Categories データ</h2>
+          {categories.length > 0 ? (
             <div className="bg-slate-800/50 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">🔧 接続情報</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-400">Supabase URL:</p>
-                  <p className="text-white font-mono">
-                    {process.env.NEXT_PUBLIC_SUPABASE_URL 
-                      ? `✅ ${process.env.NEXT_PUBLIC_SUPABASE_URL.substring(0, 30)}...` 
-                      : '❌ 未設定'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-400">Anonymous Key:</p>
-                  <p className="text-white font-mono">
-                    {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY 
-                      ? `✅ ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.substring(0, 20)}...` 
-                      : '❌ 未設定'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-400">Service Key (サーバーサイド専用):</p>
-                  <p className="text-white font-mono">
-                    ⚠️ クライアントからは確認不可
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-400">環境:</p>
-                  <p className="text-white font-mono">
-                    {process.env.NODE_ENV || 'development'}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 p-4 bg-yellow-800/20 border border-yellow-600/30 rounded-lg">
-                <p className="text-yellow-300 text-sm">
-                  💡 Service Role Keyはサーバーサイドでのみ使用され、クライアントからは見えません。
-                  実際の接続テストの成功/失敗で動作を確認してください。
-                </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-slate-600">
+                      <th className="text-purple-400 pb-2">ID</th>
+                      <th className="text-purple-400 pb-2">名前</th>
+                      <th className="text-purple-400 pb-2">説明</th>
+                      <th className="text-purple-400 pb-2">アイコン</th>
+                      <th className="text-purple-400 pb-2">色</th>
+                      <th className="text-purple-400 pb-2">順序</th>
+                      <th className="text-purple-400 pb-2">有効</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categories.map((category) => (
+                      <tr key={category.id} className="border-b border-slate-700">
+                        <td className="text-white py-2">{category.id}</td>
+                        <td className="text-white py-2">{category.name}</td>
+                        <td className="text-gray-300 py-2">{category.description}</td>
+                        <td className="text-yellow-400 py-2 text-xl">{category.icon}</td>
+                        <td className="text-white py-2">
+                          <div 
+                            className="w-4 h-4 rounded-full inline-block mr-2" 
+                            style={{ backgroundColor: category.color || '#gray' }}
+                          ></div>
+                          {category.color}
+                        </td>
+                        <td className="text-white py-2">{category.sort_order}</td>
+                        <td className="text-white py-2">
+                          {category.is_active ? '✅' : '❌'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </>
-        )}
+          ) : (
+            <div className="bg-slate-800/50 rounded-lg p-6">
+              <p className="text-gray-400">データが見つかりません</p>
+            </div>
+          )}
+        </div>
+
+        {/* Learning Contents データ表示 */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">📖 Learning Contents データ</h2>
+          {learningContents.length > 0 ? (
+            <div className="bg-slate-800/50 rounded-lg p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-slate-600">
+                      <th className="text-purple-400 pb-2">ID</th>
+                      <th className="text-purple-400 pb-2">タイトル</th>
+                      <th className="text-purple-400 pb-2">タイプ</th>
+                      <th className="text-purple-400 pb-2">難易度</th>
+                      <th className="text-purple-400 pb-2">時間(分)</th>
+                      <th className="text-purple-400 pb-2">タグ</th>
+                      <th className="text-purple-400 pb-2">公開</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {learningContents.map((content) => (
+                      <tr key={content.id} className="border-b border-slate-700">
+                        <td className="text-white py-2">{content.id}</td>
+                        <td className="text-white py-2">{content.title}</td>
+                        <td className="text-blue-400 py-2">
+                          {contentTypeIcons[content.content_type as keyof typeof contentTypeIcons]} {content.content_type}
+                        </td>
+                        <td className="py-2">
+                          <span className={`px-2 py-1 rounded-full text-xs border ${difficultyColors[content.difficulty as keyof typeof difficultyColors]}`}>
+                            {content.difficulty}
+                          </span>
+                        </td>
+                        <td className="text-white py-2">{content.estimated_time}</td>
+                        <td className="text-gray-300 py-2">
+                          {content.tags.slice(0, 3).join(', ')}
+                          {content.tags.length > 3 && '...'}
+                        </td>
+                        <td className="text-white py-2">
+                          {content.is_published ? '✅' : '❌'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-slate-800/50 rounded-lg p-6">
+              <p className="text-gray-400">データが見つかりません</p>
+            </div>
+          )}
+        </div>
+
+        {/* パフォーマンス情報 */}
+        <div className="bg-slate-800/50 rounded-lg p-6 mb-8">
+          <h3 className="text-xl font-semibold text-white mb-4">⚡ パフォーマンス改善</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <p className="text-gray-400">レンダリング:</p>
+              <p className="text-white font-mono">🚀 Server Component</p>
+            </div>
+            <div>
+              <p className="text-gray-400">データ取得:</p>
+              <p className="text-white font-mono">⚡ 並行実行</p>
+            </div>
+            <div>
+              <p className="text-gray-400">初期読み込み:</p>
+              <p className="text-white font-mono">📈 高速化完了</p>
+            </div>
+          </div>
+        </div>
 
         {/* ナビゲーション */}
         <div className="text-center mt-8">
