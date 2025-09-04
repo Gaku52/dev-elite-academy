@@ -126,13 +126,19 @@ export async function POST() {
     // 各テーブルを作成
     for (const table of tables) {
       try {
-        // テーブルが既に存在するか確認
+        // テーブルが既に存在するか確認（relation does not existエラーなら存在しない）
         const { error: checkError } = await supabaseAdmin
           .from(table.name)
           .select('*', { count: 'exact', head: true });
 
         if (!checkError) {
           results.existing.push(table.name);
+          continue;
+        }
+
+        // テーブルが存在しない場合のエラーメッセージを確認
+        if (checkError.message && !checkError.message.includes('relation') && !checkError.message.includes('does not exist')) {
+          results.errors.push({ table: table.name, error: checkError.message });
           continue;
         }
 
