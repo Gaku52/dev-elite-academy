@@ -21,43 +21,43 @@ const skillCategories = [
   {
     icon: <Cloud className="w-8 h-8" />,
     title: "DevOps & AWS",
-    description: "クラウドインフラ、CI/CD、コンテナ化、監視システム",
-    skills: ["AWS", "Docker", "Kubernetes", "Terraform", "GitHub Actions"],
+    description: "クラウドインフラとCI/CDパイプラインの構築・運用",
+    skills: ["AWS", "Docker", "Kubernetes", "Terraform"],
     color: "from-orange-500 to-red-500"
   },
   {
     icon: <Brain className="w-8 h-8" />,
     title: "AI & 機械学習",
-    description: "機械学習、LLM活用、データサイエンス、MLOps",
-    skills: ["Python", "TensorFlow", "OpenAI API", "PyTorch", "RAG"],
+    description: "機械学習とLLMを活用した実践的開発",
+    skills: ["Python", "TensorFlow", "OpenAI API", "PyTorch"],
     color: "from-purple-500 to-pink-500"
   },
   {
     icon: <Shield className="w-8 h-8" />,
     title: "セキュリティ",
-    description: "ペネトレーションテスト、脆弱性診断、セキュリティ運用",
-    skills: ["OWASP", "WAF", "SSL/TLS", "監査", "インシデント対応"],
+    description: "ペネトレーションテストと脆弱性診断の実践",
+    skills: ["OWASP", "WAF", "SSL/TLS", "監査"],
     color: "from-green-500 to-teal-500"
   },
   {
     icon: <Database className="w-8 h-8" />,
     title: "システム設計",
-    description: "アーキテクチャ設計、スケーラビリティ、パフォーマンス",
-    skills: ["マイクロサービス", "分散システム", "API設計", "DB設計", "負荷分散"],
+    description: "スケーラブルなアーキテクチャ設計と実装",
+    skills: ["マイクロサービス", "分散システム", "API設計", "DB設計"],
     color: "from-blue-500 to-cyan-500"
   },
   {
     icon: <Users className="w-8 h-8" />,
     title: "リーダーシップ",
-    description: "チームマネジメント、プロジェクト管理、ビジネススキル",
-    skills: ["アジャイル", "スクラム", "ステークホルダー管理", "ROI計算", "技術選定"],
+    description: "チームマネジメントとプロジェクト推進力",
+    skills: ["アジャイル", "スクラム", "技術選定", "ROI計算"],
     color: "from-indigo-500 to-purple-500"
   },
   {
     icon: <Target className="w-8 h-8" />,
     title: "キャリア戦略",
-    description: "年収向上、ポートフォリオ構築、転職戦略、市場価値分析",
-    skills: ["面接対策", "給与交渉", "技術ブログ", "OSS貢献", "ネットワーキング"],
+    description: "年収向上と市場価値を高める転職戦略",
+    skills: ["面接対策", "給与交渉", "技術ブログ", "OSS貢献"],
     color: "from-yellow-500 to-orange-500"
   }
 ];
@@ -213,17 +213,17 @@ export default function Home() {
                 className="relative group"
               >
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-                <div className="relative p-6 bg-black/40 backdrop-blur-sm rounded-lg leading-none min-h-[280px] flex flex-col">
+                <div className="relative p-6 bg-black/40 backdrop-blur-sm rounded-lg leading-none h-[320px] flex flex-col">
                   <div className={`flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-r ${category.color} rounded-lg text-white`}>
                     {category.icon}
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">{category.title}</h3>
-                  <p className="text-gray-300 mb-4 flex-grow">{category.description}</p>
+                  <h3 className="text-xl font-semibold text-white mb-3">{category.title}</h3>
+                  <p className="text-gray-300 mb-6 flex-grow leading-relaxed">{category.description}</p>
                   <div className="flex flex-wrap gap-2 mt-auto">
                     {category.skills.map((skill) => (
                       <span
                         key={skill}
-                        className="px-3 py-1 bg-purple-800/50 text-purple-100 rounded-full text-sm"
+                        className="px-3 py-1.5 bg-purple-800/50 text-purple-100 rounded-full text-sm font-medium"
                       >
                         {skill}
                       </span>
