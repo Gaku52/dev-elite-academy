@@ -203,7 +203,7 @@ export default function Home() {
             </motion.p>
           </div>
 
-          <div className="mt-20 grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-20 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
             {skillCategories.map((category, index) => (
               <motion.div
                 key={category.title}
@@ -213,13 +213,13 @@ export default function Home() {
                 className="relative group"
               >
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-                <div className="relative p-6 bg-black/40 backdrop-blur-sm rounded-lg leading-none">
+                <div className="relative p-6 bg-black/40 backdrop-blur-sm rounded-lg leading-none min-h-[280px] flex flex-col">
                   <div className={`flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-r ${category.color} rounded-lg text-white`}>
                     {category.icon}
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-2">{category.title}</h3>
-                  <p className="text-gray-300 mb-4">{category.description}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <p className="text-gray-300 mb-4 flex-grow">{category.description}</p>
+                  <div className="flex flex-wrap gap-2 mt-auto">
                     {category.skills.map((skill) => (
                       <span
                         key={skill}
