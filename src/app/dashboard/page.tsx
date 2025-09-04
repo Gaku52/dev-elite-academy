@@ -59,6 +59,12 @@ export default async function Dashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <Link
+                href="/usage"
+                className="text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                📊 使用状況監視
+              </Link>
+              <Link
                 href="/db-test"
                 className="text-green-400 hover:text-green-300 transition-colors"
               >
