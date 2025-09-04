@@ -1,22 +1,26 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null
 
 // CI/CD環境用のService Role Keyを使用したクライアント
-export const supabaseAdmin = createClient(
-  supabaseUrl, 
-  supabaseServiceKey || supabaseAnonKey,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
+export const supabaseAdmin = supabaseUrl && (supabaseServiceKey || supabaseAnonKey)
+  ? createClient(
+      supabaseUrl, 
+      supabaseServiceKey || supabaseAnonKey,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+  : null
 
 // 型定義
 export interface Category {
@@ -36,7 +40,7 @@ export interface LearningContent {
   title: string
   description: string | null
   content_type: 'ARTICLE' | 'VIDEO' | 'QUIZ' | 'EXERCISE' | 'FLASHCARD'
-  content_body: any
+  content_body: Record<string, unknown>
   difficulty: 'EASY' | 'MEDIUM' | 'HARD'
   estimated_time: number
   tags: string[]
@@ -64,6 +68,10 @@ export async function getCategories() {
   const client = process.env.NODE_ENV === 'production' && process.env.SUPABASE_SERVICE_KEY 
     ? supabaseAdmin 
     : supabase
+  
+  if (!client) {
+    return []
+  }
     
   const { data, error } = await client
     .from('categories')
@@ -80,6 +88,10 @@ export async function getLearningContents() {
   const client = process.env.NODE_ENV === 'production' && process.env.SUPABASE_SERVICE_KEY 
     ? supabaseAdmin 
     : supabase
+  
+  if (!client) {
+    return []
+  }
     
   const { data, error } = await client
     .from('learning_contents')
