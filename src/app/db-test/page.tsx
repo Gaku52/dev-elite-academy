@@ -20,6 +20,12 @@ export default function DbTestPage() {
         setLoading(true);
         setError(null);
 
+        // 環境変数の状況をデバッグ
+        console.log('🔧 環境変数チェック:');
+        console.log('NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? '設定済み' : '未設定');
+        console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '設定済み' : '未設定');
+        console.log('NODE_ENV:', process.env.NODE_ENV);
+
         // Categories テーブルをテスト
         try {
           const categoriesData = await getCategories();
@@ -214,19 +220,23 @@ export default function DbTestPage() {
                 <div>
                   <p className="text-gray-400">Supabase URL:</p>
                   <p className="text-white font-mono">
-                    {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ 設定済み' : '❌ 未設定'}
+                    {process.env.NEXT_PUBLIC_SUPABASE_URL 
+                      ? `✅ ${process.env.NEXT_PUBLIC_SUPABASE_URL.substring(0, 30)}...` 
+                      : '❌ 未設定'}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-400">Anonymous Key:</p>
                   <p className="text-white font-mono">
-                    {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ 設定済み' : '❌ 未設定'}
+                    {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY 
+                      ? `✅ ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.substring(0, 20)}...` 
+                      : '❌ 未設定'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Service Key:</p>
+                  <p className="text-gray-400">Service Key (サーバーサイド専用):</p>
                   <p className="text-white font-mono">
-                    {process.env.SUPABASE_SERVICE_KEY ? '✅ 設定済み' : '❌ 未設定'}
+                    ⚠️ クライアントからは確認不可
                   </p>
                 </div>
                 <div>
@@ -235,6 +245,12 @@ export default function DbTestPage() {
                     {process.env.NODE_ENV || 'development'}
                   </p>
                 </div>
+              </div>
+              <div className="mt-4 p-4 bg-yellow-800/20 border border-yellow-600/30 rounded-lg">
+                <p className="text-yellow-300 text-sm">
+                  💡 Service Role Keyはサーバーサイドでのみ使用され、クライアントからは見えません。
+                  実際の接続テストの成功/失敗で動作を確認してください。
+                </p>
               </div>
             </div>
           </>
