@@ -175,9 +175,10 @@ export default async function Dashboard() {
           {learningContents.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {learningContents.slice(0, 6).map((content) => (
-                <div
+                <Link
                   key={content.id}
-                  className="bg-gradient-to-br from-slate-800/50 to-slate-700/30 rounded-lg p-6 border border-slate-600/30 hover:border-purple-500/50 transition-all duration-300 cursor-pointer group"
+                  href={`/learn/${content.id}`}
+                  className="bg-gradient-to-br from-slate-800/50 to-slate-700/30 rounded-lg p-6 border border-slate-600/30 hover:border-purple-500/50 transition-all duration-300 cursor-pointer group block"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-2">
@@ -212,7 +213,7 @@ export default async function Dashboard() {
                       ))}
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
