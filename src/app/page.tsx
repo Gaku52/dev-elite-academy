@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { 
   Code, 
   Target, 
@@ -104,13 +105,13 @@ export default function Home() {
                   className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start"
                 >
                   <div className="rounded-md shadow">
-                    <a
+                    <Link
                       href="/dashboard"
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 md:py-4 md:text-lg md:px-10 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                     >
                       📊 学習ダッシュボード
                       <ChevronRight className="ml-2 w-5 h-5" />
-                    </a>
+                    </Link>
                   </div>
                   <div className="mt-3 sm:mt-0 sm:ml-3">
                     <a
@@ -122,6 +123,14 @@ export default function Home() {
                       <Github className="mr-2 w-5 h-5" />
                       GitHub で見る
                     </a>
+                  </div>
+                  <div className="mt-3 sm:mt-0 sm:ml-3">
+                    <Link
+                      href="/db-test"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-green-100 bg-green-800/50 hover:bg-green-700/50 md:py-4 md:text-lg md:px-10 transition-all duration-300"
+                    >
+                      🧪 DB接続テスト
+                    </Link>
                   </div>
                 </motion.div>
               </div>
