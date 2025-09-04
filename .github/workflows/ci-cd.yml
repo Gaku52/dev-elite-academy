@@ -36,8 +36,12 @@ jobs:
     - name: Test Supabase connection
       run: |
         echo "Testing Supabase connection..."
+        echo "SUPABASE_URL: $NEXT_PUBLIC_SUPABASE_URL"
+        echo "ANON_KEY length: ${#NEXT_PUBLIC_SUPABASE_ANON_KEY}"
         node -e "
         const { createClient } = require('@supabase/supabase-js');
+        console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+        console.log('Key starts with:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 10));
         const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
         supabase.from('categories').select('count').then(({data, error}) => {
           if (error) throw error;
