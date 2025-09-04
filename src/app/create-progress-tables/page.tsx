@@ -12,16 +12,20 @@ import {
 
 export default function CreateProgressTablesPage() {
   const [sql, setSql] = useState('');
+  const [sqlType, setSqlType] = useState('simple'); // 'simple' または 'full'
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [idType, setIdType] = useState('');
 
-  useEffect(() => {
-    // SQL取得
-    fetch('/api/generate-sql')
+  const fetchSql = (type: 'simple' | 'full') => {
+    setLoading(true);
+    const endpoint = type === 'simple' ? '/api/generate-simple-sql' : '/api/generate-sql';
+    
+    fetch(endpoint)
       .then(response => response.text())
       .then(data => {
         setSql(data);
+        setSqlType(type);
         // ID型を判定
         if (data.includes('INTEGER')) {
           setIdType('INTEGER');
@@ -34,6 +38,11 @@ export default function CreateProgressTablesPage() {
         console.error('SQL取得エラー:', error);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    // デフォルトでシンプル版を読み込み
+    fetchSql('simple');
   }, []);
 
   const copyToClipboard = async () => {
@@ -92,6 +101,43 @@ export default function CreateProgressTablesPage() {
               <h3 className="text-blue-300 font-semibold mb-2">SQLを実行</h3>
               <p className="text-gray-400 text-sm">コピーしたSQLを貼り付けて実行</p>
             </div>
+          </div>
+        </div>
+
+        {/* SQL種類選択 */}
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-700/30 rounded-lg p-6 border border-slate-600/30 mb-6">
+          <h3 className="text-white font-semibold mb-4">SQL種類を選択</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <button
+              onClick={() => fetchSql('simple')}
+              className={`p-4 rounded-lg border transition-all ${
+                sqlType === 'simple' 
+                  ? 'bg-green-800/30 border-green-500 text-green-300'
+                  : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-green-500'
+              }`}
+            >
+              <div className="text-lg font-semibold mb-2">🔰 シンプル版（推奨）</div>
+              <div className="text-sm">
+                • テーブル作成のみ<br/>
+                • エラーが発生しにくい<br/>
+                • 基本機能で十分
+              </div>
+            </button>
+            <button
+              onClick={() => fetchSql('full')}
+              className={`p-4 rounded-lg border transition-all ${
+                sqlType === 'full' 
+                  ? 'bg-blue-800/30 border-blue-500 text-blue-300'
+                  : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-blue-500'
+              }`}
+            >
+              <div className="text-lg font-semibold mb-2">⚙️ 完全版（上級者向け）</div>
+              <div className="text-sm">
+                • インデックス・RLS・トリガー含む<br/>
+                • 最大パフォーマンス<br/>
+                • エラーの可能性あり
+              </div>
+            </button>
           </div>
         </div>
 
