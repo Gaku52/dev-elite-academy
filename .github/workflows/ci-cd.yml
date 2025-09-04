@@ -36,19 +36,38 @@ jobs:
     - name: Test Supabase connection
       run: |
         echo "Testing Supabase connection..."
-        echo "SUPABASE_URL: $NEXT_PUBLIC_SUPABASE_URL"
-        echo "ANON_KEY length: ${#NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+        echo "URL length: ${#NEXT_PUBLIC_SUPABASE_URL}"
+        echo "Key length: ${#NEXT_PUBLIC_SUPABASE_ANON_KEY}"
         node -e "
         const { createClient } = require('@supabase/supabase-js');
-        console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-        console.log('Key starts with:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 10));
-        const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-        supabase.from('categories').select('count').then(({data, error}) => {
-          if (error) throw error;
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        
+        if (!url) {
+          console.error('❌ NEXT_PUBLIC_SUPABASE_URL is not set');
+          process.exit(1);
+        }
+        if (!key) {
+          console.error('❌ NEXT_PUBLIC_SUPABASE_ANON_KEY is not set');
+          process.exit(1);
+        }
+        
+        console.log('URL format check:', url.includes('supabase.co') ? '✅' : '❌');
+        console.log('Key format check:', key.startsWith('eyJ') ? '✅' : '❌');
+        
+        const supabase = createClient(url, key);
+        supabase.from('categories').select('*').then(({data, error}) => {
+          if (error) {
+            console.error('❌ Supabase query failed:', error.message);
+            process.exit(1);
+          }
           console.log('✅ Supabase connection successful');
           console.log('📊 Categories found:', data?.length || 0);
+          if (data && data.length > 0) {
+            console.log('📝 Sample category:', data[0].name);
+          }
         }).catch(err => {
-          console.error('❌ Supabase connection failed:', err);
+          console.error('❌ Supabase connection failed:', err.message || err);
           process.exit(1);
         });
         "
