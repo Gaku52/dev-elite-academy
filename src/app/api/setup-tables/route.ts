@@ -1,19 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing Supabase environment variables');
   }
-});
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+}
 
 // 既存のlearning_contentsテーブルの構造を確認してから適切な型で作成
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     // まず既存のlearning_contentsテーブルの構造を確認
     const { data: tableInfo, error: infoError } = await supabaseAdmin
       .from('learning_contents')
@@ -31,9 +38,9 @@ export async function POST(request: NextRequest) {
     const idType = typeof tableInfo?.[0]?.id === 'number' ? 'INTEGER' : 'UUID';
     
     const results = {
-      created: [],
-      existing: [],
-      errors: []
+      created: [] as string[],
+      existing: [] as string[],
+      errors: [] as Array<{ table: string; error: string }>
     };
 
     // テーブル作成SQL（既存の型に合わせて動的に生成）
@@ -141,36 +148,36 @@ export async function POST(request: NextRequest) {
         }
 
         results.created.push(table.name);
-      } catch (error: any) {
-        results.errors.push({ table: table.name, error: error.message });
+      } catch (error) {
+        results.errors.push({ table: table.name, error: (error as Error).message });
       }
     }
 
-    // インデックス作成
-    const indexes = [
-      'CREATE INDEX IF NOT EXISTS idx_user_progress_email ON user_progress(user_email)',
-      'CREATE INDEX IF NOT EXISTS idx_user_progress_content ON user_progress(content_id)',
-      'CREATE INDEX IF NOT EXISTS idx_user_progress_status ON user_progress(status)',
-      'CREATE INDEX IF NOT EXISTS idx_section_progress_email ON section_progress(user_email)',
-      'CREATE INDEX IF NOT EXISTS idx_learning_sessions_date ON learning_sessions(session_date)'
-    ];
+    // インデックス作成（将来の実装用）
+    // const indexes = [
+    //   'CREATE INDEX IF NOT EXISTS idx_user_progress_email ON user_progress(user_email)',
+    //   'CREATE INDEX IF NOT EXISTS idx_user_progress_content ON user_progress(content_id)',
+    //   'CREATE INDEX IF NOT EXISTS idx_user_progress_status ON user_progress(status)',
+    //   'CREATE INDEX IF NOT EXISTS idx_section_progress_email ON section_progress(user_email)',
+    //   'CREATE INDEX IF NOT EXISTS idx_learning_sessions_date ON learning_sessions(session_date)'
+    // ];
 
-    // RLS設定
-    const rlsCommands = tables.map(t => ({
-      enable: `ALTER TABLE ${t.name} ENABLE ROW LEVEL SECURITY`,
-      policy: `CREATE POLICY IF NOT EXISTS "Allow all access to ${t.name}" ON ${t.name} FOR ALL USING (true)`
-    }));
+    // RLS設定（将来の実装用）
+    // const rlsCommands = tables.map(t => ({
+    //   enable: `ALTER TABLE ${t.name} ENABLE ROW LEVEL SECURITY`,
+    //   policy: `CREATE POLICY IF NOT EXISTS "Allow all access to ${t.name}" ON ${t.name} FOR ALL USING (true)`
+    // }));
 
-    // トリガー作成
-    const triggerSQL = `
-      CREATE OR REPLACE FUNCTION update_updated_at_column()
-      RETURNS TRIGGER AS $$
-      BEGIN
-          NEW.updated_at = NOW();
-          RETURN NEW;
-      END;
-      $$ language 'plpgsql';
-    `;
+    // トリガー作成（将来の実装用）
+    // const triggerSQL = `
+    //   CREATE OR REPLACE FUNCTION update_updated_at_column()
+    //   RETURNS TRIGGER AS $$
+    //   BEGIN
+    //       NEW.updated_at = NOW();
+    //       RETURN NEW;
+    //   END;
+    //   $$ language 'plpgsql';
+    // `;
 
     return NextResponse.json({
       message: 'テーブル作成処理を実行しました',
@@ -182,10 +189,10 @@ export async function POST(request: NextRequest) {
       sqlForManualExecution: results.errors.length > 0 ? tables.map(t => t.sql).join('\n\n') : null
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json({ 
       error: 'テーブル作成中にエラーが発生しました',
-      details: error.message 
+      details: (error as Error).message 
     }, { status: 500 });
   }
 }

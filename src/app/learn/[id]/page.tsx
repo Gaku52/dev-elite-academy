@@ -55,8 +55,9 @@ async function getLearningContent(id: string) {
   }
 }
 
-export default async function LearnPage({ params }: { params: { id: string } }) {
-  const content = await getLearningContent(params.id);
+export default async function LearnPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const content = await getLearningContent(resolvedParams.id);
 
   if (!content) {
     notFound();

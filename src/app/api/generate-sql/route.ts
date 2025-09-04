@@ -1,18 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing Supabase environment variables');
   }
-});
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+}
 
 export async function GET() {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     // 既存のlearning_contentsテーブルの構造を確認
     const { data: tableInfo } = await supabaseAdmin
       .from('learning_contents')
@@ -20,7 +27,6 @@ export async function GET() {
       .limit(1);
 
     // ID型を判定（numberならINTEGER、そうでなければUUID）
-    const idType = typeof tableInfo?.[0]?.id === 'number' ? 'INTEGER' : 'UUID DEFAULT gen_random_uuid()';
     const refType = typeof tableInfo?.[0]?.id === 'number' ? 'INTEGER' : 'UUID';
 
     // 完全なSQL文を生成
@@ -154,10 +160,10 @@ CREATE TRIGGER update_learning_notes_updated_at
       }
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json({ 
       error: 'SQL生成中にエラーが発生しました',
-      details: error.message 
+      details: (error as Error).message 
     }, { status: 500 });
   }
 }
