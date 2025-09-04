@@ -12,14 +12,30 @@ import {
 
 export default function CreateProgressTablesPage() {
   const [sql, setSql] = useState('');
-  const [sqlType, setSqlType] = useState('simple'); // 'simple' または 'full'
+  const [sqlType, setSqlType] = useState('simple'); // 'simple', 'full', 'user_master', 'auth_integration'
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [idType, setIdType] = useState('');
+  const [tableStatus, setTableStatus] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(false);
 
-  const fetchSql = (type: 'simple' | 'full') => {
+  const fetchSql = (type: 'simple' | 'full' | 'user_master' | 'auth_integration') => {
     setLoading(true);
-    const endpoint = type === 'simple' ? '/api/generate-simple-sql' : '/api/generate-sql';
+    let endpoint = '/api/generate-simple-sql';
+    
+    switch(type) {
+      case 'full':
+        endpoint = '/api/generate-sql';
+        break;
+      case 'user_master':
+        endpoint = '/api/generate-user-master-sql';
+        break;
+      case 'auth_integration':
+        endpoint = '/api/generate-auth-integration-sql';
+        break;
+      default:
+        endpoint = '/api/generate-simple-sql';
+    }
     
     fetch(endpoint)
       .then(response => response.text())
@@ -40,8 +56,25 @@ export default function CreateProgressTablesPage() {
       });
   };
 
+  const fetchTableStatus = async () => {
+    setStatusLoading(true);
+    try {
+      const response = await fetch('/api/check-tables-status');
+      if (response.ok) {
+        const data = await response.json();
+        setTableStatus(data);
+      }
+    } catch (error) {
+      console.error('テーブル状況確認エラー:', error);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // デフォルトでシンプル版を読み込み
+    // デフォルトでテーブル状況確認を実行
+    fetchTableStatus();
+    // シンプル版SQLを読み込み
     fetchSql('simple');
   }, []);
 
@@ -79,6 +112,75 @@ export default function CreateProgressTablesPage() {
           🔧 学習進捗管理テーブル作成
         </h1>
 
+        {/* テーブル状況確認 */}
+        <div className="bg-gradient-to-br from-slate-800/30 to-slate-700/30 rounded-lg p-6 border border-slate-600/30 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-white flex items-center">
+              <Database className="w-6 h-6 mr-2" />
+              現在のデータベース状況
+            </h2>
+            <button
+              onClick={fetchTableStatus}
+              disabled={statusLoading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {statusLoading ? '確認中...' : '再確認'}
+            </button>
+          </div>
+          
+          {tableStatus && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-black/30 rounded-lg p-4">
+                <h3 className="text-blue-300 font-semibold mb-2">基本情報</h3>
+                <div className="text-sm text-gray-300 space-y-1">
+                  <div>総テーブル数: {tableStatus.summary.totalTables}</div>
+                  <div>ID型: {tableStatus.summary.idType}</div>
+                  <div>認証統合: {
+                    tableStatus.summary.authIntegrationStatus === 'fully_integrated' ? '✅ 完了' :
+                    tableStatus.summary.authIntegrationStatus === 'partial_tables_only' ? '⚠️ 部分的' :
+                    '❌ 未実装'
+                  }</div>
+                </div>
+              </div>
+              
+              <div className="bg-black/30 rounded-lg p-4">
+                <h3 className="text-green-300 font-semibold mb-2">コアテーブル ({tableStatus.summary.coreAppTablesCount}/2)</h3>
+                <div className="text-sm text-gray-300">
+                  {tableStatus.tables.coreApp.map(table => (
+                    <div key={table}>✅ {table}</div>
+                  ))}
+                  {tableStatus.summary.coreAppTablesCount < 2 && (
+                    <div className="text-yellow-400">⚠️ 基本テーブルが不足</div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="bg-black/30 rounded-lg p-4">
+                <h3 className="text-purple-300 font-semibold mb-2">進捗テーブル ({tableStatus.summary.progressTablesCount}/3)</h3>
+                <div className="text-sm text-gray-300">
+                  {tableStatus.tables.progress.map(table => (
+                    <div key={table}>✅ {table}</div>
+                  ))}
+                  {tableStatus.summary.progressTablesCount === 0 && (
+                    <div className="text-yellow-400">⚠️ 進捗テーブルなし</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {tableStatus?.recommendations?.length > 0 && (
+            <div className="mt-4 p-4 bg-yellow-800/30 border border-yellow-700/50 rounded-lg">
+              <h4 className="text-yellow-300 font-semibold mb-2">推奨アクション</h4>
+              <ul className="text-yellow-200 text-sm space-y-1">
+                {tableStatus.recommendations.map((rec, index) => (
+                  <li key={index}>• {rec.message}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
         {/* 手順説明 */}
         <div className="bg-gradient-to-br from-blue-800/30 to-cyan-800/30 rounded-lg p-6 border border-blue-700/30 mb-8">
           <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
@@ -107,7 +209,7 @@ export default function CreateProgressTablesPage() {
         {/* SQL種類選択 */}
         <div className="bg-gradient-to-br from-slate-800/50 to-slate-700/30 rounded-lg p-6 border border-slate-600/30 mb-6">
           <h3 className="text-white font-semibold mb-4">SQL種類を選択</h3>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4 mb-4">
             <button
               onClick={() => fetchSql('simple')}
               className={`p-4 rounded-lg border transition-all ${
@@ -116,9 +218,9 @@ export default function CreateProgressTablesPage() {
                   : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-green-500'
               }`}
             >
-              <div className="text-lg font-semibold mb-2">🔰 シンプル版（推奨）</div>
+              <div className="text-lg font-semibold mb-2">🔰 基本進捗テーブル</div>
               <div className="text-sm">
-                • テーブル作成のみ<br/>
+                • user_email ベース<br/>
                 • エラーが発生しにくい<br/>
                 • 基本機能で十分
               </div>
@@ -131,13 +233,49 @@ export default function CreateProgressTablesPage() {
                   : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-blue-500'
               }`}
             >
-              <div className="text-lg font-semibold mb-2">⚙️ 完全版（上級者向け）</div>
+              <div className="text-lg font-semibold mb-2">⚙️ 完全版進捗テーブル</div>
               <div className="text-sm">
                 • インデックス・RLS・トリガー含む<br/>
                 • 最大パフォーマンス<br/>
-                • エラーの可能性あり
+                • user_email ベース
               </div>
             </button>
+          </div>
+          
+          <div className="border-t border-slate-600/30 pt-4">
+            <h4 className="text-white font-semibold mb-3">🔐 認証システム対応版</h4>
+            <div className="grid md:grid-cols-2 gap-4">
+              <button
+                onClick={() => fetchSql('user_master')}
+                className={`p-4 rounded-lg border transition-all ${
+                  sqlType === 'user_master' 
+                    ? 'bg-purple-800/30 border-purple-500 text-purple-300'
+                    : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-purple-500'
+                }`}
+              >
+                <div className="text-lg font-semibold mb-2">👤 ユーザーマスターテーブル</div>
+                <div className="text-sm">
+                  • GitHub OAuth対応<br/>
+                  • auth.users との連携<br/>
+                  • 自動トリガー付き
+                </div>
+              </button>
+              <button
+                onClick={() => fetchSql('auth_integration')}
+                className={`p-4 rounded-lg border transition-all ${
+                  sqlType === 'auth_integration' 
+                    ? 'bg-orange-800/30 border-orange-500 text-orange-300'
+                    : 'bg-slate-700/50 border-slate-600 text-gray-300 hover:border-orange-500'
+                }`}
+              >
+                <div className="text-lg font-semibold mb-2">🔄 認証統合更新版</div>
+                <div className="text-sm">
+                  • 既存テーブル更新<br/>
+                  • user_email → auth.users.id<br/>
+                  • データ移行サポート
+                </div>
+              </button>
+            </div>
           </div>
         </div>
 
