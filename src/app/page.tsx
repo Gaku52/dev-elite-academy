@@ -102,42 +102,42 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
-                  className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start"
+                  className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start flex-wrap gap-3"
                 >
                   <div className="rounded-md shadow">
                     <Link
                       href="/dashboard"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 md:py-4 md:text-lg md:px-10 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                      className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 md:py-3 md:text-base md:px-8 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap"
                     >
-                      📊 学習ダッシュボード
-                      <ChevronRight className="ml-2 w-5 h-5" />
+                      📊 ダッシュボード
+                      <ChevronRight className="ml-2 w-4 h-4" />
                     </Link>
                   </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
+                  <div>
                     <a
                       href="https://github.com/Gaku52/dev-elite-academy"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-purple-100 bg-purple-800/50 hover:bg-purple-700/50 md:py-4 md:text-lg md:px-10 transition-all duration-300"
+                      className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-purple-100 bg-purple-800/50 hover:bg-purple-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
                     >
-                      <Github className="mr-2 w-5 h-5" />
-                      GitHub で見る
+                      <Github className="mr-2 w-4 h-4" />
+                      GitHub
                     </a>
                   </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
+                  <div>
                     <Link
                       href="/db-test"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-green-100 bg-green-800/50 hover:bg-green-700/50 md:py-4 md:text-lg md:px-10 transition-all duration-300"
+                      className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-green-100 bg-green-800/50 hover:bg-green-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
                     >
-                      🧪 DB接続テスト
+                      🧪 DB接続
                     </Link>
                   </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
+                  <div>
                     <Link
                       href="/usage"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-100 bg-blue-800/50 hover:bg-blue-700/50 md:py-4 md:text-lg md:px-10 transition-all duration-300"
+                      className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-blue-100 bg-blue-800/50 hover:bg-blue-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
                     >
-                      📊 使用状況監視
+                      📊 使用状況
                     </Link>
                   </div>
                 </motion.div>
