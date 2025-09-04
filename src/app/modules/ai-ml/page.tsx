@@ -329,20 +329,46 @@ export default function AIMachineLearningPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="relative overflow-hidden bg-gradient-to-br from-purple-900/20 via-black to-pink-900/20">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            className="text-center relative"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Claude Codeマスターガイド
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="inline-block mb-4"
+            >
+              <span className="text-6xl">🤖</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              Claude Code
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                マスターガイド
+              </span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              AIペアプログラミングで開発効率を10倍に。
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              AIペアプログラミングで開発効率を
+              <span className="text-2xl font-bold text-purple-400 mx-1">10倍</span>
+              に。
+              <br />
               Claude Codeを使いこなして、高品質なコードを高速に実装する方法を学びます。
             </p>
+            <div className="mt-8 flex justify-center gap-4 flex-wrap">
+              <span className="px-4 py-2 bg-purple-800/30 rounded-full text-purple-300 border border-purple-700">
+                🚀 初心者歓迎
+              </span>
+              <span className="px-4 py-2 bg-pink-800/30 rounded-full text-pink-300 border border-pink-700">
+                ✨ 即戦力スキル
+              </span>
+              <span className="px-4 py-2 bg-blue-800/30 rounded-full text-blue-300 border border-blue-700">
+                🎯 実践的
+              </span>
+            </div>
           </motion.div>
         </div>
       </div>
