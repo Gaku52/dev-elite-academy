@@ -2,7 +2,61 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getCategories, getLearningContents, Category, LearningContent } from '@/lib/supabase';
+
+// 型定義
+interface Category {
+  id: number;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  color: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+interface LearningContent {
+  id: number;
+  category_id: number;
+  title: string;
+  description: string | null;
+  content_type: 'ARTICLE' | 'VIDEO' | 'QUIZ' | 'EXERCISE' | 'FLASHCARD';
+  content_body: Record<string, unknown>;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  estimated_time: number;
+  tags: string[];
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+  category?: Category;
+}
+
+// API呼び出し関数（文字化け防止対応）
+async function fetchCategories(): Promise<Category[]> {
+  const response = await fetch('/api/categories', {
+    headers: {
+      'Accept': 'application/json; charset=utf-8',
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Categories API error: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
+}
+
+async function fetchLearningContents(): Promise<LearningContent[]> {
+  const response = await fetch('/api/learning-contents', {
+    headers: {
+      'Accept': 'application/json; charset=utf-8',
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Learning Contents API error: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
+}
 
 export default function DbTestPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -26,26 +80,26 @@ export default function DbTestPage() {
         console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '設定済み' : '未設定');
         console.log('NODE_ENV:', process.env.NODE_ENV);
 
-        // Categories テーブルをテスト
+        // Categories API テスト
         try {
-          const categoriesData = await getCategories();
+          const categoriesData = await fetchCategories();
           setCategories(categoriesData);
           setTestResults(prev => ({ ...prev, categoriesSuccess: true }));
-          console.log('✅ Categories SELECT成功:', categoriesData);
+          console.log('✅ Categories API成功:', categoriesData);
         } catch (err) {
-          console.error('❌ Categories SELECT失敗:', err);
-          setError(prev => prev ? `${prev}\nCategories: ${err}` : `Categories: ${err}`);
+          console.error('❌ Categories API失敗:', err);
+          setError(prev => prev ? `${prev}\nCategories API: ${err}` : `Categories API: ${err}`);
         }
 
-        // Learning Contents テーブルをテスト
+        // Learning Contents API テスト
         try {
-          const contentsData = await getLearningContents();
+          const contentsData = await fetchLearningContents();
           setLearningContents(contentsData);
           setTestResults(prev => ({ ...prev, learningContentsSuccess: true }));
-          console.log('✅ Learning Contents SELECT成功:', contentsData);
+          console.log('✅ Learning Contents API成功:', contentsData);
         } catch (err) {
-          console.error('❌ Learning Contents SELECT失敗:', err);
-          setError(prev => prev ? `${prev}\nLearning Contents: ${err}` : `Learning Contents: ${err}`);
+          console.error('❌ Learning Contents API失敗:', err);
+          setError(prev => prev ? `${prev}\nLearning Contents API: ${err}` : `Learning Contents API: ${err}`);
         }
 
       } catch (err) {
@@ -67,7 +121,7 @@ export default function DbTestPage() {
             🧪 Database Connection Test
           </h1>
           <p className="text-gray-300">
-            Supabase接続テスト - categoriesとlearning_contentsテーブルのSELECTクエリ確認
+            🔒 API Routes経由でのSecureなSupabase接続テスト - Categories & Learning Contentsデータ表示
           </p>
         </div>
 
