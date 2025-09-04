@@ -105,10 +105,10 @@ export default function Home() {
                 >
                   <div className="rounded-md shadow">
                     <a
-                      href="/modules/ai-ml"
+                      href="/dashboard"
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 md:py-4 md:text-lg md:px-10 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                     >
-                      🤖 Claude Codeを学ぶ
+                      📊 学習ダッシュボード
                       <ChevronRight className="ml-2 w-5 h-5" />
                     </a>
                   </div>
