@@ -65,11 +65,26 @@ export default function AuthPage() {
           return;
         }
 
-        const { error } = await signUp(email, password);
+        const { data, error } = await signUp(email, password);
         
         if (error) {
-          setMessage({ type: 'error', text: error.message });
-        } else {
+          console.error('SignUp Error:', error);
+          let errorMessage = 'アカウント作成に失敗しました。';
+          
+          if (error.message.includes('Email signups are disabled')) {
+            errorMessage = 'メール認証が無効になっています。Supabaseダッシュボードで有効にしてください。';
+          } else if (error.message.includes('User already registered')) {
+            errorMessage = 'このメールアドレスは既に登録されています。';
+          } else if (error.message.includes('Invalid email')) {
+            errorMessage = '有効なメールアドレスを入力してください。';
+          } else if (error.message.includes('Password should be at least')) {
+            errorMessage = 'パスワードは6文字以上で設定してください。';
+          } else {
+            errorMessage = error.message;
+          }
+          
+          setMessage({ type: 'error', text: errorMessage });
+        } else if (data?.user) {
           setMessage({ 
             type: 'success', 
             text: 'アカウントが作成されました！確認メールをチェックしてください。' 
@@ -78,6 +93,11 @@ export default function AuthPage() {
           setIsLogin(true);
           setPassword('');
           setConfirmPassword('');
+        } else {
+          setMessage({ 
+            type: 'error', 
+            text: 'アカウント作成に失敗しました。環境設定を確認してください。' 
+          });
         }
       }
     } catch {
