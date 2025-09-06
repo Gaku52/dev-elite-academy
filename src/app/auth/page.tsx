@@ -40,10 +40,15 @@ export default function AuthPage() {
     setLoading(true);
     setMessage(null);
 
+    // 入力値をトリムして余分な空白を削除
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    const trimmedConfirmPassword = confirmPassword.trim();
+
     try {
       if (isLogin) {
         // ログイン処理
-        const { data, error } = await signIn(email, password);
+        const { data, error } = await signIn(trimmedEmail, trimmedPassword);
         
         if (error) {
           setMessage({ type: 'error', text: error.message });
@@ -53,19 +58,29 @@ export default function AuthPage() {
         }
       } else {
         // 登録処理
-        if (password !== confirmPassword) {
-          setMessage({ type: 'error', text: 'パスワードが一致しません' });
+        console.log('Registration attempt:', { 
+          original_password: password, 
+          original_confirmPassword: confirmPassword,
+          trimmed_password: trimmedPassword,
+          trimmed_confirmPassword: trimmedConfirmPassword,
+          passwordLength: trimmedPassword.length,
+          confirmPasswordLength: trimmedConfirmPassword.length,
+          areEqual: trimmedPassword === trimmedConfirmPassword 
+        });
+        
+        if (trimmedPassword !== trimmedConfirmPassword) {
+          setMessage({ type: 'error', text: `パスワードが一致しません (入力: ${trimmedPassword.length}文字, 確認: ${trimmedConfirmPassword.length}文字)` });
           setLoading(false);
           return;
         }
         
-        if (password.length < 6) {
+        if (trimmedPassword.length < 6) {
           setMessage({ type: 'error', text: 'パスワードは6文字以上で入力してください' });
           setLoading(false);
           return;
         }
 
-        const { data, error } = await signUp(email, password);
+        const { data, error } = await signUp(trimmedEmail, trimmedPassword);
         
         if (error) {
           console.error('SignUp Error:', error);
@@ -127,7 +142,12 @@ export default function AuthPage() {
           {/* タブ切り替え */}
           <div className="flex mb-6">
             <button
-              onClick={() => setIsLogin(true)}
+              onClick={() => {
+                setIsLogin(true);
+                setMessage(null);
+                setPassword('');
+                setConfirmPassword('');
+              }}
               className={`flex-1 py-2 px-4 text-center rounded-l-lg transition-colors ${
                 isLogin 
                   ? 'bg-purple-600 text-white' 
@@ -138,7 +158,12 @@ export default function AuthPage() {
               ログイン
             </button>
             <button
-              onClick={() => setIsLogin(false)}
+              onClick={() => {
+                setIsLogin(false);
+                setMessage(null);
+                setPassword('');
+                setConfirmPassword('');
+              }}
               className={`flex-1 py-2 px-4 text-center rounded-r-lg transition-colors ${
                 !isLogin 
                   ? 'bg-purple-600 text-white' 
