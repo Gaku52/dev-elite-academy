@@ -80,7 +80,13 @@ export default function AuthPage() {
           return;
         }
 
+        console.log('Page: Starting signup process...');
         const { data, error } = await signUp(trimmedEmail, trimmedPassword);
+        console.log('Page: Signup completed with:', { 
+          hasUser: !!data?.user, 
+          hasError: !!error,
+          errorMessage: error?.message 
+        });
         
         if (error) {
           console.error('SignUp Error:', error);
@@ -94,6 +100,8 @@ export default function AuthPage() {
             errorMessage = '有効なメールアドレスを入力してください。';
           } else if (error.message.includes('Password should be at least')) {
             errorMessage = 'パスワードは6文字以上で設定してください。';
+          } else if (error.message.includes('Database error')) {
+            errorMessage = 'データベースエラー: Supabaseダッシュボードの「Confirm email」設定を確認してください。';
           } else {
             errorMessage = error.message;
           }

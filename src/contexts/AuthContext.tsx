@@ -62,15 +62,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     signUp: async (email: string, password: string) => {
       setLoading(true);
-      const result = await auth.signUp(email, password);
-      setLoading(false);
-      return result;
+      try {
+        console.log('AuthContext: Attempting signup for:', email);
+        const result = await auth.signUp(email, password);
+        console.log('AuthContext: Signup result:', {
+          user: result.data?.user?.id,
+          error: result.error?.message
+        });
+        setLoading(false);
+        return result;
+      } catch (error) {
+        console.error('AuthContext: Signup exception:', error);
+        setLoading(false);
+        throw error;
+      }
     },
     signIn: async (email: string, password: string) => {
       setLoading(true);
-      const result = await auth.signIn(email, password);
-      setLoading(false);
-      return result;
+      try {
+        console.log('AuthContext: Attempting signin for:', email);
+        const result = await auth.signIn(email, password);
+        console.log('AuthContext: Signin result:', {
+          user: result.data?.user?.id,
+          error: result.error?.message
+        });
+        setLoading(false);
+        return result;
+      } catch (error) {
+        console.error('AuthContext: Signin exception:', error);
+        setLoading(false);
+        throw error;
+      }
     },
     signOut: async () => {
       setLoading(true);
