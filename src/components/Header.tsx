@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   User, 
   LogOut, 
@@ -17,6 +17,24 @@ import {
 export default function Header() {
   const { user, signOut, loading } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // クリック外でメニューを閉じる
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userMenuOpen]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -65,39 +83,52 @@ export default function Header() {
             {loading ? (
               <div className="w-8 h-8 bg-gray-700 rounded-full animate-pulse"></div>
             ) : user ? (
-              <div className="relative">
+              <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center space-x-2 text-white hover:text-purple-300 transition-colors"
+                  aria-label="ユーザーメニュー"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4" />
                   </div>
-                  <span className="hidden sm:block text-sm font-medium">
+                  <span className="hidden sm:block text-sm font-medium max-w-[150px] truncate">
                     {user.email?.split('@')[0]}
                   </span>
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-lg border border-slate-700 z-50">
-                    <div className="p-3 border-b border-slate-700">
-                      <p className="text-white text-sm font-medium">{user.email}</p>
-                      <p className="text-gray-400 text-xs">学習者</p>
+                  <div className="absolute right-0 mt-2 w-64 bg-slate-800 rounded-lg shadow-xl border border-slate-700 z-50 overflow-hidden">
+                    <div className="p-4 border-b border-slate-700 bg-gradient-to-r from-purple-600/10 to-pink-600/10">
+                      <p className="text-white text-sm font-medium truncate" title={user.email || ''}>
+                        {user.email}
+                      </p>
+                      <p className="text-gray-400 text-xs mt-1">学習者</p>
                     </div>
                     <div className="p-2">
                       <Link
                         href="/dashboard"
-                        className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700 rounded-md"
+                        className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700 rounded-md transition-colors"
                         onClick={() => setUserMenuOpen(false)}
                       >
+                        <BarChart3 className="w-4 h-4 inline mr-2" />
                         学習ダッシュボード
                       </Link>
+                      <Link
+                        href="/usage"
+                        className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700 rounded-md transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Settings className="w-4 h-4 inline mr-2" />
+                        使用状況
+                      </Link>
+                      <div className="border-t border-slate-700 my-2"></div>
                       <button
                         onClick={handleSignOut}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700 rounded-md flex items-center"
+                        className="w-full text-left px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-600/20 rounded-md flex items-center transition-colors group"
                       >
-                        <LogOut className="w-4 h-4 mr-2" />
+                        <LogOut className="w-4 h-4 mr-2 group-hover:animate-pulse" />
                         ログアウト
                       </button>
                     </div>
@@ -107,7 +138,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/auth"
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <LogIn className="w-4 h-4" />
                 <span>ログイン</span>
