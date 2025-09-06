@@ -21,7 +21,7 @@ const FREE_PLAN_LIMITS = {
   edge_functions: 500000      // 500,000 Edge Function実行/月
 };
 
-// サーバーサイドでのDB使用状況取得
+// サーバーサイドでのDB使用状況取得（改良版）
 async function getUsageStats() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
@@ -38,22 +38,95 @@ async function getUsageStats() {
   });
 
   try {
-    // テーブルサイズとレコード数を取得
+    // 1. 基本テーブルの情報取得
     const [categoriesResult, contentsResult] = await Promise.all([
       supabaseAdmin.from('categories').select('*', { count: 'exact' }),
       supabaseAdmin.from('learning_contents').select('*', { count: 'exact' })
     ]);
 
-    // データベースサイズの推定（概算）
-    const totalRecords = (categoriesResult.count || 0) + (contentsResult.count || 0);
-    const estimatedDbSizeMB = Math.max(0.1, totalRecords * 0.001); // 1レコード ≈ 1KB と仮定
+    // 2. 進捗追跡テーブルの情報取得
+    let userProgressCount = 0;
+    let sectionProgressCount = 0;
+    let learningSessionsCount = 0;
+    let authUsersCount = 0;
+
+    try {
+      const [userProgressResult, sectionProgressResult, learningSessionsResult] = await Promise.all([
+        supabaseAdmin.from('user_progress').select('*', { count: 'exact' }),
+        supabaseAdmin.from('section_progress').select('*', { count: 'exact' }),
+        supabaseAdmin.from('learning_sessions').select('*', { count: 'exact' })
+      ]);
+
+      userProgressCount = userProgressResult.count || 0;
+      sectionProgressCount = sectionProgressResult.count || 0;
+      learningSessionsCount = learningSessionsResult.count || 0;
+    } catch (error) {
+      console.log('Progress tables not found, they may not be created yet:', error);
+    }
+
+    // 3. 認証ユーザー数取得
+    try {
+      const { data: authData, count } = await supabaseAdmin.auth.admin.listUsers({
+        page: 1,
+        perPage: 1
+      });
+      authUsersCount = authData?.pagination?.total_users || count || 0;
+    } catch (error) {
+      console.log('Auth users count unavailable with current API key:', error);
+    }
+
+    // 4. データベースサイズの精密推定
+    const totalRecords = 
+      (categoriesResult.count || 0) + 
+      (contentsResult.count || 0) +
+      userProgressCount +
+      sectionProgressCount + 
+      learningSessionsCount +
+      authUsersCount;
+
+    // より現実的なサイズ推定（テーブル構造とインデックスを考慮）
+    const baseTableSize = {
+      categories: (categoriesResult.count || 0) * 0.5,      // 0.5KB per record
+      learning_contents: (contentsResult.count || 0) * 2.0, // 2KB per record (larger content)
+      user_progress: userProgressCount * 0.3,               // 0.3KB per record
+      section_progress: sectionProgressCount * 0.2,         // 0.2KB per record
+      learning_sessions: learningSessionsCount * 0.2,       // 0.2KB per record
+      auth_users: authUsersCount * 0.8                      // 0.8KB per record
+    };
+
+    const estimatedDbSizeMB = Math.max(
+      0.1, 
+      Object.values(baseTableSize).reduce((sum, size) => sum + size, 0) / 1024 // Convert to MB
+    );
+
+    // 5. 月間推定活動量（仮想データ - 実際のメトリクスが利用可能になるまで）
+    const estimatedMonthlyRequests = Math.min(50000, Math.max(100, totalRecords * 10));
+    const estimatedMonthlyBandwidthGB = Math.min(5, Math.max(0.01, estimatedDbSizeMB * 0.1));
 
     return {
+      // 基本テーブル
       categories_count: categoriesResult.count || 0,
       learning_contents_count: contentsResult.count || 0,
+      
+      // 進捗追跡テーブル
+      user_progress_count: userProgressCount,
+      section_progress_count: sectionProgressCount,
+      learning_sessions_count: learningSessionsCount,
+      
+      // 認証
+      auth_users_count: authUsersCount,
+      
+      // 集計値
       total_records: totalRecords,
       estimated_db_size_mb: estimatedDbSizeMB,
-      last_updated: new Date().toISOString()
+      
+      // 推定使用量
+      estimated_monthly_requests: estimatedMonthlyRequests,
+      estimated_monthly_bandwidth_gb: estimatedMonthlyBandwidthGB,
+      
+      // メタデータ
+      last_updated: new Date().toISOString(),
+      detailed_size_breakdown: baseTableSize
     };
   } catch (error) {
     console.error('Usage stats fetch error:', error);
@@ -83,7 +156,7 @@ export default async function UsagePage() {
     month: 'long' 
   });
 
-  // 使用状況の項目
+  // 使用状況の項目（改良版）
   const usageItems = [
     {
       name: 'データベース容量',
@@ -91,31 +164,63 @@ export default async function UsagePage() {
       current: usageStats?.estimated_db_size_mb || 0,
       limit: FREE_PLAN_LIMITS.database_size_mb,
       unit: 'MB',
-      description: 'テーブルデータのストレージ使用量'
+      description: 'すべてのテーブルとインデックスの推定容量'
     },
     {
-      name: 'テーブルレコード数',
-      icon: <HardDrive className="w-6 h-6" />,
-      current: usageStats?.total_records || 0,
-      limit: 100000, // 推定値
-      unit: '件',
-      description: '全テーブルの合計レコード数'
-    },
-    {
-      name: 'カテゴリー',
-      icon: <Server className="w-6 h-6" />,
-      current: usageStats?.categories_count || 0,
-      limit: 1000, // 推定値
-      unit: '件',
-      description: 'categoriesテーブルのレコード数'
-    },
-    {
-      name: '学習コンテンツ',
+      name: '月間リクエスト数',
       icon: <Activity className="w-6 h-6" />,
-      current: usageStats?.learning_contents_count || 0,
-      limit: 10000, // 推定値
+      current: usageStats?.estimated_monthly_requests || 0,
+      limit: FREE_PLAN_LIMITS.monthly_requests,
+      unit: 'req',
+      description: 'API呼び出しとデータベースクエリの推定数'
+    },
+    {
+      name: '認証ユーザー数',
+      icon: <Server className="w-6 h-6" />,
+      current: usageStats?.auth_users_count || 0,
+      limit: FREE_PLAN_LIMITS.auth_users,
+      unit: '人',
+      description: '登録済みユーザーアカウント数'
+    },
+    {
+      name: '月間帯域幅',
+      icon: <TrendingUp className="w-6 h-6" />,
+      current: usageStats?.estimated_monthly_bandwidth_gb || 0,
+      limit: FREE_PLAN_LIMITS.monthly_bandwidth_gb,
+      unit: 'GB',
+      description: 'データ転送量の推定値'
+    },
+    {
+      name: '学習進捗レコード',
+      icon: <CheckCircle className="w-6 h-6" />,
+      current: (usageStats?.user_progress_count || 0) + (usageStats?.section_progress_count || 0),
+      limit: 50000, // 推定値
       unit: '件',
-      description: 'learning_contentsテーブルのレコード数'
+      description: 'ユーザーの学習進捗データ'
+    },
+    {
+      name: '学習セッション',
+      icon: <HardDrive className="w-6 h-6" />,
+      current: usageStats?.learning_sessions_count || 0,
+      limit: 25000, // 推定値
+      unit: '件',
+      description: '学習セッションの履歴データ'
+    },
+    {
+      name: 'コンテンツデータ',
+      icon: <AlertTriangle className="w-6 h-6" />,
+      current: (usageStats?.categories_count || 0) + (usageStats?.learning_contents_count || 0),
+      limit: 5000, // 推定値
+      unit: '件',
+      description: 'カテゴリーと学習コンテンツの総数'
+    },
+    {
+      name: 'データベース効率',
+      icon: <TrendingUp className="w-6 h-6" />,
+      current: Math.round(((usageStats?.total_records || 1) / Math.max(1, (usageStats?.estimated_db_size_mb || 0.1) * 1024)) * 100) / 100,
+      limit: 2000, // レコード/MB (効率値)
+      unit: 'rec/MB',
+      description: 'データベースの格納効率（高いほど良い）'
     }
   ];
 
