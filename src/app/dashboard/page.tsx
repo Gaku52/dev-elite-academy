@@ -1,17 +1,12 @@
 import { 
-  Book, 
   Clock, 
-  Target, 
-  TrendingUp,
   PlayCircle,
-  CheckCircle,
   BookOpen,
   Trophy,
   Star,
   ChevronRight,
   BarChart3,
-  Calendar,
-  Zap
+  Calendar
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
@@ -53,7 +48,6 @@ async function getDashboardData() {
 // Server Component（高速表示）
 export default async function Dashboard() {
   const { categories, learningContents } = await getDashboardData();
-  const totalEstimatedHours = Math.round(learningContents.reduce((total, content) => total + (content.estimated_time || 0), 0) / 60);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
