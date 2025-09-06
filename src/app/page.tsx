@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import { 
   Code, 
@@ -72,7 +71,6 @@ const stats = [
 ];
 
 export default function Home() {
-  const { user, signOut } = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Header />

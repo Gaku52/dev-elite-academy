@@ -69,7 +69,6 @@ export async function GET(request: Request) {
 
     // 学習ストリークの計算（簡易版）
     let streak = 0;
-    const today = new Date().toISOString().split('T')[0];
     const uniqueDates = [...new Set(sessions.map(s => s.session_date))].sort().reverse();
     
     for (let i = 0; i < uniqueDates.length; i++) {

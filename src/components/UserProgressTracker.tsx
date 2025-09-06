@@ -9,7 +9,6 @@ import {
   Target,
   Zap,
   BookOpen,
-  CheckCircle,
   BarChart3
 } from 'lucide-react';
 
@@ -35,6 +34,52 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchUserProgress = async () => {
+      try {
+        const response = await fetch(`/api/user/progress?userId=${user?.id || ''}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProgress({
+            completedLessons: data.completed_contents || 0,
+            totalLessons: totalContents,
+            totalHours: data.total_estimated_hours || 0,
+            completedHours: data.completed_hours || 0,
+            streak: data.learning_streak || 0,
+            achievements: data.achievements || []
+          });
+        }
+      } catch (error) {
+        console.error('Progress fetch error:', error);
+        loadGuestProgress();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const loadGuestProgress = () => {
+      // ローカルストレージから進捗を集計
+      const completedCount = Object.keys(localStorage)
+        .filter(key => key.startsWith('progress_') && key.endsWith(`_${totalContents}`))
+        .reduce((count, key) => {
+          try {
+            const progressData = JSON.parse(localStorage.getItem(key) || '[]');
+            return count + (Array.isArray(progressData) && progressData.length > 0 ? 1 : 0);
+          } catch {
+            return count;
+          }
+        }, 0);
+
+      setProgress({
+        completedLessons: completedCount,
+        totalLessons: totalContents,
+        totalHours: Math.round(totalContents * 1.5), // 推定
+        completedHours: Math.round(completedCount * 1.5),
+        streak: completedCount > 0 ? 1 : 0, // 簡易計算
+        achievements: completedCount > 0 ? ['初回完了'] : []
+      });
+      setLoading(false);
+    };
+
     if (user) {
       fetchUserProgress();
     } else {
@@ -42,52 +87,6 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
       loadGuestProgress();
     }
   }, [user, totalContents]);
-
-  const fetchUserProgress = async () => {
-    try {
-      const response = await fetch(`/api/user/progress?userId=${user.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setProgress({
-          completedLessons: data.completed_contents || 0,
-          totalLessons: totalContents,
-          totalHours: data.total_estimated_hours || 0,
-          completedHours: data.completed_hours || 0,
-          streak: data.learning_streak || 0,
-          achievements: data.achievements || []
-        });
-      }
-    } catch (error) {
-      console.error('Progress fetch error:', error);
-      loadGuestProgress();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadGuestProgress = () => {
-    // ローカルストレージから進捗を集計
-    const completedCount = Object.keys(localStorage)
-      .filter(key => key.startsWith('progress_') && key.endsWith(`_${totalContents}`))
-      .reduce((count, key) => {
-        try {
-          const progressData = JSON.parse(localStorage.getItem(key) || '[]');
-          return count + (Array.isArray(progressData) && progressData.length > 0 ? 1 : 0);
-        } catch {
-          return count;
-        }
-      }, 0);
-
-    setProgress({
-      completedLessons: completedCount,
-      totalLessons: totalContents,
-      totalHours: Math.round(totalContents * 1.5), // 推定
-      completedHours: Math.round(completedCount * 1.5),
-      streak: completedCount > 0 ? 1 : 0, // 簡易計算
-      achievements: completedCount > 0 ? ['初回完了'] : []
-    });
-    setLoading(false);
-  };
 
   const progressPercentage = progress.totalLessons > 0 
     ? Math.round((progress.completedLessons / progress.totalLessons) * 100)
