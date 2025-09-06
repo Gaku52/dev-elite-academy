@@ -320,7 +320,7 @@ export default function Home() {
             </a>
           </div>
           <p className="mt-8 text-center text-base text-gray-400">
-            &copy; 2025 Dev Elite Academy. Built with Next.js, TypeScript, and Tailwind CSS.
+            &copy; 2025 Dev Elite Academy. Built with Next.js 15, TypeScript, and Tailwind CSS.
           </p>
         </div>
       </footer>
