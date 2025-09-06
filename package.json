@@ -7,7 +7,12 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "node scripts/db-cli.js migrate",
+    "db:reset": "node scripts/db-cli.js reset",
+    "db:status": "node scripts/db-cli.js status",
+    "db:seed": "node scripts/db-cli.js seed",
+    "db:query": "node scripts/db-cli.js query"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
@@ -37,8 +42,10 @@
     "@types/node": "^20.19.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
+    "pg": "^8.16.3",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4",
