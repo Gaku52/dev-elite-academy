@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import Header from '@/components/Header';
 import { 
   Code, 
   Target, 
@@ -74,6 +75,7 @@ export default function Home() {
   const { user, signOut } = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <Header />
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
@@ -128,44 +130,12 @@ export default function Home() {
                   </div>
                   <div>
                     <Link
-                      href="/db-test"
+                      href="/learn"
                       className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-green-100 bg-green-800/50 hover:bg-green-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
                     >
-                      🧪 DB接続
+                      📚 学習を始める
+                      <ChevronRight className="ml-2 w-4 h-4" />
                     </Link>
-                  </div>
-                  <div>
-                    <Link
-                      href="/usage"
-                      className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-blue-100 bg-blue-800/50 hover:bg-blue-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
-                    >
-                      📊 使用状況
-                    </Link>
-                  </div>
-                  <div>
-                    <Link
-                      href="/create-progress-tables"
-                      className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-yellow-100 bg-yellow-800/50 hover:bg-yellow-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
-                    >
-                      🔧 テーブル作成
-                    </Link>
-                  </div>
-                  <div>
-                    {user ? (
-                      <button
-                        onClick={signOut}
-                        className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-red-100 bg-red-800/50 hover:bg-red-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
-                      >
-                        👋 ログアウト
-                      </button>
-                    ) : (
-                      <Link
-                        href="/auth"
-                        className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-indigo-100 bg-indigo-800/50 hover:bg-indigo-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
-                      >
-                        🔑 ログイン
-                      </Link>
-                    )}
                   </div>
                 </motion.div>
               </div>

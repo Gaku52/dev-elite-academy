@@ -5,10 +5,18 @@ import {
   TrendingUp,
   PlayCircle,
   CheckCircle,
-  BookOpen
+  BookOpen,
+  Trophy,
+  Star,
+  ChevronRight,
+  BarChart3,
+  Calendar,
+  Zap
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import Header from '@/components/Header';
+import UserProgressTracker from '@/components/UserProgressTracker';
 
 // サーバーサイドでのデータ取得
 async function getDashboardData() {
@@ -45,100 +53,43 @@ async function getDashboardData() {
 // Server Component（高速表示）
 export default async function Dashboard() {
   const { categories, learningContents } = await getDashboardData();
+  const totalEstimatedHours = Math.round(learningContents.reduce((total, content) => total + (content.estimated_time || 0), 0) / 60);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Header */}
-      <div className="border-b border-purple-800/30 bg-black/20 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <TrendingUp className="w-8 h-8 text-purple-400 mr-3" />
-              <h1 className="text-xl font-semibold text-white">学習ダッシュボード</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/usage"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                📊 使用状況監視
-              </Link>
-              <Link
-                href="/db-test"
-                className="text-green-400 hover:text-green-300 transition-colors"
-              >
-                🧪 DB接続テスト
-              </Link>
-              <Link
-                href="/"
-                className="text-purple-400 hover:text-purple-300 transition-colors"
-              >
-                ← ホームに戻る
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome Section */}
         <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
+            <Trophy className="w-8 h-8 text-white" />
+          </div>
           <h2 className="text-4xl font-bold text-white mb-4">
-            🚀 学習の旅を始めましょう
+            学習ダッシュボード
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            🚀 Server Component - 高速データベース連携で効率的なスキルアップ
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            高年収エンジニアへの道のり。あなたの学習進捗を追跡し、スキルアップの成果を可視化します。
           </p>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-gradient-to-br from-purple-800/30 to-pink-800/30 rounded-lg p-6 border border-purple-700/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-300 text-sm">利用可能コンテンツ</p>
-                <p className="text-2xl font-bold text-white">{learningContents.length}</p>
-              </div>
-              <Book className="w-8 h-8 text-purple-400" />
-            </div>
-          </div>
+        {/* User Progress Tracker */}
+        <UserProgressTracker totalContents={learningContents.length} />
 
-          <div className="bg-gradient-to-br from-blue-800/30 to-cyan-800/30 rounded-lg p-6 border border-blue-700/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-300 text-sm">学習カテゴリー</p>
-                <p className="text-2xl font-bold text-white">{categories.length}</p>
-              </div>
-              <Target className="w-8 h-8 text-blue-400" />
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-800/30 to-emerald-800/30 rounded-lg p-6 border border-green-700/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-300 text-sm">学習時間（予想）</p>
-                <p className="text-2xl font-bold text-white">
-                  {Math.round(learningContents.reduce((total, content) => total + (content.estimated_time || 0), 0) / 60)}時間
-                </p>
-              </div>
-              <Clock className="w-8 h-8 text-green-400" />
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-yellow-800/30 to-orange-800/30 rounded-lg p-6 border border-yellow-700/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-yellow-300 text-sm">完了率</p>
-                <p className="text-2xl font-bold text-white">0%</p>
-              </div>
-              <CheckCircle className="w-8 h-8 text-yellow-400" />
-            </div>
-          </div>
-        </div>
-
-        {/* Categories Section */}
+        {/* Learning Path Section */}
         <div className="mb-12">
-          <h3 className="text-2xl font-bold text-white mb-6">📚 学習カテゴリー</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold text-white flex items-center">
+              <BarChart3 className="w-6 h-6 mr-3 text-purple-400" />
+              学習パス
+            </h3>
+            <Link 
+              href="/learn"
+              className="text-purple-400 hover:text-purple-300 transition-colors flex items-center text-sm"
+            >
+              すべて見る <ChevronRight className="w-4 h-4 ml-1" />
+            </Link>
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {categories.map((category) => (
               <div
@@ -168,9 +119,15 @@ export default async function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Content */}
+        {/* Quick Start Section */}
         <div className="mb-12">
-          <h3 className="text-2xl font-bold text-white mb-6">🆕 最新の学習コンテンツ</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold text-white flex items-center">
+              <PlayCircle className="w-6 h-6 mr-3 text-green-400" />
+              今すぐ始める
+            </h3>
+            <p className="text-gray-400 text-sm">最新の学習コンテンツから選択</p>
+          </div>
           {learningContents.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {learningContents.slice(0, 6).map((content) => (
@@ -222,21 +179,35 @@ export default async function Dashboard() {
           )}
         </div>
 
-        {/* Call to Action */}
-        <div className="mt-12 text-center bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl p-8 border border-purple-500/30">
+        {/* Motivation Section */}
+        <div className="mt-12 text-center bg-gradient-to-r from-indigo-800/20 to-purple-800/20 rounded-xl p-8 border border-indigo-500/30">
+          <div className="flex items-center justify-center mb-4">
+            <Star className="w-8 h-8 text-yellow-400 mr-2" />
+            <Trophy className="w-8 h-8 text-yellow-400 mr-2" />
+            <Star className="w-8 h-8 text-yellow-400" />
+          </div>
           <h3 className="text-2xl font-bold text-white mb-4">
-            🎯 今すぐ学習を開始しよう！
+            高年収エンジニアへの挑戦
           </h3>
-          <p className="text-gray-300 mb-6">
-            高速データベース連携で効率的な学習体験を提供
+          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+            技術力を向上させ、市場価値を高める学習を今すぐ始めましょう。継続的な成長があなたの未来を変えます。
           </p>
-          <Link
-            href="/modules/ai-ml"
-            className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            <PlayCircle className="w-5 h-5 mr-2" />
-            Claude Code学習を始める
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/learn"
+              className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              <PlayCircle className="w-5 h-5 mr-2" />
+              学習を開始する
+            </Link>
+            <Link
+              href="#"
+              className="inline-flex items-center px-8 py-3 bg-transparent border-2 border-purple-500 text-purple-300 font-semibold rounded-lg hover:bg-purple-500/10 transition-all duration-300"
+            >
+              <Calendar className="w-5 h-5 mr-2" />
+              学習計画を立てる
+            </Link>
+          </div>
         </div>
       </div>
     </div>
