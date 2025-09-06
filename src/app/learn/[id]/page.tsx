@@ -36,7 +36,7 @@ export default function LearnPage({ params }: LearnPageProps) {
   const { user } = useAuth();
   const router = useRouter();
 
-  // ユーザー進捗取得
+  // ユーザー進捗取得（フォールバック付き）
   const fetchUserProgress = useCallback(async () => {
     if (!user || !contentId) return;
 
@@ -57,9 +57,24 @@ export default function LearnPage({ params }: LearnPageProps) {
           .filter((section: any) => section.is_completed) // eslint-disable-line @typescript-eslint/no-explicit-any
           .map((section: any) => section.section_number); // eslint-disable-line @typescript-eslint/no-explicit-any
         setCompletedSections(completedIds);
+      } else {
+        // データベーステーブルが存在しない場合、ローカルストレージから読み込み
+        const localProgressKey = `progress_${user.id}_${contentId}`;
+        const localProgress = localStorage.getItem(localProgressKey);
+        if (localProgress) {
+          const completedIds = JSON.parse(localProgress);
+          setCompletedSections(completedIds);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch user progress:', error);
+      // フォールバック：ローカルストレージから読み込み
+      const localProgressKey = `progress_${user.id}_${contentId}`;
+      const localProgress = localStorage.getItem(localProgressKey);
+      if (localProgress) {
+        const completedIds = JSON.parse(localProgress);
+        setCompletedSections(completedIds);
+      }
     }
   }, [user, contentId]);
 
@@ -151,7 +166,7 @@ export default function LearnPage({ params }: LearnPageProps) {
     return notFound();
   }
 
-  // セクション完了処理
+  // セクション完了処理（改良版）
   const handleSectionComplete = async (sectionId: number, sectionType: string) => {
     if (!user || updatingSection === sectionId) return;
 
@@ -162,8 +177,12 @@ export default function LearnPage({ params }: LearnPageProps) {
       ? completedSections.filter(id => id !== sectionId)
       : [...completedSections, sectionId];
 
-    // 楽観的UI更新
+    // まずUIを更新（確実に反映）
     setCompletedSections(newCompletedSections);
+
+    // ローカルストレージに即座に保存（フォールバック）
+    const localProgressKey = `progress_${user.id}_${contentId}`;
+    localStorage.setItem(localProgressKey, JSON.stringify(newCompletedSections));
 
     try {
       const sessionDuration = Math.round((new Date().getTime() - sessionStart.getTime()) / 60000);
@@ -188,16 +207,17 @@ export default function LearnPage({ params }: LearnPageProps) {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update progress');
+      if (response.ok) {
+        console.log('✅ Progress saved to database');
+        // データベース保存成功時は最新データを取得
+        await fetchUserProgress();
+      } else {
+        console.log('⚠️ Database save failed, using local storage fallback');
+        // データベース保存失敗でも、ローカルストレージに保存済みなので状態は維持
       }
-
-      // 進捗データを再取得
-      await fetchUserProgress();
     } catch (error) {
-      console.error('Failed to update progress:', error);
-      // エラー時は状態を戻す
-      setCompletedSections(completedSections);
+      console.error('Database save error (using local storage):', error);
+      // エラーでもローカルストレージに保存済みなので、状態は戻さない
     } finally {
       setUpdatingSection(null);
     }
