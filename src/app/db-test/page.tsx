@@ -5,11 +5,24 @@ import { createClient } from '@supabase/supabase-js';
 
 // サーバーサイドでのデータ取得
 async function getServerData() {
+  // 本番環境（Vercel）の環境変数を直接参照
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
+  // デバッグ情報を追加（本番環境での確認用）
+  const debugInfo = {
+    hasUrl: !!supabaseUrl,
+    hasServiceKey: !!supabaseServiceKey,
+    nodeEnv: process.env.NODE_ENV,
+    platform: process.env.VERCEL ? 'Vercel' : 'Local'
+  };
+
   if (!supabaseUrl || !supabaseServiceKey) {
-    return { categories: [], learningContents: [], error: '環境変数が設定されていません' };
+    return { 
+      categories: [], 
+      learningContents: [], 
+      error: `環境変数が設定されていません。Debug info: ${JSON.stringify(debugInfo)}` 
+    };
   }
 
   const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
