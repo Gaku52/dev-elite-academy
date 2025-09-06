@@ -28,7 +28,15 @@ export default function Header() {
     };
 
     if (userMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      // 少し遅延を入れてイベントリスナーを追加（初回クリックとの競合を避ける）
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 100);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
     }
 
     return () => {
@@ -36,9 +44,22 @@ export default function Header() {
     };
   }, [userMenuOpen]);
 
-  const handleSignOut = async () => {
-    await signOut();
-    setUserMenuOpen(false);
+  const handleSignOut = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    } finally {
+      setUserMenuOpen(false);
+    }
+  };
+
+  const handleMenuToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setUserMenuOpen(prev => !prev);
   };
 
   return (
@@ -85,9 +106,10 @@ export default function Header() {
             ) : user ? (
               <div className="relative" ref={menuRef}>
                 <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  onClick={handleMenuToggle}
                   className="flex items-center space-x-2 text-white hover:text-purple-300 transition-colors"
                   aria-label="ユーザーメニュー"
+                  type="button"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4" />
@@ -127,6 +149,7 @@ export default function Header() {
                       <button
                         onClick={handleSignOut}
                         className="w-full text-left px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-600/20 rounded-md flex items-center transition-colors group"
+                        type="button"
                       >
                         <LogOut className="w-4 h-4 mr-2 group-hover:animate-pulse" />
                         ログアウト
