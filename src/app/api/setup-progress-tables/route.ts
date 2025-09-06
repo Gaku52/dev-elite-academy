@@ -121,7 +121,7 @@ CREATE POLICY "Users can update own sessions" ON learning_sessions
 
     // テーブルの存在確認
     try {
-      const { data: userProgressCheck } = await supabaseAdmin
+      await supabaseAdmin
         .from('user_progress')
         .select('id')
         .limit(1);
@@ -131,7 +131,7 @@ CREATE POLICY "Users can update own sessions" ON learning_sessions
     }
 
     try {
-      const { data: sectionProgressCheck } = await supabaseAdmin
+      await supabaseAdmin
         .from('section_progress')
         .select('id')
         .limit(1);
@@ -141,7 +141,7 @@ CREATE POLICY "Users can update own sessions" ON learning_sessions
     }
 
     try {
-      const { data: learningSessionsCheck } = await supabaseAdmin
+      await supabaseAdmin
         .from('learning_sessions')
         .select('id')
         .limit(1);
