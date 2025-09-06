@@ -46,13 +46,21 @@ async function getServerData() {
     const categories = categoriesResult.data || [];
     const learningContents = contentsResult.data || [];
 
+    const categoryError = categoriesResult.error;
+    const contentError = contentsResult.error;
+    
+    let errorMsg = null;
+    if (categoryError) errorMsg = `Categories error: ${categoryError.message}`;
+    if (contentError) errorMsg = errorMsg ? `${errorMsg} | Contents error: ${contentError.message}` : `Contents error: ${contentError.message}`;
+    
     return {
       categories,
       learningContents,
-      error: categoriesResult.error || contentsResult.error ? 'データ取得エラー' : null
+      error: errorMsg
     };
   } catch (err) {
-    return { categories: [], learningContents: [], error: `サーバーエラー: ${err}` };
+    console.error('Database connection error:', err);
+    return { categories: [], learningContents: [], error: `サーバーエラー: ${err instanceof Error ? err.message : String(err)}` };
   }
 }
 
