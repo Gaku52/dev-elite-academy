@@ -17,49 +17,65 @@ import {
 export default function Header() {
   const { user, signOut, loading } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // クリック外でメニューを閉じる
+  // コンポーネントマウント後にイベント処理を有効化
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    setIsMounted(true);
+  }, []);
+
+  // クリック外でメニューを閉じる（マウント後のみ）
+  useEffect(() => {
+    if (!isMounted || !userMenuOpen) return;
+
+    const handleClickOutside = (event: Event) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
       }
     };
 
-    if (userMenuOpen) {
-      // 少し遅延を入れてイベントリスナーを追加（初回クリックとの競合を避ける）
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-      }, 100);
-      
-      return () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }
-
+    // より長い遅延でイベントリスナーを追加（本番環境対応）
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside, { passive: false });
+      document.addEventListener('touchstart', handleClickOutside, { passive: false });
+    }, 200);
+    
     return () => {
+      clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [userMenuOpen]);
+  }, [userMenuOpen, isMounted]);
 
   const handleSignOut = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    console.log('🔥 Logout button clicked!'); // デバッグ用
+    
+    // 即座にメニューを閉じる
+    setUserMenuOpen(false);
+    
     try {
       await signOut();
+      console.log('✅ Sign out successful');
     } catch (error) {
-      console.error('Sign out error:', error);
-    } finally {
-      setUserMenuOpen(false);
+      console.error('❌ Sign out error:', error);
     }
   };
 
   const handleMenuToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setUserMenuOpen(prev => !prev);
+    
+    console.log('🎯 Menu toggle clicked!'); // デバッグ用
+    
+    setUserMenuOpen(prev => {
+      const newState = !prev;
+      console.log('📋 Menu state:', prev, '->', newState);
+      return newState;
+    });
   };
 
   return (
@@ -121,7 +137,14 @@ export default function Header() {
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-slate-800 rounded-lg shadow-xl border border-slate-700 z-50 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-64 bg-slate-800 rounded-lg shadow-xl border border-slate-700 overflow-hidden" 
+                       style={{ 
+                         zIndex: 9999, 
+                         pointerEvents: 'auto',
+                         position: 'absolute',
+                         top: '100%',
+                         right: '0'
+                       }}>
                     <div className="p-4 border-b border-slate-700 bg-gradient-to-r from-purple-600/10 to-pink-600/10">
                       <p className="text-white text-sm font-medium truncate" title={user.email || ''}>
                         {user.email}
@@ -148,8 +171,15 @@ export default function Header() {
                       <div className="border-t border-slate-700 my-2"></div>
                       <button
                         onClick={handleSignOut}
-                        className="w-full text-left px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-600/20 rounded-md flex items-center transition-colors group"
+                        className="w-full text-left px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-600/20 rounded-md flex items-center transition-colors group cursor-pointer"
                         type="button"
+                        style={{ 
+                          pointerEvents: 'auto',
+                          zIndex: 10000,
+                          position: 'relative',
+                          userSelect: 'none',
+                          WebkitUserSelect: 'none'
+                        }}
                       >
                         <LogOut className="w-4 h-4 mr-2 group-hover:animate-pulse" />
                         ログアウト
