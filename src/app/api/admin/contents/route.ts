@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,38 +17,35 @@ export async function GET(request: NextRequest) {
     const categoryId = searchParams.get('categoryId');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
-    const skip = (page - 1) * limit;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-    const where = categoryId ? { categoryId: parseInt(categoryId) } : {};
+    let query = supabase
+      .from('learning_contents')
+      .select(`
+        *,
+        category:categories(*),
+        progress:user_progress(count)
+      `, { count: 'exact' })
+      .order('category_id')
+      .order('id')
+      .range(from, to);
 
-    const [contents, total] = await Promise.all([
-      prisma.learningContent.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: [
-          { categoryId: 'asc' },
-          { id: 'asc' }
-        ],
-        include: {
-          category: true,
-          _count: {
-            select: {
-              progress: true
-            }
-          }
-        }
-      }),
-      prisma.learningContent.count({ where })
-    ]);
+    if (categoryId) {
+      query = query.eq('category_id', parseInt(categoryId));
+    }
+
+    const { data: contents, error, count } = await query;
+
+    if (error) throw error;
 
     return NextResponse.json({
       contents,
       pagination: {
         page,
         limit,
-        total,
-        totalPages: Math.ceil(total / limit)
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit)
       }
     });
   } catch (error) {
@@ -72,22 +79,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const content = await prisma.learningContent.create({
-      data: {
-        categoryId,
+    const { data: content, error } = await supabase
+      .from('learning_contents')
+      .insert({
+        category_id: categoryId,
         title,
         description,
-        contentType,
-        contentBody,
+        content_type: contentType,
+        content_body: contentBody,
         difficulty,
-        estimatedTime: estimatedTime ?? 30,
+        estimated_time: estimatedTime ?? 30,
         tags: tags ?? [],
-        isPublished: isPublished ?? false
-      },
-      include: {
-        category: true
-      }
-    });
+        is_published: isPublished ?? false
+      })
+      .select(`
+        *,
+        category:categories(*)
+      `)
+      .single();
+
+    if (error) throw error;
 
     return NextResponse.json(content, { status: 201 });
   } catch (error) {
@@ -122,23 +133,27 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const content = await prisma.learningContent.update({
-      where: { id },
-      data: {
-        categoryId,
+    const { data: content, error } = await supabase
+      .from('learning_contents')
+      .update({
+        category_id: categoryId,
         title,
         description,
-        contentType,
-        contentBody,
+        content_type: contentType,
+        content_body: contentBody,
         difficulty,
-        estimatedTime,
+        estimated_time: estimatedTime,
         tags,
-        isPublished
-      },
-      include: {
-        category: true
-      }
-    });
+        is_published: isPublished
+      })
+      .eq('id', id)
+      .select(`
+        *,
+        category:categories(*)
+      `)
+      .single();
+
+    if (error) throw error;
 
     return NextResponse.json(content);
   } catch (error) {
@@ -162,9 +177,12 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await prisma.learningContent.delete({
-      where: { id: parseInt(id) }
-    });
+    const { error } = await supabase
+      .from('learning_contents')
+      .delete()
+      .eq('id', parseInt(id));
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (error) {

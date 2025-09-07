@@ -1,22 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 export async function GET() {
   try {
-    const categories = await prisma.category.findMany({
-      orderBy: [
-        { sortOrder: 'asc' },
-        { id: 'asc' }
-      ],
-      include: {
-        _count: {
-          select: {
-            contents: true,
-            studyPlans: true
-          }
-        }
-      }
-    });
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select(`
+        *,
+        contents:learning_contents(count),
+        study_plans(count)
+      `)
+      .eq('is_active', true)
+      .order('sort_order');
+
+    if (error) throw error;
 
     return NextResponse.json(categories);
   } catch (error) {
@@ -40,16 +47,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const category = await prisma.category.create({
-      data: {
+    const { data: category, error } = await supabase
+      .from('categories')
+      .insert({
         name,
         description,
         icon,
         color,
-        sortOrder: sortOrder ?? 0,
-        isActive: isActive ?? true
-      }
-    });
+        sort_order: sortOrder ?? 0,
+        is_active: isActive ?? true
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
@@ -73,17 +84,21 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const category = await prisma.category.update({
-      where: { id },
-      data: {
+    const { data: category, error } = await supabase
+      .from('categories')
+      .update({
         name,
         description,
         icon,
         color,
-        sortOrder,
-        isActive
-      }
-    });
+        sort_order: sortOrder,
+        is_active: isActive
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
 
     return NextResponse.json(category);
   } catch (error) {
@@ -107,9 +122,12 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await prisma.category.delete({
-      where: { id: parseInt(id) }
-    });
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', parseInt(id));
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (error) {
