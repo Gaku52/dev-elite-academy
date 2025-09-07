@@ -24,8 +24,7 @@ export async function GET(request: NextRequest) {
           category: true,
           _count: {
             select: {
-              progress: true,
-              studyPlans: true
+              progress: true
             }
           }
         }

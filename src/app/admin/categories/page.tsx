@@ -15,7 +15,6 @@ interface Category {
   _count?: {
     contents: number;
     studyPlans: number;
-    learningPaths: number;
   };
 }
 
@@ -311,7 +310,6 @@ export default function CategoriesPage() {
                     <div className="space-y-1">
                       <div>コンテンツ: {category._count?.contents || 0}</div>
                       <div>学習計画: {category._count?.studyPlans || 0}</div>
-                      <div>学習パス: {category._count?.learningPaths || 0}</div>
                     </div>
                   </td>
                   <td className="px-4 py-3">

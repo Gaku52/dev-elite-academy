@@ -24,7 +24,6 @@ interface LearningContent {
   category: Category;
   _count?: {
     progress: number;
-    studyPlans: number;
   };
 }
 
@@ -463,10 +462,7 @@ export default function ContentsPage() {
                   </td>
                   <td className="px-4 py-3 text-sm">{content.estimatedTime}分</td>
                   <td className="px-4 py-3 text-sm">
-                    <div className="space-y-1">
-                      <div>進捗: {content._count?.progress || 0}</div>
-                      <div>計画: {content._count?.studyPlans || 0}</div>
-                    </div>
+                    <div>進捗: {content._count?.progress || 0}</div>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 w-fit ${

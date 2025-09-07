@@ -12,8 +12,7 @@ export async function GET() {
         _count: {
           select: {
             contents: true,
-            studyPlans: true,
-            learningPaths: true
+            studyPlans: true
           }
         }
       }
