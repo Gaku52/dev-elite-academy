@@ -11,7 +11,9 @@ import {
   BookOpen,
   Home,
   BarChart3,
-  Settings
+  Settings,
+  Database,
+  FolderOpen
 } from 'lucide-react';
 
 export default function Header() {
@@ -169,6 +171,23 @@ export default function Header() {
                         使用状況
                       </Link>
                       <div className="border-t border-slate-700 my-2"></div>
+                      <Link
+                        href="/admin/categories"
+                        className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700 rounded-md transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <FolderOpen className="w-4 h-4 inline mr-2" />
+                        カテゴリ管理
+                      </Link>
+                      <Link
+                        href="/admin/contents"
+                        className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700 rounded-md transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Database className="w-4 h-4 inline mr-2" />
+                        コンテンツ管理
+                      </Link>
+                      <div className="border-t border-slate-700 my-2"></div>
                       <button
                         onClick={handleSignOut}
                         className="w-full text-left px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-600/20 rounded-md flex items-center transition-colors group cursor-pointer"
@@ -224,6 +243,20 @@ export default function Header() {
           >
             <Settings className="w-4 h-4 mr-3" />
             使用状況
+          </Link>
+          <Link 
+            href="/admin/categories" 
+            className="flex items-center text-gray-300 hover:text-white transition-colors py-2"
+          >
+            <FolderOpen className="w-4 h-4 mr-3" />
+            カテゴリ管理
+          </Link>
+          <Link 
+            href="/admin/contents" 
+            className="flex items-center text-gray-300 hover:text-white transition-colors py-2"
+          >
+            <Database className="w-4 h-4 mr-3" />
+            コンテンツ管理
           </Link>
         </div>
       </div>
