@@ -28,9 +28,6 @@ model Profile {
   studyPlans            StudyPlan[]
   achievements          Achievement[]
   studySessions         StudySession[]
-  learningPaths         LearningPath[]
-  learningUnits         LearningUnit[]
-  userLearningPaths     UserLearningPath[]
 
   @@map("profiles")
 }
@@ -49,7 +46,6 @@ model Category {
   // リレーション
   contents    LearningContent[]
   studyPlans  StudyPlan[]
-  learningPaths LearningPath[]
 
   @@map("categories")
 }
@@ -193,113 +189,3 @@ enum ProgressStatus {
   COMPLETED
 }
 
-// 学習パス（個人が作成・共有可能）
-model LearningPath {
-  id            String   @id @default(uuid())
-  title         String
-  description   String?
-  categoryId    Int?     @map("category_id")
-  createdBy     String   @map("created_by")
-  isPublic      Boolean  @default(false) @map("is_public")
-  isTemplate    Boolean  @default(false) @map("is_template")
-  tags          String[]
-  difficulty    Difficulty?
-  estimatedDays Int?     @map("estimated_days")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  // リレーション
-  category      Category?         @relation(fields: [categoryId], references: [id])
-  creator       Profile           @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  units         LearningPathUnit[]
-  userPaths     UserLearningPath[]
-
-  @@index([createdBy])
-  @@index([isPublic])
-  @@map("learning_paths")
-}
-
-// 学習単元（再利用可能）
-model LearningUnit {
-  id            String   @id @default(uuid())
-  title         String
-  description   String?
-  contentType   ContentType @map("content_type")
-  contentBody   Json     @map("content_body")
-  difficulty    Difficulty
-  estimatedTime Int      @map("estimated_time") // 分単位
-  tags          String[]
-  contentHash   String?  @map("content_hash") // 重複チェック用
-  createdBy     String   @map("created_by")
-  isPublic      Boolean  @default(false) @map("is_public")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  // リレーション
-  creator       Profile           @relation(fields: [createdBy], references: [id])
-  pathUnits     LearningPathUnit[]
-  progress      UnitProgress[]
-
-  @@unique([contentHash])
-  @@index([createdBy])
-  @@index([isPublic])
-  @@map("learning_units")
-}
-
-// 学習パスと学習単元の中間テーブル
-model LearningPathUnit {
-  id            String       @id @default(uuid())
-  pathId        String       @map("path_id")
-  unitId        String       @map("unit_id")
-  sortOrder     Int          @default(0) @map("sort_order")
-  isRequired    Boolean      @default(true) @map("is_required")
-  createdAt     DateTime     @default(now()) @map("created_at")
-
-  // リレーション
-  path          LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
-  unit          LearningUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
-
-  @@unique([pathId, unitId])
-  @@map("learning_path_units")
-}
-
-// ユーザーと学習パスの関連
-model UserLearningPath {
-  id            String       @id @default(uuid())
-  userId        String       @map("user_id")
-  pathId        String       @map("path_id")
-  status        ProgressStatus @default(NOT_STARTED)
-  startedAt     DateTime?    @map("started_at")
-  completedAt   DateTime?    @map("completed_at")
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @updatedAt @map("updated_at")
-
-  // リレーション
-  user          Profile      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  path          LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
-  unitProgress  UnitProgress[]
-
-  @@unique([userId, pathId])
-  @@map("user_learning_paths")
-}
-
-// 学習単元の進捗
-model UnitProgress {
-  id            String           @id @default(uuid())
-  userPathId    String           @map("user_path_id")
-  unitId        String           @map("unit_id")
-  status        ProgressStatus   @default(NOT_STARTED)
-  score         Float?           // 0.0-100.0
-  timeSpent     Int              @default(0) @map("time_spent") // 分単位
-  attempts      Int              @default(0)
-  completedAt   DateTime?        @map("completed_at")
-  createdAt     DateTime         @default(now()) @map("created_at")
-  updatedAt     DateTime         @updatedAt @map("updated_at")
-
-  // リレーション
-  userPath      UserLearningPath @relation(fields: [userPathId], references: [id], onDelete: Cascade)
-  unit          LearningUnit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
-
-  @@unique([userPathId, unitId])
-  @@map("unit_progress")
-}
