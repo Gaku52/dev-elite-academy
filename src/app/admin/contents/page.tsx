@@ -10,21 +10,19 @@ interface Category {
 
 interface LearningContent {
   id: number;
-  categoryId: number;
+  category_id: number;
   title: string;
   description: string | null;
-  contentType: string;
-  contentBody: Record<string, unknown>;
+  content_type: string;
+  content_body: Record<string, unknown>;
   difficulty: string;
-  estimatedTime: number;
+  estimated_time: number;
   tags: string[];
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
   category: Category;
-  _count?: {
-    progress: number;
-  };
+  progress?: { count: number }[];
 }
 
 interface PaginationInfo {
@@ -140,15 +138,15 @@ export default function ContentsPage() {
   const handleEdit = (content: LearningContent) => {
     setEditingContent(content);
     setFormData({
-      categoryId: content.categoryId,
+      categoryId: content.category_id,
       title: content.title,
       description: content.description || '',
-      contentType: content.contentType,
-      contentBody: content.contentBody,
+      contentType: content.content_type,
+      contentBody: content.content_body,
       difficulty: content.difficulty,
-      estimatedTime: content.estimatedTime,
+      estimatedTime: content.estimated_time,
       tags: content.tags,
-      isPublished: content.isPublished
+      isPublished: content.is_published
     });
     setShowForm(true);
   };
@@ -455,23 +453,23 @@ export default function ContentsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    {CONTENT_TYPES.find(t => t.value === content.contentType)?.label}
+                    {CONTENT_TYPES.find(t => t.value === content.content_type)?.label}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     {DIFFICULTY_LEVELS.find(d => d.value === content.difficulty)?.label}
                   </td>
-                  <td className="px-4 py-3 text-sm">{content.estimatedTime}分</td>
+                  <td className="px-4 py-3 text-sm">{content.estimated_time}分</td>
                   <td className="px-4 py-3 text-sm">
-                    <div>進捗: {content._count?.progress || 0}</div>
+                    <div>進捗: {content.progress?.[0]?.count || 0}</div>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 w-fit ${
-                      content.isPublished 
+                      content.is_published 
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {content.isPublished ? <Eye size={14} /> : <EyeOff size={14} />}
-                      {content.isPublished ? '公開' : '非公開'}
+                      {content.is_published ? <Eye size={14} /> : <EyeOff size={14} />}
+                      {content.is_published ? '公開' : '非公開'}
                     </span>
                   </td>
                   <td className="px-4 py-3">

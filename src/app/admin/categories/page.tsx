@@ -78,8 +78,8 @@ export default function CategoriesPage() {
       description: category.description || '',
       icon: category.icon || '',
       color: category.color || '#000000',
-      sortOrder: category.sortOrder,
-      isActive: category.isActive
+      sortOrder: category.sort_order,
+      isActive: category.is_active
     });
     setShowForm(true);
   };
@@ -128,7 +128,7 @@ export default function CategoriesPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id: category.id,
-            sortOrder: targetCategory.sortOrder
+            sortOrder: targetCategory.sort_order
           })
         }),
         fetch('/api/admin/categories', {
@@ -136,7 +136,7 @@ export default function CategoriesPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id: targetCategory.id,
-            sortOrder: category.sortOrder
+            sortOrder: category.sort_order
           })
         })
       ]);
@@ -286,7 +286,7 @@ export default function CategoriesPage() {
                       >
                         <ChevronDown size={16} />
                       </button>
-                      <span className="ml-2">{category.sortOrder}</span>
+                      <span className="ml-2">{category.sort_order}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -306,17 +306,17 @@ export default function CategoriesPage() {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="space-y-1">
-                      <div>コンテンツ: {category._count?.contents || 0}</div>
-                      <div>学習計画: {category._count?.studyPlans || 0}</div>
+                      <div>コンテンツ: {category.contents?.[0]?.count || 0}</div>
+                      <div>学習計画: {category.study_plans?.[0]?.count || 0}</div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 text-xs rounded-full ${
-                      category.isActive 
+                      category.is_active 
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {category.isActive ? '有効' : '無効'}
+                      {category.is_active ? '有効' : '無効'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
