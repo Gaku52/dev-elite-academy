@@ -9,13 +9,11 @@ interface Category {
   description: string | null;
   icon: string | null;
   color: string | null;
-  sortOrder: number;
-  isActive: boolean;
-  createdAt: string;
-  _count?: {
-    contents: number;
-    studyPlans: number;
-  };
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  contents?: { count: number }[];
+  study_plans?: { count: number }[];
 }
 
 export default function CategoriesPage() {
