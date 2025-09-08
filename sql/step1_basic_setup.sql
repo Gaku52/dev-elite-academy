@@ -1,0 +1,9 @@
+-- Step 1: 基本セットアップ
+-- 拡張機能とEnum型の作成
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TYPE skill_level AS ENUM ('BEGINNER', 'INTERMEDIATE', 'ADVANCED');
+CREATE TYPE content_type AS ENUM ('ARTICLE', 'VIDEO', 'QUIZ', 'EXERCISE', 'FLASHCARD');
+CREATE TYPE difficulty AS ENUM ('EASY', 'MEDIUM', 'HARD');
+CREATE TYPE progress_status AS ENUM ('NOT_STARTED', 'IN_PROGRESS', 'COMPLETED');
