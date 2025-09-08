@@ -13,7 +13,8 @@ import {
   BarChart3,
   Settings,
   Database,
-  FolderOpen
+  FolderOpen,
+  FileText
 } from 'lucide-react';
 
 export default function Header() {
@@ -107,6 +108,13 @@ export default function Header() {
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               学習ダッシュボード
+            </Link>
+            <Link 
+              href="/specifications" 
+              className="flex items-center text-gray-300 hover:text-white transition-colors"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              仕様書・設計書
             </Link>
             <Link 
               href="/usage" 
@@ -236,6 +244,13 @@ export default function Header() {
           >
             <BarChart3 className="w-4 h-4 mr-3" />
             学習ダッシュボード
+          </Link>
+          <Link 
+            href="/specifications" 
+            className="flex items-center text-gray-300 hover:text-white transition-colors py-2"
+          >
+            <FileText className="w-4 h-4 mr-3" />
+            仕様書・設計書
           </Link>
           <Link 
             href="/usage" 

@@ -135,6 +135,15 @@ export default function Home() {
                       <ChevronRight className="ml-2 w-4 h-4" />
                     </Link>
                   </div>
+                  <div>
+                    <Link
+                      href="/specifications"
+                      className="flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-blue-100 bg-blue-800/50 hover:bg-blue-700/50 md:py-3 md:text-base md:px-8 transition-all duration-300 whitespace-nowrap"
+                    >
+                      📋 仕様書・設計書
+                      <ChevronRight className="ml-2 w-4 h-4" />
+                    </Link>
+                  </div>
                 </motion.div>
               </div>
             </main>
