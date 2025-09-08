@@ -1,21 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FileText, ExternalLink, Calendar, FileCode } from 'lucide-react';
+import { FileText, ExternalLink, FileCode } from 'lucide-react';
 import Header from '@/components/Header';
-import Link from 'next/link';
-
-interface GitHubFile {
-  name: string;
-  path: string;
-  sha: string;
-  size: number;
-  url: string;
-  html_url: string;
-  git_url: string;
-  download_url: string;
-  type: string;
-}
 
 interface Specification {
   name: string;
@@ -155,15 +142,14 @@ export default function SpecificationsPage() {
         </div>
       </section>
 
-        {specifications.length === 0 && !error && (
-          <div className="container-modern">
-            <div className="card-modern p-12 text-center">
-              <FileText className="w-16 h-16 text-[#6F6F6F] mx-auto mb-4" />
-              <p className="text-[#6F6F6F] text-lg">仕様書・設計書がまだありません</p>
-            </div>
+      {specifications.length === 0 && !error && (
+        <div className="container-modern">
+          <div className="card-modern p-12 text-center">
+            <FileText className="w-16 h-16 text-[#6F6F6F] mx-auto mb-4" />
+            <p className="text-[#6F6F6F] text-lg">仕様書・設計書がまだありません</p>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
