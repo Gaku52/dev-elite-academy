@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import Header from '@/components/Header';
 import { 
   Database, 
   Activity,
@@ -230,43 +231,44 @@ export default async function UsagePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-white">
+      <Header />
+      <div className="container-modern py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold text-black mb-4">
             📊 Supabase使用状況モニター
           </h1>
-          <p className="text-gray-300">
+          <p className="text-[#6F6F6F]">
             無料プラン制限の監視と有料プラン移行タイミングの判断
           </p>
-          <p className="text-sm text-gray-400 mt-2">
+          <p className="text-sm text-[#6F6F6F] mt-2">
             対象期間: {currentMonth} | 最終更新: {usageStats?.last_updated ? new Date(usageStats.last_updated).toLocaleString('ja-JP') : '取得中'}
           </p>
         </div>
 
         {/* 無料プラン概要 */}
-        <div className="bg-gradient-to-r from-blue-800/30 to-cyan-800/30 rounded-lg p-6 mb-8 border border-blue-700/30">
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-            <CheckCircle className="w-6 h-6 mr-2 text-blue-400" />
+        <div className="card-modern p-6 mb-8 bg-blue-50 border-blue-200">
+          <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
+            <CheckCircle className="w-6 h-6 mr-2 text-blue-500" />
             Supabase無料プラン制限
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="text-blue-300">データベース容量</p>
-              <p className="text-white font-mono">{FREE_PLAN_LIMITS.database_size_mb}MB</p>
+              <p className="text-blue-700">データベース容量</p>
+              <p className="text-black font-mono">{FREE_PLAN_LIMITS.database_size_mb}MB</p>
             </div>
             <div>
-              <p className="text-blue-300">月間リクエスト</p>
-              <p className="text-white font-mono">{FREE_PLAN_LIMITS.monthly_requests.toLocaleString()}</p>
+              <p className="text-blue-700">月間リクエスト</p>
+              <p className="text-black font-mono">{FREE_PLAN_LIMITS.monthly_requests.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-blue-300">同時接続数</p>
-              <p className="text-white font-mono">{FREE_PLAN_LIMITS.concurrent_connections}</p>
+              <p className="text-blue-700">同時接続数</p>
+              <p className="text-black font-mono">{FREE_PLAN_LIMITS.concurrent_connections}</p>
             </div>
             <div>
-              <p className="text-blue-300">月間帯域幅</p>
-              <p className="text-white font-mono">{FREE_PLAN_LIMITS.monthly_bandwidth_gb}GB</p>
+              <p className="text-blue-700">月間帯域幅</p>
+              <p className="text-black font-mono">{FREE_PLAN_LIMITS.monthly_bandwidth_gb}GB</p>
             </div>
           </div>
         </div>
@@ -280,43 +282,59 @@ export default async function UsagePage() {
             return (
               <div
                 key={item.name}
-                className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/30"
+                className="card-modern p-6"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg bg-${status.color}-800/30 border border-${status.color}-700/30`}>
-                      <div className={`text-${status.color}-400`}>
+                    <div className={`p-2 rounded-2xl ${
+                      status.status === 'danger' ? 'bg-red-100 border border-red-200' :
+                      status.status === 'warning' ? 'bg-yellow-100 border border-yellow-200' :
+                      'bg-green-100 border border-green-200'
+                    }`}>
+                      <div className={`${
+                        status.status === 'danger' ? 'text-red-600' :
+                        status.status === 'warning' ? 'text-yellow-600' :
+                        'text-green-600'
+                      }`}>
                         {item.icon}
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">{item.name}</h3>
-                      <p className="text-sm text-gray-400">{item.description}</p>
+                      <h3 className="text-lg font-semibold text-black">{item.name}</h3>
+                      <p className="text-sm text-[#6F6F6F]">{item.description}</p>
                     </div>
                   </div>
-                  <div className={`px-3 py-1 rounded-full text-sm bg-${status.color}-800/30 text-${status.color}-300 border border-${status.color}-700/50`}>
+                  <div className={`px-3 py-1 rounded-full text-sm ${
+                    status.status === 'danger' ? 'bg-red-100 text-red-800 border border-red-200' :
+                    status.status === 'warning' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                    'bg-green-100 text-green-800 border border-green-200'
+                  }`}>
                     {status.message}
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-300">
+                    <span className="text-black">
                       {item.current.toLocaleString()} / {item.limit.toLocaleString()} {item.unit}
                     </span>
-                    <span className={`font-mono text-${status.color}-300`}>
+                    <span className={`font-mono ${
+                      status.status === 'danger' ? 'text-red-700' :
+                      status.status === 'warning' ? 'text-yellow-700' :
+                      'text-green-700'
+                    }`}>
                       {percentage.toFixed(1)}%
                     </span>
                   </div>
                   
-                  <div className="w-full bg-gray-700 rounded-full h-3">
+                  <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
                       className={`h-3 rounded-full bg-gradient-to-r transition-all duration-500 ${
                         status.status === 'danger' 
                           ? 'from-red-500 to-red-600' 
                           : status.status === 'warning'
                           ? 'from-yellow-500 to-orange-500'
-                          : 'from-green-500 to-blue-500'
+                          : 'from-green-500 to-[#8E9C78]'
                       }`}
                       style={{ width: `${Math.min(100, percentage)}%` }}
                     ></div>
@@ -328,9 +346,9 @@ export default async function UsagePage() {
         </div>
 
         {/* 有料プラン移行判断 */}
-        <div className="bg-gradient-to-r from-purple-800/30 to-pink-800/30 rounded-lg p-6 mb-8 border border-purple-700/30">
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-            <TrendingUp className="w-6 h-6 mr-2 text-purple-400" />
+        <div className="card-modern p-6 mb-8 bg-[#8E9C78]/10 border-[#8E9C78]/20">
+          <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
+            <TrendingUp className="w-6 h-6 mr-2 text-[#8E9C78]" />
             有料プラン移行判断
           </h2>
           
@@ -342,31 +360,31 @@ export default async function UsagePage() {
                 
                 if (dbUsage >= 80) {
                   return (
-                    <div className="flex items-center space-x-3 p-4 bg-red-800/30 border border-red-700/50 rounded-lg">
-                      <AlertTriangle className="w-8 h-8 text-red-400" />
+                    <div className="flex items-center space-x-3 p-4 bg-red-50 border border-red-200 rounded-2xl">
+                      <AlertTriangle className="w-8 h-8 text-red-600" />
                       <div>
-                        <p className="text-white font-semibold">🚨 有料プラン移行推奨</p>
-                        <p className="text-red-300 text-sm">データベース使用率が{dbUsage.toFixed(1)}%に達しています</p>
+                        <p className="text-black font-semibold">🚨 有料プラン移行推奨</p>
+                        <p className="text-red-700 text-sm">データベース使用率が{dbUsage.toFixed(1)}%に達しています</p>
                       </div>
                     </div>
                   );
                 } else if (dbUsage >= 60) {
                   return (
-                    <div className="flex items-center space-x-3 p-4 bg-yellow-800/30 border border-yellow-700/50 rounded-lg">
-                      <AlertTriangle className="w-8 h-8 text-yellow-400" />
+                    <div className="flex items-center space-x-3 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
+                      <AlertTriangle className="w-8 h-8 text-yellow-600" />
                       <div>
-                        <p className="text-white font-semibold">⚠️ 監視強化期間</p>
-                        <p className="text-yellow-300 text-sm">使用量増加を注意深く監視してください</p>
+                        <p className="text-black font-semibold">⚠️ 監視強化期間</p>
+                        <p className="text-yellow-700 text-sm">使用量増加を注意深く監視してください</p>
                       </div>
                     </div>
                   );
                 } else {
                   return (
-                    <div className="flex items-center space-x-3 p-4 bg-green-800/30 border border-green-700/50 rounded-lg">
-                      <CheckCircle className="w-8 h-8 text-green-400" />
+                    <div className="flex items-center space-x-3 p-4 bg-green-50 border border-green-200 rounded-2xl">
+                      <CheckCircle className="w-8 h-8 text-green-600" />
                       <div>
-                        <p className="text-white font-semibold">✅ 無料プランで問題なし</p>
-                        <p className="text-green-300 text-sm">現在の使用量なら無料プランで継続可能です</p>
+                        <p className="text-black font-semibold">✅ 無料プランで問題なし</p>
+                        <p className="text-green-700 text-sm">現在の使用量なら無料プランで継続可能です</p>
                       </div>
                     </div>
                   );
@@ -377,9 +395,9 @@ export default async function UsagePage() {
 
           {/* 推奨アクション */}
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-600/30">
-              <h4 className="text-white font-semibold mb-2">📈 Pro Plan (月$25)</h4>
-              <ul className="text-gray-300 text-sm space-y-1">
+            <div className="card-modern p-4">
+              <h4 className="text-black font-semibold mb-2">📈 Pro Plan (月$25)</h4>
+              <ul className="text-[#6F6F6F] text-sm space-y-1">
                 <li>• データベース: 8GB</li>
                 <li>• 月間帯域幅: 250GB</li>
                 <li>• 同時接続: 200</li>
@@ -387,9 +405,9 @@ export default async function UsagePage() {
               </ul>
             </div>
             
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-600/30">
-              <h4 className="text-white font-semibold mb-2">🚀 Team Plan (月$599)</h4>
-              <ul className="text-gray-300 text-sm space-y-1">
+            <div className="card-modern p-4">
+              <h4 className="text-black font-semibold mb-2">🚀 Team Plan (月$599)</h4>
+              <ul className="text-[#6F6F6F] text-sm space-y-1">
                 <li>• データベース: 500GB</li>
                 <li>• 月間帯域幅: 2.5TB</li>
                 <li>• 同時接続: 1,500</li>
@@ -403,13 +421,13 @@ export default async function UsagePage() {
         <div className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors mr-4"
+            className="btn-modern inline-flex items-center px-6 py-3 mr-4"
           >
             ← ホームに戻る
           </Link>
           <Link
             href="/db-test"
-            className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="btn-secondary inline-flex items-center px-6 py-3"
           >
             🧪 DB接続テスト
           </Link>
