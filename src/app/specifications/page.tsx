@@ -70,19 +70,19 @@ export default function SpecificationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex justify-center items-center">
-        <div className="text-white">読み込み中...</div>
+      <div className="min-h-screen bg-white flex justify-center items-center">
+        <div className="text-[#6F6F6F]">読み込み中...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen bg-white">
         <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-900/20 backdrop-blur-sm p-6 rounded-lg border border-red-800/30">
-            <p className="text-red-400">{error}</p>
+        <div className="container-modern py-16">
+          <div className="card-modern p-6 border-red-200 bg-red-50">
+            <p className="text-red-600">{error}</p>
           </div>
         </div>
       </div>
@@ -90,44 +90,44 @@ export default function SpecificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-white">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-2">
-            仕様書・設計書
-          </h1>
-          <p className="text-gray-300">
-            プロジェクトの仕様書と設計書の一覧です。各ドキュメントをクリックして詳細を確認できます。
-          </p>
-        </div>
+      <section className="py-20">
+        <div className="container-modern">
+          <div className="mb-16 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
+              仕様書・設計書
+            </h1>
+            <p className="text-xl text-[#6F6F6F] max-w-2xl mx-auto">
+              プロジェクトの仕様書と設計書の一覧です。各ドキュメントをクリックして詳細を確認できます。
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {specifications.map((spec) => (
-            <div
-              key={spec.path}
-              className="bg-black/40 backdrop-blur-sm rounded-lg border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 overflow-hidden group"
-            >
-              <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {specifications.map((spec) => (
+              <div
+                key={spec.path}
+                className="card-modern p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+              >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 bg-purple-900/30 rounded-lg group-hover:bg-purple-800/40 transition-colors">
-                    <FileText className="w-6 h-6 text-purple-400" />
+                  <div className="p-3 bg-[#8E9C78]/10 rounded-2xl group-hover:bg-[#8E9C78]/20 transition-colors">
+                    <FileText className="w-6 h-6 text-[#8E9C78]" />
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-[#6F6F6F] bg-gray-100 px-2 py-1 rounded-full">
                     {formatFileSize(spec.size)}
                   </span>
                 </div>
                 
-                <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2">
+                <h3 className="text-xl font-bold text-black mb-4 line-clamp-2">
                   {spec.displayName}
                 </h3>
                 
-                <div className="flex items-center gap-4 mt-4">
+                <div className="flex flex-col gap-3 mt-6">
                   <a
                     href={spec.downloadUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                    className="btn-modern flex items-center justify-center gap-2 text-sm py-3"
                   >
                     <FileCode size={16} />
                     <span>HTMLで表示</span>
@@ -136,28 +136,31 @@ export default function SpecificationsPage() {
                     href={spec.htmlUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-300 transition-colors"
+                    className="btn-secondary flex items-center justify-center gap-2 text-sm py-3"
                   >
                     <ExternalLink size={16} />
                     <span>GitHubで表示</span>
                   </a>
                 </div>
-              </div>
-              
-              <div className="px-6 py-3 bg-purple-900/20 border-t border-purple-800/30">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <FileText size={14} />
-                  <span>{spec.name}</span>
+                
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex items-center gap-2 text-xs text-[#6F6F6F]">
+                    <FileText size={12} />
+                    <span>{spec.name}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+      </section>
 
         {specifications.length === 0 && !error && (
-          <div className="bg-black/40 backdrop-blur-sm p-8 rounded-lg border border-purple-800/30 text-center">
-            <FileText className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-            <p className="text-gray-400">仕様書・設計書がまだありません</p>
+          <div className="container-modern">
+            <div className="card-modern p-12 text-center">
+              <FileText className="w-16 h-16 text-[#6F6F6F] mx-auto mb-4" />
+              <p className="text-[#6F6F6F] text-lg">仕様書・設計書がまだありません</p>
+            </div>
           </div>
         )}
       </div>
