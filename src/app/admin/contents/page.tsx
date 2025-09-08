@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import Header from '@/components/Header';
 
 interface Category {
   id: number;
@@ -206,31 +207,43 @@ export default function ContentsPage() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64">読み込み中...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <Header />
+        <div className="flex justify-center items-center h-64">
+          <div className="text-white text-xl">読み込み中...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">学習コンテンツマスタ管理</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600"
-        >
-          <Plus size={20} />
-          新規追加
-        </button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <Header />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">学習コンテンツマスタ管理</h1>
+            <p className="text-gray-300">学習コンテンツの作成・編集・管理を行います</p>
+          </div>
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            <Plus size={20} />
+            新規追加
+          </button>
+        </div>
 
-      <div className="mb-4">
-        <select
-          value={selectedCategory}
-          onChange={(e) => {
-            setSelectedCategory(e.target.value);
-            setPagination({ ...pagination, page: 1 });
-          }}
-          className="px-3 py-2 border rounded-lg"
-        >
+        <div className="mb-6">
+          <select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setPagination({ ...pagination, page: 1 });
+            }}
+            className="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+          >
           <option value="">全カテゴリ</option>
           {categories.map(cat => (
             <option key={cat.id} value={cat.id}>
@@ -240,19 +253,19 @@ export default function ContentsPage() {
         </select>
       </div>
 
-      {showForm && (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-xl font-semibold mb-4">
-            {editingContent ? 'コンテンツ編集' : '新規コンテンツ'}
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        {showForm && (
+          <div className="bg-gradient-to-br from-slate-800/50 to-slate-700/30 backdrop-blur-sm p-6 rounded-lg border border-slate-600/30 mb-8">
+            <h2 className="text-xl font-semibold text-white mb-6">
+              {editingContent ? 'コンテンツ編集' : '新規コンテンツ'}
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">カテゴリ *</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">カテゴリ *</label>
                 <select
                   value={formData.categoryId}
                   onChange={(e) => setFormData({ ...formData, categoryId: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                   required
                 >
                   <option value="">選択してください</option>
@@ -264,34 +277,34 @@ export default function ContentsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">タイトル *</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">タイトル *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">説明</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">説明</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
+                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">コンテンツタイプ *</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">コンテンツタイプ *</label>
                 <select
                   value={formData.contentType}
                   onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                   required
                 >
                   {CONTENT_TYPES.map(type => (
@@ -302,11 +315,11 @@ export default function ContentsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">難易度 *</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">難易度 *</label>
                 <select
                   value={formData.difficulty}
                   onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                   required
                 >
                   {DIFFICULTY_LEVELS.map(level => (
@@ -317,19 +330,19 @@ export default function ContentsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">推定時間（分）</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">推定時間（分）</label>
                 <input
                   type="number"
                   value={formData.estimatedTime}
                   onChange={(e) => setFormData({ ...formData, estimatedTime: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                   min="1"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">コンテンツ本文（JSON）</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">コンテンツ本文（JSON）</label>
               <textarea
                 value={JSON.stringify(formData.contentBody, null, 2)}
                 onChange={(e) => {
@@ -340,26 +353,26 @@ export default function ContentsPage() {
                     // Invalid JSON, keep as is
                   }
                 }}
-                className="w-full px-3 py-2 border rounded-lg font-mono text-sm"
+                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 font-mono text-sm"
                 rows={6}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">タグ</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">タグ</label>
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                  className="flex-1 px-3 py-2 border rounded-lg"
+                  className="flex-1 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                   placeholder="タグを入力してEnter"
                 />
                 <button
                   type="button"
                   onClick={handleAddTag}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                  className="bg-slate-600 text-white px-6 py-2 rounded-lg hover:bg-slate-700 transition-all duration-300"
                 >
                   追加
                 </button>
@@ -389,23 +402,23 @@ export default function ContentsPage() {
                   type="checkbox"
                   checked={formData.isPublished}
                   onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                  className="rounded"
+                  className="rounded text-purple-500 focus:ring-purple-500/20"
                 />
-                <span className="text-sm font-medium">公開</span>
+                <span className="text-sm font-medium text-gray-300">公開</span>
               </label>
             </div>
 
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-2 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 {editingContent ? '更新' : '登録'}
               </button>
               <button
                 type="button"
                 onClick={resetForm}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                className="bg-slate-600 text-white px-6 py-2 rounded-lg hover:bg-slate-700 transition-all duration-300"
               >
                 キャンセル
               </button>
@@ -414,37 +427,37 @@ export default function ContentsPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 sticky top-0">
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-700/30 backdrop-blur-sm rounded-lg border border-slate-600/30 overflow-hidden">
+          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+            <table className="w-full">
+              <thead className="bg-slate-700/50 border-b border-slate-600/50 sticky top-0">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">カテゴリ</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイトル</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイプ</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">難易度</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">時間</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">利用数</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状態</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">ID</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">カテゴリ</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">タイトル</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">タイプ</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">難易度</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">時間</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">利用数</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">状態</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-slate-600/30">
               {contents.map((content) => (
-                <tr key={content.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm">{content.id}</td>
-                  <td className="px-4 py-3 text-sm">{content.category.name}</td>
+                <tr key={content.id} className="hover:bg-slate-700/30 text-white transition-colors">
+                  <td className="px-4 py-3 text-sm text-gray-300">{content.id}</td>
+                  <td className="px-4 py-3 text-sm text-gray-300">{content.category.name}</td>
                   <td className="px-4 py-3">
                     <div>
-                      <div className="font-medium">{content.title}</div>
+                      <div className="font-medium text-white">{content.title}</div>
                       {content.description && (
-                        <div className="text-sm text-gray-600">{content.description}</div>
+                        <div className="text-sm text-gray-300">{content.description}</div>
                       )}
                       {content.tags.length > 0 && (
                         <div className="flex gap-1 mt-1">
                           {content.tags.map(tag => (
-                            <span key={tag} className="text-xs bg-gray-100 px-2 py-0.5 rounded">
+                            <span key={tag} className="text-xs bg-slate-600/30 text-gray-300 px-2 py-0.5 rounded">
                               {tag}
                             </span>
                           ))}
@@ -452,21 +465,21 @@ export default function ContentsPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm text-gray-300">
                     {CONTENT_TYPES.find(t => t.value === content.content_type)?.label}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm text-gray-300">
                     {DIFFICULTY_LEVELS.find(d => d.value === content.difficulty)?.label}
                   </td>
-                  <td className="px-4 py-3 text-sm">{content.estimated_time}分</td>
+                  <td className="px-4 py-3 text-sm text-gray-300">{content.estimated_time}分</td>
                   <td className="px-4 py-3 text-sm">
-                    <div>進捗: {content.progress?.[0]?.count || 0}</div>
+                    <div className="text-gray-300">進捗: {content.progress?.[0]?.count || 0}</div>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 w-fit ${
                       content.is_published 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-green-600/20 text-green-300 border border-green-500/30' 
+                        : 'bg-gray-600/20 text-gray-300 border border-gray-500/30'
                     }`}>
                       {content.is_published ? <Eye size={14} /> : <EyeOff size={14} />}
                       {content.is_published ? '公開' : '非公開'}
@@ -476,13 +489,13 @@ export default function ContentsPage() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(content)}
-                        className="p-1 hover:bg-blue-100 rounded text-blue-600"
+                        className="p-1 hover:bg-blue-600/20 rounded text-blue-400 hover:text-blue-300"
                       >
                         <Edit size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(content.id)}
-                        className="p-1 hover:bg-red-100 rounded text-red-600"
+                        className="p-1 hover:bg-red-600/20 rounded text-red-400 hover:text-red-300"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -495,15 +508,15 @@ export default function ContentsPage() {
         </div>
 
         {pagination.totalPages > 1 && (
-          <div className="px-4 py-3 border-t flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+          <div className="px-4 py-3 border-t border-slate-600/30 flex items-center justify-between">
+            <div className="text-sm text-gray-300">
               全 {pagination.total} 件中 {(pagination.page - 1) * pagination.limit + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} 件を表示
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page === 1}
-                className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 border border-slate-600/30 rounded text-gray-300 hover:bg-slate-700/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -511,10 +524,10 @@ export default function ContentsPage() {
                 <button
                   key={i + 1}
                   onClick={() => handlePageChange(i + 1)}
-                  className={`px-3 py-1 border rounded ${
+                  className={`px-3 py-1 border border-slate-600/30 rounded transition-colors ${
                     pagination.page === i + 1 
-                      ? 'bg-blue-500 text-white' 
-                      : 'hover:bg-gray-50'
+                      ? 'bg-purple-600 text-white border-purple-500' 
+                      : 'text-gray-300 hover:bg-slate-700/30'
                   }`}
                 >
                   {i + 1}
@@ -523,13 +536,14 @@ export default function ContentsPage() {
               <button
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page === pagination.totalPages}
-                className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 border border-slate-600/30 rounded text-gray-300 hover:bg-slate-700/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight size={18} />
               </button>
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
