@@ -102,7 +102,7 @@ export default async function DbTestPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             🧪 Database Connection Test
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-800">
             🚀 Server Component - 高速なデータベース接続とレンダリング
           </p>
         </div>
@@ -117,7 +117,7 @@ export default async function DbTestPage() {
             <h3 className="text-xl font-semibold text-white mb-2">
               {categories.length > 0 ? '✅' : '❌'} Categories テーブル
             </h3>
-            <p className="text-gray-300">
+            <p className="text-gray-800">
               データ件数: {categories.length}件
             </p>
           </div>
@@ -130,7 +130,7 @@ export default async function DbTestPage() {
             <h3 className="text-xl font-semibold text-white mb-2">
               {learningContents.length > 0 ? '✅' : '❌'} Learning Contents テーブル
             </h3>
-            <p className="text-gray-300">
+            <p className="text-gray-800">
               データ件数: {learningContents.length}件
             </p>
           </div>
@@ -167,7 +167,7 @@ export default async function DbTestPage() {
                       <tr key={category.id} className="border-b border-slate-700">
                         <td className="text-white py-2">{category.id}</td>
                         <td className="text-white py-2">{category.name}</td>
-                        <td className="text-gray-300 py-2">{category.description}</td>
+                        <td className="text-gray-800 py-2">{category.description}</td>
                         <td className="text-yellow-400 py-2 text-xl">{category.icon}</td>
                         <td className="text-white py-2">
                           <div 
@@ -188,7 +188,7 @@ export default async function DbTestPage() {
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <p className="text-gray-500">データが見つかりません</p>
+              <p className="text-gray-800">データが見つかりません</p>
             </div>
           )}
         </div>
@@ -225,7 +225,7 @@ export default async function DbTestPage() {
                           </span>
                         </td>
                         <td className="text-white py-2">{content.estimated_time}</td>
-                        <td className="text-gray-300 py-2">
+                        <td className="text-gray-800 py-2">
                           {content.tags.slice(0, 3).join(', ')}
                           {content.tags.length > 3 && '...'}
                         </td>
@@ -240,7 +240,7 @@ export default async function DbTestPage() {
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <p className="text-gray-500">データが見つかりません</p>
+              <p className="text-gray-800">データが見つかりません</p>
             </div>
           )}
         </div>
