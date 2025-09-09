@@ -246,20 +246,20 @@ export default async function DbTestPage() {
         </div>
 
         {/* パフォーマンス情報 */}
-        <div className="bg-slate-800/50 rounded-lg p-6 mb-8">
-          <h3 className="text-xl font-semibold text-white mb-4">⚡ パフォーマンス改善</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">⚡ パフォーマンス改善</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <p className="text-gray-400">レンダリング:</p>
-              <p className="text-white font-mono">🚀 Server Component</p>
+              <p className="text-gray-700">レンダリング:</p>
+              <p className="text-gray-900 font-mono">🚀 Server Component</p>
             </div>
             <div>
-              <p className="text-gray-400">データ取得:</p>
-              <p className="text-white font-mono">⚡ 並行実行</p>
+              <p className="text-gray-700">データ取得:</p>
+              <p className="text-gray-900 font-mono">⚡ 並行実行</p>
             </div>
             <div>
-              <p className="text-gray-400">初期読み込み:</p>
-              <p className="text-white font-mono">📈 高速化完了</p>
+              <p className="text-gray-700">初期読み込み:</p>
+              <p className="text-gray-900 font-mono">📈 高速化完了</p>
             </div>
           </div>
         </div>
