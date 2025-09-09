@@ -146,7 +146,7 @@ export default async function DbTestPage() {
 
         {/* Categories データ表示 */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">📚 Categories データ</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">📚 Categories データ</h2>
           {categories.length > 0 ? (
             <div className="bg-slate-800/50 rounded-lg p-6">
               <div className="overflow-x-auto">
@@ -195,7 +195,7 @@ export default async function DbTestPage() {
 
         {/* Learning Contents データ表示 */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">📖 Learning Contents データ</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">📖 Learning Contents データ</h2>
           {learningContents.length > 0 ? (
             <div className="bg-slate-800/50 rounded-lg p-6">
               <div className="overflow-x-auto">
