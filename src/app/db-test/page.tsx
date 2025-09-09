@@ -96,13 +96,13 @@ export default async function DbTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
             🧪 Database Connection Test
           </h1>
-          <p className="text-gray-300">
+          <p className="text-gray-600">
             🚀 Server Component - 高速なデータベース接続とレンダリング
           </p>
         </div>
@@ -187,8 +187,8 @@ export default async function DbTestPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-slate-800/50 rounded-lg p-6">
-              <p className="text-gray-400">データが見つかりません</p>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <p className="text-gray-500">データが見つかりません</p>
             </div>
           )}
         </div>
@@ -239,8 +239,8 @@ export default async function DbTestPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-slate-800/50 rounded-lg p-6">
-              <p className="text-gray-400">データが見つかりません</p>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <p className="text-gray-500">データが見つかりません</p>
             </div>
           )}
         </div>
