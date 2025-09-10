@@ -187,23 +187,17 @@ export default function LearnPage({ params }: LearnPageProps) {
     try {
       const sessionDuration = Math.round((new Date().getTime() - sessionStart.getTime()) / 60000);
       
-      const response = await fetch('/api/learning/progress', {
+      const response = await fetch('/api/progress/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user.id,
           contentId: contentId,
-          sessionDurationMinutes: sessionDuration,
-          completedSections: [{
-            type: sectionType,
-            number: sectionId,
-            completed: !isCompleted,
-            duration: 0
-          }],
-          progressPercentage: Math.round((newCompletedSections.length / learningSections.length) * 100),
-          status: newCompletedSections.length === learningSections.length ? 'completed' : 'in_progress'
+          status: newCompletedSections.length === learningSections.length ? 'COMPLETED' : 'IN_PROGRESS',
+          score: Math.round((newCompletedSections.length / learningSections.length) * 100),
+          timeSpent: sessionDuration,
+          attempts: 1
         }),
       });
 
