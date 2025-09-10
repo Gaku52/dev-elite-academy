@@ -1,29 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
 
-// Supabaseクライアントを作成（認証付き）
-async function getSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
-
-  const cookieStore = cookies();
-  
-  return createClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
-      },
-    },
-  });
-}
-
-// サービスロール用のクライアント（管理者用）
-function getSupabaseAdmin() {
+// Supabaseクライアントを作成（サービスロール用）
+function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
@@ -39,6 +18,24 @@ function getSupabaseAdmin() {
   });
 }
 
+// サービスロール用のクライアント（管理者用）
+// 現在は使用していないが、将来の管理機能のために残しておく
+// function getSupabaseAdmin() {
+//   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+//   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+
+//   if (!supabaseUrl || !supabaseServiceKey) {
+//     throw new Error('Missing Supabase environment variables');
+//   }
+
+//   return createClient(supabaseUrl, supabaseServiceKey, {
+//     auth: {
+//       autoRefreshToken: false,
+//       persistSession: false
+//     }
+//   });
+// }
+
 // POST: 進捗を保存/更新（認証ユーザー用）
 export async function POST(request: NextRequest) {
   try {
@@ -49,11 +46,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'contentId is required' }, { status: 400 });
     }
 
-    // 認証チェック
-    const supabase = await getSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // 認証チェック（ヘッダーからユーザーIDを取得）
+    const authHeader = request.headers.get('authorization');
+    const userId = authHeader?.replace('Bearer ', '') || null;
 
-    if (authError || !user) {
+    if (!userId) {
       // 未認証の場合はゲストとして処理（ローカルストレージで管理）
       return NextResponse.json({ 
         success: false, 
@@ -62,8 +59,8 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
-    const userId = user.id;
-
+    const supabase = getSupabaseClient();
+    
     // 既存の進捗をチェック
     const { data: existingProgress } = await supabase
       .from('user_progress')
@@ -76,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     if (existingProgress) {
       // 更新
-      const updateData: Record<string, any> = {
+      const updateData: Record<string, unknown> = {
         status: status || existingProgress.status,
         updated_at: new Date().toISOString()
       };
@@ -106,7 +103,7 @@ export async function POST(request: NextRequest) {
       result = data;
     } else {
       // 新規作成
-      const insertData = {
+      const insertData: Record<string, unknown> = {
         user_id: userId,
         content_id: contentId,
         status: status || 'IN_PROGRESS',
@@ -140,12 +137,12 @@ export async function POST(request: NextRequest) {
       message: 'Progress saved successfully'
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error saving progress:', error);
     return NextResponse.json({ 
       error: 'Failed to save progress',
-      details: error.message || 'Unknown error',
-      code: error.code || 'UNKNOWN'
+      details: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as { code?: string }).code || 'UNKNOWN'
     }, { status: 500 });
   }
 }
@@ -156,10 +153,11 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const contentId = searchParams.get('contentId');
 
-    const supabase = await getSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // 認証チェック（ヘッダーからユーザーIDを取得）
+    const authHeader = request.headers.get('authorization');
+    const userId = authHeader?.replace('Bearer ', '') || null;
 
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ 
         success: false, 
         message: 'Authentication required',
@@ -167,6 +165,8 @@ export async function GET(request: NextRequest) {
         data: [] 
       });
     }
+
+    const supabase = getSupabaseClient();
 
     let query = supabase
       .from('user_progress')
@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
           )
         )
       `)
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     if (contentId) {
       query = query.eq('content_id', contentId);
@@ -205,11 +205,11 @@ export async function GET(request: NextRequest) {
       data: data || [] 
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching progress:', error);
     return NextResponse.json({ 
       error: 'Failed to fetch progress',
-      details: error.message || 'Unknown error'
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }
@@ -224,10 +224,11 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'contentId is required' }, { status: 400 });
     }
 
-    const supabase = await getSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // 認証チェック（ヘッダーからユーザーIDを取得）
+    const authHeader = request.headers.get('authorization');
+    const userId = authHeader?.replace('Bearer ', '') || null;
 
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ 
         success: false, 
         message: 'Authentication required',
@@ -235,10 +236,12 @@ export async function DELETE(request: NextRequest) {
       }, { status: 401 });
     }
 
+    const supabase = getSupabaseClient();
+
     const { error } = await supabase
       .from('user_progress')
       .delete()
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('content_id', contentId);
 
     if (error) {
@@ -251,11 +254,11 @@ export async function DELETE(request: NextRequest) {
       message: 'Progress reset successfully' 
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error resetting progress:', error);
     return NextResponse.json({ 
       error: 'Failed to reset progress',
-      details: error.message || 'Unknown error'
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }

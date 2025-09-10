@@ -167,7 +167,7 @@ export default function LearnPage({ params }: LearnPageProps) {
   }
 
   // セクション完了処理（改良版）
-  const handleSectionComplete = async (sectionId: number, sectionType: string) => {
+  const handleSectionComplete = async (sectionId: number) => {
     if (!user || updatingSection === sectionId) return;
 
     setUpdatingSection(sectionId);
@@ -355,7 +355,7 @@ export default function LearnPage({ params }: LearnPageProps) {
                       </div>
                     </div>
                     <button 
-                      onClick={() => handleSectionComplete(section.id, section.type)}
+                      onClick={() => handleSectionComplete(section.id)}
                       disabled={updatingSection === section.id}
                       className={`px-4 py-2 rounded-2xl transition-colors text-sm font-medium flex items-center ${
                         updatingSection === section.id
