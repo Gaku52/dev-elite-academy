@@ -153,7 +153,7 @@ export default function Home() {
               <div className="card-modern p-8 bg-gradient-to-br from-[#8E9C78]/10 to-[#8E9C78]/5">
                 <h3 className="text-2xl font-bold text-black mb-6">統計</h3>
                 <div className="grid grid-cols-2 gap-6">
-                  {stats.map((stat, index) => (
+                  {stats.map((stat) => (
                     <div key={stat.label} className="text-center space-y-2">
                       <div className="flex justify-center text-[#8E9C78]">
                         {stat.icon}
