@@ -41,24 +41,29 @@ export default function LearnPage({ params }: LearnPageProps) {
     if (!user || !contentId) return;
 
     try {
-      const response = await fetch(`/api/learning/progress?userId=${user.id}&contentId=${contentId}`);
-      if (response.ok) {
-        const progressData = await response.json();
-        if (progressData.length > 0) {
-          // setUserProgress(progressData[0]);
+      // 新しいAPIエンドポイントで進捗を取得
+      const response = await fetch(`/api/progress/update?contentId=${contentId}`, {
+        headers: {
+          'Authorization': `Bearer ${user.id}`
         }
-      }
-
-      // セクション別進捗も取得
-      const sectionsResponse = await fetch(`/api/learning/sections?userId=${user.id}&contentId=${contentId}`);
-      if (sectionsResponse.ok) {
-        const sectionsData = await sectionsResponse.json();
-        const completedIds = sectionsData
-          .filter((section: any) => section.is_completed) // eslint-disable-line @typescript-eslint/no-explicit-any
-          .map((section: any) => section.section_number); // eslint-disable-line @typescript-eslint/no-explicit-any
-        setCompletedSections(completedIds);
-      } else {
-        // データベーステーブルが存在しない場合、ローカルストレージから読み込み
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data && result.data.length > 0) {
+          const progressData = result.data[0];
+          // 進捗データから完了済みセクションを復元
+          // scoreが25%刻みで各セクションの完了状態を表す
+          const score = progressData.score || 0;
+          const completedCount = Math.floor(score / 25);
+          const completedIds = [];
+          for (let i = 1; i <= completedCount; i++) {
+            completedIds.push(i);
+          }
+          setCompletedSections(completedIds);
+        }
+      } else if (response.status === 401) {
+        // 認証エラーの場合、ローカルストレージから読み込み
         const localProgressKey = `progress_${user.id}_${contentId}`;
         const localProgress = localStorage.getItem(localProgressKey);
         if (localProgress) {
@@ -191,6 +196,7 @@ export default function LearnPage({ params }: LearnPageProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.id}`
         },
         body: JSON.stringify({
           contentId: contentId,
