@@ -88,14 +88,40 @@ export default async function Dashboard() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {categories.map((category) => {
               const pathUrl = getLearningPathUrl(category.name);
-              const CardWrapper = pathUrl ? Link : 'div';
-              const cardProps = pathUrl ? { href: pathUrl } : {};
+              
+              if (pathUrl) {
+                return (
+                  <Link
+                    key={category.id}
+                    href={pathUrl}
+                    className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 block"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <span className="text-3xl">
+                        {category.icon}
+                      </span>
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: category.color || '#8E9C78' }}
+                      ></div>
+                    </div>
+                    <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
+                      {category.name}
+                    </h4>
+                    <p className="text-[#6F6F6F] text-sm">
+                      {category.description}
+                    </p>
+                    <div className="mt-4 text-xs text-[#8E9C78]">
+                      {learningContents.filter(content => content.category_id === category.id).length} コンテンツ
+                    </div>
+                  </Link>
+                );
+              }
               
               return (
-                <CardWrapper
+                <div
                   key={category.id}
-                  {...cardProps}
-                  className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 block"
+                  className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <span className="text-3xl">
@@ -115,7 +141,7 @@ export default async function Dashboard() {
                   <div className="mt-4 text-xs text-[#8E9C78]">
                     {learningContents.filter(content => content.category_id === category.id).length} コンテンツ
                   </div>
-                </CardWrapper>
+                </div>
               );
             })}
           </div>
