@@ -55,16 +55,14 @@ export default function Header() {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('🔥 Logout button clicked!'); // デバッグ用
-    
     // 即座にメニューを閉じる
     setUserMenuOpen(false);
     
     try {
       await signOut();
-      console.log('✅ Sign out successful');
+      // Sign out successful
     } catch (error) {
-      console.error('❌ Sign out error:', error);
+      // Sign out error
     }
   };
 
@@ -72,13 +70,7 @@ export default function Header() {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('🎯 Menu toggle clicked!'); // デバッグ用
-    
-    setUserMenuOpen(prev => {
-      const newState = !prev;
-      console.log('📋 Menu state:', prev, '->', newState);
-      return newState;
-    });
+    setUserMenuOpen(prev => !prev);
   };
 
   return (
