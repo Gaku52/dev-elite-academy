@@ -76,9 +76,9 @@ export default function Home() {
       <Header />
       
       {/* Hero Section */}
-      <section className="pt-20 pb-32">
+      <section className="pt-12 sm:pt-16 md:pt-20 pb-16 sm:pb-24 md:pb-32">
         <div className="container-modern">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <div className="space-y-8">
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -86,14 +86,14 @@ export default function Home() {
                 transition={{ duration: 0.8 }}
                 className="space-y-6"
               >
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black leading-tight tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black leading-tight tracking-tight">
                   Dev Elite{' '}
                   <span className="text-gradient">
                     Academy
                   </span>
                 </h1>
                 
-                <p className="text-xl text-[#6F6F6F] leading-relaxed max-w-xl">
+                <p className="text-base sm:text-lg md:text-xl text-[#6F6F6F] leading-relaxed max-w-xl">
                   エンジニア3年目から高年収エンジニアへ。DevOps、AI/ML、セキュリティ、アーキテクチャ設計まで、将来性のある技術スキルを実践的に習得し、年収800万円以上を目指す統合学習プラットフォーム。
                 </p>
               </motion.div>
@@ -102,18 +102,18 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="flex flex-col sm:flex-row gap-4"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4"
               >
                 <Link
                   href="/dashboard"
-                  className="btn-modern inline-flex items-center justify-center space-x-2 text-lg px-8 py-4"
+                  className="btn-modern inline-flex items-center justify-center space-x-2 text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
                 >
                   <span>📊 ダッシュボード</span>
                   <ChevronRight className="w-5 h-5" />
                 </Link>
                 <Link
                   href="/learn"
-                  className="btn-secondary inline-flex items-center justify-center space-x-2 text-lg px-8 py-4"
+                  className="btn-secondary inline-flex items-center justify-center space-x-2 text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
                 >
                   <span>📚 学習を始める</span>
                   <ChevronRight className="w-5 h-5" />
@@ -124,7 +124,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="flex gap-4"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4"
               >
                 <Link
                   href="/specifications"
@@ -170,7 +170,7 @@ export default function Home() {
       </section>
 
       {/* Skills Categories Section */}
-      <section className="py-32 bg-gray-50">
+      <section className="py-16 sm:py-24 md:py-32 bg-gray-50">
         <div className="container-modern">
           <div className="text-center mb-16">
             <motion.div
@@ -179,16 +179,16 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="space-y-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-black">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black">
                 高年収エンジニアへの道のり
               </h2>
-              <p className="text-xl text-[#6F6F6F] max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl text-[#6F6F6F] max-w-2xl mx-auto">
                 実際の業務で必要とされる技術スキルを体系的に習得し、市場価値の高いエンジニアを目指します。
               </p>
             </motion.div>
           </div>
 
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {skillCategories.map((category, index) => (
               <motion.div
                 key={category.title}
@@ -219,7 +219,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 bg-[#8E9C78]">
+      <section className="py-16 sm:py-24 md:py-32 bg-[#8E9C78]">
         <div className="container-modern text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -228,15 +228,15 @@ export default function Home() {
             className="space-y-8"
           >
             <div className="space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold text-white">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white">
                 今すぐスキルアップを開始
               </h2>
-              <p className="text-xl text-white/80 max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
                 実践的なプロジェクトと体系化された学習パスで、確実にスキルアップできます。
               </p>
             </div>
             
-            <button className="bg-white text-[#8E9C78] px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-50 transition-colors inline-flex items-center space-x-2">
+            <button className="bg-white text-[#8E9C78] px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-gray-50 transition-colors inline-flex items-center space-x-2">
               <span>無料で始める</span>
               <ChevronRight className="w-5 h-5" />
             </button>

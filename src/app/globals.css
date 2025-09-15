@@ -84,9 +84,15 @@ button, a, input, textarea, select {
   padding: 0 2rem;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 640px) {
   .container-modern {
     padding: 0 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container-modern {
+    padding: 0 1.5rem;
   }
 }
 
@@ -103,11 +109,17 @@ button, a, input, textarea, select {
   color: white;
   border: none;
   border-radius: var(--radius);
-  padding: 12px 24px;
+  padding: 10px 20px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: var(--font-sans);
+}
+
+@media (min-width: 640px) {
+  .btn-modern {
+    padding: 12px 24px;
+  }
 }
 
 .btn-modern:hover {
@@ -120,6 +132,13 @@ button, a, input, textarea, select {
   background: transparent;
   color: var(--foreground);
   border: 1px solid var(--border);
+  padding: 10px 20px;
+}
+
+@media (min-width: 640px) {
+  .btn-secondary {
+    padding: 12px 24px;
+  }
 }
 
 .btn-secondary:hover {
