@@ -121,7 +121,7 @@ export function useLearningProgress(moduleName?: string) {
     };
 
     loadData();
-  }, [fetchProgress, fetchStats, getCurrentUserId]);
+  }, [fetchProgress, fetchStats, getCurrentUserId, moduleName]);
 
   // 進捗を保存
   const saveProgress = useCallback(async (

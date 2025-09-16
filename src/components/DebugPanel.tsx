@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export default function DebugPanel() {
-  const [userInfo, setUserInfo] = useState<{ id: string; email: string } | null>(null);
+  const [userInfo, setUserInfo] = useState<{ id: string; email?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
