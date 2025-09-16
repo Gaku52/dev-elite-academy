@@ -103,9 +103,15 @@ export default function ITFundamentalsPage() {
           <h1 className="text-4xl font-bold text-black mb-4">
             基本情報技術者試験
           </h1>
-          <p className="text-xl text-[#6F6F6F] max-w-3xl mx-auto">
+          <p className="text-xl text-[#6F6F6F] max-w-3xl mx-auto mb-4">
             IT基礎知識を体系的に学習
           </p>
+          <Link
+            href="/learning-stats"
+            className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+          >
+            📊 学習統計を見る
+          </Link>
         </div>
 
         <div className="mb-8">
