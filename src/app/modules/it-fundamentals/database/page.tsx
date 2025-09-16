@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Database, Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Database, Menu, X, RotateCcw } from 'lucide-react';
+import { useLearningProgress } from '@/hooks/useLearningProgress';
 
 const learningModules = [
   {
@@ -1239,16 +1240,52 @@ export default function DatabasePage() {
   const [showQuizResult, setShowQuizResult] = useState<{[key: string]: boolean}>({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // 進捗管理Hook
+  const {
+    progress,
+    stats,
+    loading,
+    error,
+    saveProgress,
+    resetProgress,
+    isSectionCompleted,
+    refetch
+  } = useLearningProgress('database');
+
   const currentModule = learningModules[activeModule];
   const currentSection = currentModule.sections[activeSection];
   const sectionKey = `${activeModule}-${activeSection}`;
 
-  const handleQuizAnswer = (answer: number) => {
+  // 進捗データをローカルステートに同期
+  useEffect(() => {
+    if (progress.length > 0) {
+      const completedSet = new Set<string>();
+      progress.forEach(p => {
+        if (p.is_completed) {
+          completedSet.add(p.section_key);
+        }
+      });
+      setCompletedSections(completedSet);
+    }
+  }, [progress]);
+
+  const handleQuizAnswer = async (answer: number) => {
     setQuizAnswers({...quizAnswers, [sectionKey]: answer});
     setShowQuizResult({...showQuizResult, [sectionKey]: true});
 
-    if (answer === currentSection.quiz.correct) {
+    const isCorrect = answer === currentSection.quiz.correct;
+    const isCompleted = isCorrect;
+
+    if (isCorrect) {
       setCompletedSections(new Set([...completedSections, sectionKey]));
+    }
+
+    // データベースに進捗を保存
+    try {
+      await saveProgress(sectionKey, isCompleted, isCorrect);
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+      // エラーハンドリング（必要に応じてユーザーに通知）
     }
   };
 
@@ -1272,7 +1309,23 @@ export default function DatabasePage() {
     setSidebarOpen(false);
   };
 
-  const progress = (completedSections.size / learningModules.reduce((acc, m) => acc + m.sections.length, 0)) * 100;
+  const localProgress = (completedSections.size / learningModules.reduce((acc, m) => acc + m.sections.length, 0)) * 100;
+
+  // 進捗リセット処理
+  const handleResetProgress = async () => {
+    if (window.confirm('データベースモジュールの学習進捗をリセットしますか？この操作は元に戻せません。')) {
+      try {
+        await resetProgress('database');
+        setCompletedSections(new Set());
+        setQuizAnswers({});
+        setShowQuizResult({});
+        alert('進捗をリセットしました。');
+      } catch (error) {
+        console.error('Failed to reset progress:', error);
+        alert('進捗のリセットに失敗しました。');
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1292,7 +1345,7 @@ export default function DatabasePage() {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-gray-900">データベース</h1>
-                <p className="text-xs text-gray-600">{Math.round(progress)}% 完了</p>
+                <p className="text-xs text-gray-600">{Math.round(localProgress)}% 完了</p>
               </div>
             </div>
           </div>
@@ -1331,14 +1384,33 @@ export default function DatabasePage() {
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-gray-600">学習進捗</span>
-                  <span className="text-gray-900 font-medium">{Math.round(progress)}%</span>
+                  <span className="text-gray-900 font-medium">{Math.round(localProgress)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
                   <div
                     className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
+                    style={{ width: `${localProgress}%` }}
                   />
                 </div>
+                {stats && (
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <div className="flex justify-between">
+                      <span>完了問題数:</span>
+                      <span>{stats.moduleStats.database?.completed || 0} / {stats.moduleStats.database?.total || 0}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>正答率:</span>
+                      <span>{stats.correctRate || 0}%</span>
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={handleResetProgress}
+                  className="mt-2 flex items-center text-xs text-red-600 hover:text-red-800 transition-colors"
+                >
+                  <RotateCcw className="w-3 h-3 mr-1" />
+                  進捗をリセット
+                </button>
               </div>
             </div>
 
@@ -1398,14 +1470,33 @@ export default function DatabasePage() {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-600">学習進捗</span>
-                    <span className="text-gray-900 font-medium">{Math.round(progress)}%</span>
+                    <span className="text-gray-900 font-medium">{Math.round(localProgress)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
                     <div
                       className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${progress}%` }}
+                      style={{ width: `${localProgress}%` }}
                     />
                   </div>
+                  {stats && (
+                    <div className="text-xs text-gray-500 space-y-1">
+                      <div className="flex justify-between">
+                        <span>完了:</span>
+                        <span>{stats.moduleStats.database?.completed || 0}/{stats.moduleStats.database?.total || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>正答率:</span>
+                        <span>{stats.correctRate || 0}%</span>
+                      </div>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleResetProgress}
+                    className="mt-2 flex items-center text-xs text-red-600 hover:text-red-800 transition-colors"
+                  >
+                    <RotateCcw className="w-3 h-3 mr-1" />
+                    リセット
+                  </button>
                 </div>
               </div>
 
@@ -1555,6 +1646,7 @@ export default function DatabasePage() {
                   </button>
                   <div className="text-sm text-gray-500">
                     {completedSections.size} / {learningModules.reduce((acc, m) => acc + m.sections.length, 0)} セクション完了
+                    {loading && <span className="ml-2 text-blue-500">同期中...</span>}
                   </div>
                   <button
                     onClick={nextSection}
