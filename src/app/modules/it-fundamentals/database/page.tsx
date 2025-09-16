@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Database, Menu, X, RotateCcw } from 'lucide-react';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
+import DebugPanel from '@/components/DebugPanel';
 
 const learningModules = [
   {
@@ -1257,12 +1258,25 @@ export default function DatabasePage() {
   useEffect(() => {
     if (progress.length > 0) {
       const completedSet = new Set<string>();
+      const answersMap: {[key: string]: number} = {};
+      const resultsMap: {[key: string]: boolean} = {};
+
       progress.forEach(p => {
         if (p.is_completed) {
           completedSet.add(p.section_key);
+          // 正解した問題の答えを復元（正解の選択肢番号を設定）
+          const moduleIndex = parseInt(p.section_key.split('-')[0]);
+          const sectionIndex = parseInt(p.section_key.split('-')[1]);
+          if (learningModules[moduleIndex] && learningModules[moduleIndex].sections[sectionIndex]) {
+            answersMap[p.section_key] = learningModules[moduleIndex].sections[sectionIndex].quiz.correct;
+          }
+          resultsMap[p.section_key] = true;
         }
       });
+
       setCompletedSections(completedSet);
+      setQuizAnswers(answersMap);
+      setShowQuizResult(resultsMap);
     }
   }, [progress]);
 
@@ -1659,6 +1673,7 @@ export default function DatabasePage() {
           </div>
         </div>
       </div>
+      <DebugPanel />
     </div>
   );
 }

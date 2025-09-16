@@ -57,6 +57,7 @@ export function useLearningProgress(moduleName?: string) {
         throw new Error(data.error);
       }
 
+      console.log('📊 Fetched progress data:', data.progress);
       setProgress(data.progress || []);
     } catch (err) {
       console.error('Error fetching progress:', err);
@@ -95,16 +96,26 @@ export function useLearningProgress(moduleName?: string) {
       setError(null);
 
       const userId = await getCurrentUserId();
+      console.log('🔍 Learning Progress Debug - User ID:', userId);
+
       if (!userId) {
+        console.log('❌ User not authenticated, skipping progress load');
         setError('User not authenticated');
         setLoading(false);
         return;
       }
 
-      await Promise.all([
-        fetchProgress(userId),
-        fetchStats(userId)
-      ]);
+      console.log('🔄 Loading progress for user:', userId, 'module:', moduleName);
+
+      try {
+        await Promise.all([
+          fetchProgress(userId),
+          fetchStats(userId)
+        ]);
+        console.log('✅ Progress loaded successfully');
+      } catch (err) {
+        console.error('❌ Error loading progress:', err);
+      }
 
       setLoading(false);
     };
@@ -128,6 +139,8 @@ export function useLearningProgress(moduleName?: string) {
     }
 
     try {
+      console.log('💾 Saving progress:', { userId, moduleName, sectionKey, isCompleted, isCorrect });
+
       const response = await fetch('/api/learning-progress', {
         method: 'POST',
         headers: {
@@ -150,6 +163,8 @@ export function useLearningProgress(moduleName?: string) {
       if (data.error) {
         throw new Error(data.error);
       }
+
+      console.log('✅ Progress saved successfully:', data.progress);
 
       // ローカルステートを更新
       setProgress(prev => {
