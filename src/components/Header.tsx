@@ -224,7 +224,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/auth"
-                className="btn-modern flex items-center space-x-2"
+                className="btn-modern flex items-center space-x-2 whitespace-nowrap"
               >
                 <LogIn className="w-4 h-4" />
                 <span>ログイン</span>
