@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Code, GitBranch, Layers, AlertCircle, Trophy } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Code, AlertCircle, Trophy } from 'lucide-react';
 
 interface Quiz {
   question: string;

@@ -1245,11 +1245,8 @@ export default function DatabasePage() {
     progress,
     stats,
     loading,
-    error,
     saveProgress,
-    resetProgress,
-    isSectionCompleted,
-    refetch
+    resetProgress
   } = useLearningProgress('database');
 
   const currentModule = learningModules[activeModule];
