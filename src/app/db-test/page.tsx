@@ -96,13 +96,13 @@ export default async function DbTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
             🧪 Database Connection Test
           </h1>
-          <p className="text-gray-300">
+          <p className="text-gray-800">
             🚀 Server Component - 高速なデータベース接続とレンダリング
           </p>
         </div>
@@ -117,7 +117,7 @@ export default async function DbTestPage() {
             <h3 className="text-xl font-semibold text-white mb-2">
               {categories.length > 0 ? '✅' : '❌'} Categories テーブル
             </h3>
-            <p className="text-gray-300">
+            <p className="text-gray-800">
               データ件数: {categories.length}件
             </p>
           </div>
@@ -130,7 +130,7 @@ export default async function DbTestPage() {
             <h3 className="text-xl font-semibold text-white mb-2">
               {learningContents.length > 0 ? '✅' : '❌'} Learning Contents テーブル
             </h3>
-            <p className="text-gray-300">
+            <p className="text-gray-800">
               データ件数: {learningContents.length}件
             </p>
           </div>
@@ -146,7 +146,7 @@ export default async function DbTestPage() {
 
         {/* Categories データ表示 */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">📚 Categories データ</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">📚 Categories データ</h2>
           {categories.length > 0 ? (
             <div className="bg-slate-800/50 rounded-lg p-6">
               <div className="overflow-x-auto">
@@ -167,7 +167,7 @@ export default async function DbTestPage() {
                       <tr key={category.id} className="border-b border-slate-700">
                         <td className="text-white py-2">{category.id}</td>
                         <td className="text-white py-2">{category.name}</td>
-                        <td className="text-gray-300 py-2">{category.description}</td>
+                        <td className="text-gray-800 py-2">{category.description}</td>
                         <td className="text-yellow-400 py-2 text-xl">{category.icon}</td>
                         <td className="text-white py-2">
                           <div 
@@ -187,15 +187,15 @@ export default async function DbTestPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-slate-800/50 rounded-lg p-6">
-              <p className="text-gray-400">データが見つかりません</p>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <p className="text-gray-800">データが見つかりません</p>
             </div>
           )}
         </div>
 
         {/* Learning Contents データ表示 */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">📖 Learning Contents データ</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">📖 Learning Contents データ</h2>
           {learningContents.length > 0 ? (
             <div className="bg-slate-800/50 rounded-lg p-6">
               <div className="overflow-x-auto">
@@ -225,7 +225,7 @@ export default async function DbTestPage() {
                           </span>
                         </td>
                         <td className="text-white py-2">{content.estimated_time}</td>
-                        <td className="text-gray-300 py-2">
+                        <td className="text-gray-800 py-2">
                           {content.tags.slice(0, 3).join(', ')}
                           {content.tags.length > 3 && '...'}
                         </td>
@@ -239,27 +239,27 @@ export default async function DbTestPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-slate-800/50 rounded-lg p-6">
-              <p className="text-gray-400">データが見つかりません</p>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <p className="text-gray-800">データが見つかりません</p>
             </div>
           )}
         </div>
 
         {/* パフォーマンス情報 */}
-        <div className="bg-slate-800/50 rounded-lg p-6 mb-8">
-          <h3 className="text-xl font-semibold text-white mb-4">⚡ パフォーマンス改善</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">⚡ パフォーマンス改善</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <p className="text-gray-400">レンダリング:</p>
-              <p className="text-white font-mono">🚀 Server Component</p>
+              <p className="text-gray-700">レンダリング:</p>
+              <p className="text-gray-900 font-mono">🚀 Server Component</p>
             </div>
             <div>
-              <p className="text-gray-400">データ取得:</p>
-              <p className="text-white font-mono">⚡ 並行実行</p>
+              <p className="text-gray-700">データ取得:</p>
+              <p className="text-gray-900 font-mono">⚡ 並行実行</p>
             </div>
             <div>
-              <p className="text-gray-400">初期読み込み:</p>
-              <p className="text-white font-mono">📈 高速化完了</p>
+              <p className="text-gray-700">初期読み込み:</p>
+              <p className="text-gray-900 font-mono">📈 高速化完了</p>
             </div>
           </div>
         </div>

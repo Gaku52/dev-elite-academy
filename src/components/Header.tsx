@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect, useRef } from 'react';
-import { 
-  User, 
-  LogOut, 
-  LogIn, 
+import {
+  User,
+  LogOut,
+  LogIn,
   ChevronDown,
   BookOpen,
   Home,
@@ -14,12 +14,15 @@ import {
   Settings,
   Database,
   FolderOpen,
-  FileText
+  FileText,
+  Menu,
+  X
 } from 'lucide-react';
 
 export default function Header() {
   const { user, signOut, loading } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -55,16 +58,14 @@ export default function Header() {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('🔥 Logout button clicked!'); // デバッグ用
-    
     // 即座にメニューを閉じる
     setUserMenuOpen(false);
     
     try {
       await signOut();
-      console.log('✅ Sign out successful');
+      // Sign out successful
     } catch (error) {
-      console.error('❌ Sign out error:', error);
+      // Sign out error
     }
   };
 
@@ -72,13 +73,7 @@ export default function Header() {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('🎯 Menu toggle clicked!'); // デバッグ用
-    
-    setUserMenuOpen(prev => {
-      const newState = !prev;
-      console.log('📋 Menu state:', prev, '->', newState);
-      return newState;
-    });
+    setUserMenuOpen(prev => !prev);
   };
 
   return (
@@ -90,7 +85,7 @@ export default function Header() {
             <div className="w-10 h-10 bg-[#8E9C78] rounded-2xl flex items-center justify-center shadow-sm">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
-            <span className="text-2xl font-bold text-black tracking-tight">Dev Elite Academy</span>
+            <span className="text-xl sm:text-2xl font-bold text-black tracking-tight">Dev Elite Academy</span>
           </Link>
 
           {/* ナビゲーション */}
@@ -125,11 +120,22 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* ユーザーメニュー */}
-          <div className="relative">
-            {loading ? (
-              <div className="w-10 h-10 bg-gray-200 rounded-2xl animate-pulse"></div>
-            ) : user ? (
+          {/* モバイルメニューとユーザーメニュー */}
+          <div className="flex items-center gap-4">
+            {/* モバイルメニューボタン */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-[#6F6F6F] hover:text-[#8E9C78] transition-colors"
+              aria-label="メニュー"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            {/* ユーザーメニュー */}
+            <div className="relative">
+              {loading ? (
+                <div className="w-10 h-10 bg-gray-200 rounded-2xl animate-pulse"></div>
+              ) : user ? (
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={handleMenuToggle}
@@ -224,12 +230,14 @@ export default function Header() {
                 <span>ログイン</span>
               </Link>
             )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      <div className="md:hidden border-t border-gray-100 bg-white">
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-100 bg-white">
         <div className="container-modern py-4 space-y-2">
           <Link 
             href="/" 
@@ -275,6 +283,7 @@ export default function Header() {
           </Link>
         </div>
       </div>
+      )}
     </header>
   );
 }

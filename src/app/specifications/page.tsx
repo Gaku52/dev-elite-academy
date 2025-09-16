@@ -45,15 +45,16 @@ export default function SpecificationsPage() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const formatDisplayName = (name: string) => {
-    return name
-      .replace('.html', '')
-      .replace(/-/g, ' ')
-      .replace(/_/g, ' ')
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
+  // 未使用の関数をコメントアウト（将来使用する可能性があるため残す）
+  // const formatDisplayName = (name: string) => {
+  //   return name
+  //     .replace('.html', '')
+  //     .replace(/-/g, ' ')
+  //     .replace(/_/g, ' ')
+  //     .split(' ')
+  //     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  //     .join(' ');
+  // };
 
   if (loading) {
     return (
