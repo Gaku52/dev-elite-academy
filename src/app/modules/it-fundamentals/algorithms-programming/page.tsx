@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Code, AlertCircle, Trophy } from 'lucide-react';
+import { useLearningProgress } from '@/hooks/useLearningProgress';
 
 interface Quiz {
   question: string;
@@ -1310,17 +1311,64 @@ export default function AlgorithmsProgrammingPage() {
   const [showQuizResults, setShowQuizResults] = useState<{[key: string]: boolean}>({});
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
 
+  const { progress, saveProgress, loading: progressLoading, error: progressError } = useLearningProgress('algorithms-programming');
+
+  useEffect(() => {
+    if (progress.length > 0) {
+      console.log('🔄 Restoring algorithms-programming progress state...');
+      const completedSet = new Set<string>();
+      const answersMap: {[key: string]: number} = {};
+      const resultsMap: {[key: string]: boolean} = {};
+
+      progress.forEach((p) => {
+        const sectionKey = p.section_key;
+        if (p.is_completed) {
+          completedSet.add(sectionKey);
+          resultsMap[sectionKey] = true;
+
+          const parts = sectionKey.split('-');
+          if (parts.length >= 3) {
+            const moduleIndex = parseInt(parts[0]);
+            const sectionIndex = parseInt(parts[1]);
+            const quizIndex = parseInt(parts[2]);
+
+            if (!isNaN(moduleIndex) && !isNaN(sectionIndex) && !isNaN(quizIndex)) {
+              const module = learningModules[moduleIndex];
+              if (module && module.sections[sectionIndex] && module.sections[sectionIndex].quizzes[quizIndex]) {
+                const correctAnswer = module.sections[sectionIndex].quizzes[quizIndex].correct;
+                answersMap[sectionKey] = correctAnswer;
+              }
+            }
+          }
+        }
+      });
+
+      setCompletedQuizzes(completedSet);
+      setQuizAnswers(answersMap);
+      setShowQuizResults(resultsMap);
+      console.log('✅ Algorithms-programming progress restored:', { completed: completedSet.size, answers: Object.keys(answersMap).length });
+    }
+  }, [progress]);
+
   const currentModule = learningModules[activeModule];
   const currentSection = currentModule.sections[activeSection];
   const currentQuiz = currentSection.quizzes[currentQuizIndex];
   const quizKey = `${activeModule}-${activeSection}-${currentQuizIndex}`;
 
-  const handleQuizAnswer = (answer: number) => {
+  const handleQuizAnswer = async (answer: number) => {
     setQuizAnswers({...quizAnswers, [quizKey]: answer});
     setShowQuizResults({...showQuizResults, [quizKey]: true});
 
-    if (answer === currentQuiz.correct) {
+    const isCorrect = answer === currentQuiz.correct;
+    if (isCorrect) {
       setCompletedQuizzes(new Set([...completedQuizzes, quizKey]));
+    }
+
+    try {
+      await saveProgress(quizKey, isCorrect, isCorrect);
+      console.log('✅ Algorithms-programming progress saved:', { section: quizKey, correct: isCorrect });
+    } catch (error) {
+      console.error('❌ Failed to save algorithms-programming progress:', error);
     }
   };
 
