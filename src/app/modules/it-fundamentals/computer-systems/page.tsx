@@ -1,8 +1,7 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Calculator, Cpu, HardDrive, Monitor, AlertCircle, Trophy, Menu, X, RotateCcw } from 'lucide-react';
-import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { useState } from 'react';
+import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Calculator, AlertCircle, Trophy } from 'lucide-react';
 
 interface Quiz {
   question: string;

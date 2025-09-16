@@ -19,7 +19,7 @@ interface LearningStats {
 interface ModuleInfo {
   key: string;
   name: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   href: string;
 }
