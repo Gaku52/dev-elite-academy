@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/Header';
 import UserProgressTracker from '@/components/UserProgressTracker';
+import { getLearningPathUrl } from '@/lib/learning-paths';
 
 // サーバーサイドでのデータ取得
 async function getDashboardData() {
@@ -53,16 +54,16 @@ export default async function Dashboard() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <div className="container-modern py-12">
+      <div className="container-modern py-6 sm:py-8 md:py-12">
         {/* Welcome Section */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-[#8E9C78] rounded-2xl shadow-sm">
             <Trophy className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-4xl font-bold text-black mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-4">
             学習ダッシュボード
           </h2>
-          <p className="text-xl text-[#6F6F6F] max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-[#6F6F6F] max-w-3xl mx-auto">
             高年収エンジニアへの道のり。あなたの学習進捗を追跡し、スキルアップの成果を可視化します。
           </p>
         </div>
@@ -73,7 +74,7 @@ export default async function Dashboard() {
         {/* Learning Path Section */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-black flex items-center">
+            <h3 className="text-xl sm:text-2xl font-bold text-black flex items-center">
               <BarChart3 className="w-6 h-6 mr-3 text-[#8E9C78]" />
               学習パス
             </h3>
@@ -84,46 +85,79 @@ export default async function Dashboard() {
               すべて見る <ChevronRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <span className="text-3xl">
-                    {category.icon}
-                  </span>
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: category.color || '#8E9C78' }}
-                  ></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {categories.map((category) => {
+              const pathUrl = getLearningPathUrl(category.name);
+              
+              if (pathUrl) {
+                return (
+                  <Link
+                    key={category.id}
+                    href={pathUrl}
+                    className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 block"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <span className="text-3xl">
+                        {category.icon}
+                      </span>
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: category.color || '#8E9C78' }}
+                      ></div>
+                    </div>
+                    <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
+                      {category.name}
+                    </h4>
+                    <p className="text-[#6F6F6F] text-sm">
+                      {category.description}
+                    </p>
+                    <div className="mt-4 text-xs text-[#8E9C78]">
+                      {learningContents.filter(content => content.category_id === category.id).length} コンテンツ
+                    </div>
+                  </Link>
+                );
+              }
+              
+              return (
+                <div
+                  key={category.id}
+                  className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-3xl">
+                      {category.icon}
+                    </span>
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: category.color || '#8E9C78' }}
+                    ></div>
+                  </div>
+                  <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
+                    {category.name}
+                  </h4>
+                  <p className="text-[#6F6F6F] text-sm">
+                    {category.description}
+                  </p>
+                  <div className="mt-4 text-xs text-[#8E9C78]">
+                    {learningContents.filter(content => content.category_id === category.id).length} コンテンツ
+                  </div>
                 </div>
-                <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
-                  {category.name}
-                </h4>
-                <p className="text-[#6F6F6F] text-sm">
-                  {category.description}
-                </p>
-                <div className="mt-4 text-xs text-[#8E9C78]">
-                  {learningContents.filter(content => content.category_id === category.id).length} コンテンツ
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Quick Start Section */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-black flex items-center">
+            <h3 className="text-xl sm:text-2xl font-bold text-black flex items-center">
               <PlayCircle className="w-6 h-6 mr-3 text-green-500" />
               今すぐ始める
             </h3>
             <p className="text-[#6F6F6F] text-sm">最新の学習コンテンツから選択</p>
           </div>
           {learningContents.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {learningContents.slice(0, 6).map((content) => (
                 <Link
                   key={content.id}
