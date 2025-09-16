@@ -9,7 +9,8 @@ const fundamentalTopics = [
     icon: Calculator,
     topics: ['CPU・メモリ・入出力装置', 'オペレーティングシステム', 'システムの構成と方式'],
     color: 'bg-blue-500',
-    progress: 0
+    progress: 0,
+    href: '/modules/it-fundamentals/computer-systems'
   },
   {
     id: 2,
@@ -18,7 +19,8 @@ const fundamentalTopics = [
     icon: Code,
     topics: ['基本アルゴリズム', 'データ構造', 'プログラミング言語の基礎'],
     color: 'bg-purple-500',
-    progress: 0
+    progress: 0,
+    href: '/modules/it-fundamentals/algorithms-programming'
   },
   {
     id: 3,
@@ -27,7 +29,8 @@ const fundamentalTopics = [
     icon: Database,
     topics: ['関係データベース', 'SQL基礎', '正規化', 'トランザクション処理'],
     color: 'bg-green-500',
-    progress: 0
+    progress: 0,
+    href: '/modules/it-fundamentals/database'
   },
   {
     id: 4,
@@ -36,7 +39,8 @@ const fundamentalTopics = [
     icon: Network,
     topics: ['OSI参照モデル', 'TCP/IP', 'LAN・WAN', 'インターネット技術'],
     color: 'bg-orange-500',
-    progress: 0
+    progress: 0,
+    href: '/modules/it-fundamentals/network'
   },
   {
     id: 5,
@@ -45,7 +49,8 @@ const fundamentalTopics = [
     icon: Shield,
     topics: ['暗号技術', '認証技術', 'セキュリティ対策', 'リスクマネジメント'],
     color: 'bg-red-500',
-    progress: 0
+    progress: 0,
+    href: '/modules/it-fundamentals/security'
   },
   {
     id: 6,
@@ -54,7 +59,8 @@ const fundamentalTopics = [
     icon: Users,
     topics: ['開発手法', 'テスト技法', 'プロジェクト管理', 'サービスマネジメント'],
     color: 'bg-indigo-500',
-    progress: 0
+    progress: 0,
+    href: '/modules/it-fundamentals/system-development'
   },
   {
     id: 7,
@@ -63,7 +69,8 @@ const fundamentalTopics = [
     icon: FileText,
     topics: ['経営戦略', '企業会計', '法務・標準化', 'OR・IE'],
     color: 'bg-teal-500',
-    progress: 0
+    progress: 0,
+    href: '/modules/it-fundamentals/management-legal'
   },
   {
     id: 8,
@@ -72,7 +79,8 @@ const fundamentalTopics = [
     icon: TrendingUp,
     topics: ['システム戦略', '経営戦略マネジメント', '技術戦略マネジメント'],
     color: 'bg-pink-500',
-    progress: 0
+    progress: 0,
+    href: '/modules/it-fundamentals/strategy'
   }
 ];
 
@@ -162,9 +170,11 @@ export default function ITFundamentalsPage() {
                   </div>
                 </div>
                 
-                <button className="mt-4 w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-sm font-medium">
-                  学習を開始
-                </button>
+                <Link href={topic.href || '#'} className="mt-4 w-full block">
+                  <button className="w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-sm font-medium">
+                    学習を開始
+                  </button>
+                </Link>
               </div>
             );
           })}
