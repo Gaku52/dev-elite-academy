@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 
 // モジュール名のマッピング
-const moduleNameMapping = {
+const moduleNameMapping: Record<number, string> = {
   1: 'computer-systems',
   2: 'algorithms-programming',
   3: 'database',
@@ -19,7 +19,7 @@ const moduleNameMapping = {
 
 // 各モジュールの総クイズ数（実装済みのモジュールから取得）
 // この数値は各モジュールの実装状況に基づいて更新される
-const moduleQuizCounts = {
+const moduleQuizCounts: Record<string, number> = {
   'computer-systems': 105,        // 実装済み - 105クイズ
   'algorithms-programming': 89,   // 実装済み - 89クイズ
   'database': 21,                 // 実装済み - 21クイズ
