@@ -3,6 +3,32 @@
 import Link from 'next/link';
 import { BookOpen, ArrowLeft, Code, Database, Network, Shield, Calculator, Users, FileText, TrendingUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useLearningProgress } from '@/hooks/useLearningProgress';
+
+// モジュール名のマッピング
+const moduleNameMapping = {
+  1: 'computer-systems',
+  2: 'algorithms-programming',
+  3: 'database',
+  4: 'network',
+  5: 'security',
+  6: 'system-development',
+  7: 'management-legal',
+  8: 'strategy'
+};
+
+// 各モジュールの総クイズ数（実装済みのモジュールから取得）
+// この数値は各モジュールの実装状況に基づいて更新される
+const moduleQuizCounts = {
+  'computer-systems': 105,        // 実装済み - 105クイズ
+  'algorithms-programming': 89,   // 実装済み - 89クイズ
+  'database': 21,                 // 実装済み - 21クイズ
+  'network': 0,        // 未実装
+  'security': 0,       // 未実装
+  'system-development': 0, // 未実装
+  'management-legal': 0,   // 未実装
+  'strategy': 0        // 未実装
+};
 
 const fundamentalTopics = [
   {
@@ -89,22 +115,29 @@ const fundamentalTopics = [
 
 export default function ITFundamentalsPage() {
   const [progressData, setProgressData] = useState<{[key: number]: number}>({});
+  const { stats } = useLearningProgress();
 
   useEffect(() => {
-    // TODO: Replace with actual API call to fetch progress data
-    // For now, using placeholder data to demonstrate proper progress display
-    const mockProgressData = {
-      1: 25,  // Computer Systems: 25%
-      2: 40,  // Algorithms & Programming: 40%
-      3: 15,  // Database: 15%
-      4: 60,  // Network: 60%
-      5: 30,  // Security: 30%
-      6: 0,   // System Development: 0%
-      7: 10,  // Business & Legal: 10%
-      8: 5    // Strategy: 5%
-    };
-    setProgressData(mockProgressData);
-  }, []);
+    if (stats && stats.moduleStats) {
+      const calculatedProgress: {[key: number]: number} = {};
+
+      // 各モジュールの進捗率を計算
+      Object.entries(moduleNameMapping).forEach(([topicId, moduleName]) => {
+        const moduleProgress = stats.moduleStats[moduleName];
+        const totalQuizzes = moduleQuizCounts[moduleName] || 0;
+
+        if (moduleProgress && totalQuizzes > 0) {
+          const progressPercentage = Math.round((moduleProgress.completed / totalQuizzes) * 100);
+          calculatedProgress[parseInt(topicId)] = progressPercentage;
+        } else {
+          calculatedProgress[parseInt(topicId)] = 0;
+        }
+      });
+
+      console.log('📊 Calculated module progress:', calculatedProgress);
+      setProgressData(calculatedProgress);
+    }
+  }, [stats]);
 
   return (
     <div className="min-h-screen bg-white">
