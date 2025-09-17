@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { BookOpen, ArrowLeft, Code, Database, Network, Shield, Calculator, Users, FileText, TrendingUp } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const fundamentalTopics = [
   {
@@ -77,6 +80,24 @@ const fundamentalTopics = [
 ];
 
 export default function ITFundamentalsPage() {
+  const [progressData, setProgressData] = useState<{[key: number]: number}>({});
+
+  useEffect(() => {
+    // TODO: Replace with actual API call to fetch progress data
+    // For now, using placeholder data to demonstrate proper progress display
+    const mockProgressData = {
+      1: 25,  // Computer Systems: 25%
+      2: 40,  // Algorithms & Programming: 40%
+      3: 15,  // Database: 15%
+      4: 60,  // Network: 60%
+      5: 30,  // Security: 30%
+      6: 0,   // System Development: 0%
+      7: 10,  // Business & Legal: 10%
+      8: 5    // Strategy: 5%
+    };
+    setProgressData(mockProgressData);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="container-modern py-12">
@@ -124,6 +145,7 @@ export default function ITFundamentalsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {fundamentalTopics.map((topic) => {
             const Icon = topic.icon;
+            const currentProgress = progressData[topic.id] || 0;
             return (
               <div key={topic.id} className="card-modern p-6 hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="flex items-start mb-4">
@@ -139,7 +161,7 @@ export default function ITFundamentalsPage() {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2 mb-4">
                   {topic.topics.map((item, index) => (
                     <div key={index} className="flex items-center text-sm">
@@ -148,20 +170,20 @@ export default function ITFundamentalsPage() {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-[#6F6F6F]">進捗</span>
-                    <span className="text-[#6F6F6F]">{topic.progress}%</span>
+                    <span className="text-[#6F6F6F]">{currentProgress}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className={`${topic.color} h-2 rounded-full transition-all duration-300`}
-                      style={{ width: `${topic.progress}%` }}
+                      style={{ width: `${currentProgress}%` }}
                     ></div>
                   </div>
                 </div>
-                
+
                 <button className="mt-4 w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-sm font-medium">
                   学習を開始
                 </button>
