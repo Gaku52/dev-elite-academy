@@ -1,21 +1,8 @@
-'use client';
-
 import Link from 'next/link';
 import { BookOpen, ArrowLeft, Code, Database, Network, Shield, Calculator, Users, FileText, TrendingUp } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { getServerUser } from '@/lib/server-auth';
+import { getServerSideProgress, calculateModuleProgress } from '@/lib/server-progress';
 
-// モジュール名のマッピング
-const moduleNameMapping: Record<number, string> = {
-  1: 'computer-systems',
-  2: 'algorithms-programming',
-  3: 'database',
-  4: 'network',
-  5: 'security',
-  6: 'system-development',
-  7: 'management-legal',
-  8: 'strategy'
-};
 
 // 各モジュールの総クイズ数（実装済みのモジュールから取得）
 // この数値は各モジュールの実装状況に基づいて更新される
@@ -113,31 +100,11 @@ const fundamentalTopics = [
   }
 ];
 
-export default function ITFundamentalsPage() {
-  const [progressData, setProgressData] = useState<{[key: number]: number}>({});
-  const { stats } = useLearningProgress();
-
-  useEffect(() => {
-    if (stats && stats.moduleStats) {
-      const calculatedProgress: {[key: number]: number} = {};
-
-      // 各モジュールの進捗率を計算
-      Object.entries(moduleNameMapping).forEach(([topicId, moduleName]) => {
-        const moduleProgress = stats.moduleStats[moduleName];
-        const totalQuizzes = moduleQuizCounts[moduleName] || 0;
-
-        if (moduleProgress && totalQuizzes > 0) {
-          const progressPercentage = Math.round((moduleProgress.completed / totalQuizzes) * 100);
-          calculatedProgress[parseInt(topicId)] = progressPercentage;
-        } else {
-          calculatedProgress[parseInt(topicId)] = 0;
-        }
-      });
-
-      console.log('📊 Calculated module progress:', calculatedProgress);
-      setProgressData(calculatedProgress);
-    }
-  }, [stats]);
+export default async function ITFundamentalsPage() {
+  // サーバーサイドで進捗データを取得
+  const user = await getServerUser();
+  const { stats } = await getServerSideProgress(user?.id);
+  const progressData = calculateModuleProgress(stats, moduleQuizCounts);
 
   return (
     <div className="min-h-screen bg-white">
