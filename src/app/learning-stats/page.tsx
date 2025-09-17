@@ -1,8 +1,11 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, TrendingUp, RotateCcw, Database, Calculator, Code } from 'lucide-react';
+import { ArrowLeft, BookOpen, TrendingUp, RotateCcw, Database, Calculator, Code, BarChart3, Calendar, Flame } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import DailyProgressChart from '@/components/analytics/DailyProgressChart';
+import LearningStreakCard from '@/components/analytics/LearningStreakCard';
+import LearningHeatmap from '@/components/analytics/LearningHeatmap';
 
 interface LearningStats {
   totalQuestions: number;
@@ -52,6 +55,10 @@ export default function LearningStatsPage() {
   const [stats, setStats] = useState<LearningStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dailyProgress, setDailyProgress] = useState<any[]>([]);
+  const [streakData, setStreakData] = useState<any>(null);
+  const [chartType, setChartType] = useState<'line' | 'bar' | 'area'>('line');
+  const [dateRange, setDateRange] = useState(30); // デフォルト30日
 
   const fetchStats = async () => {
     try {
@@ -63,6 +70,7 @@ export default function LearningStatsPage() {
         return;
       }
 
+      // 既存の統計データ取得
       const url = new URL('/api/learning-progress/reset', window.location.origin);
       url.searchParams.set('userId', user.id);
       url.searchParams.set('action', 'stats');
@@ -78,6 +86,27 @@ export default function LearningStatsPage() {
       }
 
       setStats(data.stats);
+
+      // 日次進捗データの取得
+      const dailyUrl = new URL('/api/learning-analytics/daily-progress', window.location.origin);
+      dailyUrl.searchParams.set('userId', user.id);
+      dailyUrl.searchParams.set('days', dateRange.toString());
+
+      const dailyResponse = await fetch(dailyUrl.toString());
+      if (dailyResponse.ok) {
+        const dailyData = await dailyResponse.json();
+        setDailyProgress(dailyData.dailyProgress || []);
+      }
+
+      // ストリークデータの取得
+      const streakUrl = new URL('/api/learning-analytics/streak', window.location.origin);
+      streakUrl.searchParams.set('userId', user.id);
+
+      const streakResponse = await fetch(streakUrl.toString());
+      if (streakResponse.ok) {
+        const streakData = await streakResponse.json();
+        setStreakData(streakData);
+      }
     } catch (err) {
       console.error('Error fetching stats:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -119,7 +148,7 @@ export default function LearningStatsPage() {
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [dateRange]);
 
   if (loading) {
     return (
@@ -150,7 +179,7 @@ export default function LearningStatsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="container max-w-6xl mx-auto px-4 py-8">
         <Link
           href="/modules/it-fundamentals"
           className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-8 transition-colors"
@@ -166,8 +195,8 @@ export default function LearningStatsPage() {
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">学習統計</h1>
-                <p className="text-gray-600">あなたの学習進捗を確認しましょう</p>
+                <h1 className="text-3xl font-bold text-gray-900">詳細学習統計</h1>
+                <p className="text-gray-600">あなたの学習進捗を詳細に分析します</p>
               </div>
             </div>
             <button
@@ -177,6 +206,72 @@ export default function LearningStatsPage() {
               <RotateCcw className="w-4 h-4 mr-2" />
               全進捗リセット
             </button>
+          </div>
+
+          {/* ストリーク情報 */}
+          {streakData && <LearningStreakCard streakData={streakData} />}
+
+          {/* 期間選択とチャートタイプ選択 */}
+          <div className="flex flex-wrap gap-4 my-6">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">表示期間:</span>
+              <select
+                value={dateRange}
+                onChange={(e) => setDateRange(Number(e.target.value))}
+                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value={7}>1週間</option>
+                <option value={30}>1ヶ月</option>
+                <option value={90}>3ヶ月</option>
+                <option value={180}>6ヶ月</option>
+                <option value={365}>1年</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">チャートタイプ:</span>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setChartType('line')}
+                  className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                    chartType === 'line'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  折れ線
+                </button>
+                <button
+                  onClick={() => setChartType('bar')}
+                  className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                    chartType === 'bar'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  棒グラフ
+                </button>
+                <button
+                  onClick={() => setChartType('area')}
+                  className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                    chartType === 'area'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  エリア
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 日次進捗チャート */}
+          <div className="mb-8">
+            <DailyProgressChart data={dailyProgress} chartType={chartType} />
+          </div>
+
+          {/* 学習ヒートマップ */}
+          <div className="mb-8">
+            <LearningHeatmap data={dailyProgress} days={365} />
           </div>
 
           {/* 全体統計 */}
@@ -264,23 +359,40 @@ export default function LearningStatsPage() {
 
           {/* 学習のヒント */}
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">🎯 学習のポイント</h3>
+            <h3 className="text-lg font-semibold mb-4">📊 分析から見える改善点</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-gray-700 mb-2"><strong>継続的な学習:</strong></p>
-                <p className="text-gray-600">毎日少しずつでも継続することが重要です</p>
+                <p className="text-gray-700 mb-2"><strong>学習パターン:</strong></p>
+                <p className="text-gray-600">
+                  {dailyProgress.filter(d => d.totalQuestions > 0).length > 0
+                    ? '継続的に学習を進めています'
+                    : 'まずは定期的な学習習慣を作りましょう'}
+                </p>
               </div>
               <div>
-                <p className="text-gray-700 mb-2"><strong>弱点の克服:</strong></p>
-                <p className="text-gray-600">正答率の低い分野を重点的に復習しましょう</p>
+                <p className="text-gray-700 mb-2"><strong>推奨アクション:</strong></p>
+                <p className="text-gray-600">
+                  {(stats?.correctRate || 0) < 60
+                    ? '基礎から復習することをお勧めします'
+                    : '難易度の高い問題に挑戦しましょう'}
+                </p>
               </div>
               <div>
-                <p className="text-gray-700 mb-2"><strong>理解の定着:</strong></p>
-                <p className="text-gray-600">解説をしっかり読んで理解を深めましょう</p>
+                <p className="text-gray-700 mb-2"><strong>強化ポイント:</strong></p>
+                <p className="text-gray-600">
+                  {Object.entries(stats?.moduleStats || {}).reduce((min, [key, value]) => {
+                    const progress = value.completed / Math.max(value.total, 1);
+                    return progress < min.progress ? { key, progress } : min;
+                  }, { key: '', progress: 1 }).key || '全体的にバランスよく学習しています'}
+                </p>
               </div>
               <div>
-                <p className="text-gray-700 mb-2"><strong>目標設定:</strong></p>
-                <p className="text-gray-600">全体で80%以上の正答率を目指しましょう</p>
+                <p className="text-gray-700 mb-2"><strong>次の目標:</strong></p>
+                <p className="text-gray-600">
+                  {streakData?.current_streak >= 7
+                    ? 'この調子で継続しましょう'
+                    : '7日連続学習を目指しましょう'}
+                </p>
               </div>
             </div>
           </div>
