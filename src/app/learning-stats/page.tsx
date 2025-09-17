@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, TrendingUp, RotateCcw, Database, Calculator, Code, BarChart3, Calendar, Flame } from 'lucide-react';
+import { ArrowLeft, BookOpen, TrendingUp, RotateCcw, Database, Calculator, Code } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import DailyProgressChart from '@/components/analytics/DailyProgressChart';
 import LearningStreakCard from '@/components/analytics/LearningStreakCard';
@@ -55,8 +55,24 @@ export default function LearningStatsPage() {
   const [stats, setStats] = useState<LearningStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dailyProgress, setDailyProgress] = useState<any[]>([]);
-  const [streakData, setStreakData] = useState<any>(null);
+  interface DailyProgressData {
+    date: string;
+    totalQuestions: number;
+    correctQuestions: number;
+    correctRate: number;
+    timeSpent: number;
+    sectionsCompleted: number;
+  }
+
+  interface StreakData {
+    current_streak: number;
+    longest_streak: number;
+    last_activity_date: string | null;
+    total_days_learned: number;
+  }
+
+  const [dailyProgress, setDailyProgress] = useState<DailyProgressData[]>([]);
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [chartType, setChartType] = useState<'line' | 'bar' | 'area'>('line');
   const [dateRange, setDateRange] = useState(30); // デフォルト30日
 
@@ -148,6 +164,7 @@ export default function LearningStatsPage() {
 
   useEffect(() => {
     fetchStats();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange]);
 
   if (loading) {
@@ -389,7 +406,7 @@ export default function LearningStatsPage() {
               <div>
                 <p className="text-gray-700 mb-2"><strong>次の目標:</strong></p>
                 <p className="text-gray-600">
-                  {streakData?.current_streak >= 7
+                  {(streakData?.current_streak || 0) >= 7
                     ? 'この調子で継続しましょう'
                     : '7日連続学習を目指しましょう'}
                 </p>

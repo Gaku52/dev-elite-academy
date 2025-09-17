@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { handleAPIError, successResponse, APIError } from '@/lib/api-error-handler';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { format, subDays } from 'date-fns';
 
 // GET: 日次進捗データの取得
 export async function GET(request: NextRequest) {
@@ -30,7 +30,14 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     // データを日付ごとに集計
-    const progressByDate: Record<string, any> = {};
+    const progressByDate: Record<string, {
+      date: string;
+      totalQuestions: number;
+      correctQuestions: number;
+      timeSpent: number;
+      sectionsCompleted: number;
+      modules: string[];
+    }> = {};
     const dates = [];
 
     for (let i = 0; i < days; i++) {
@@ -47,7 +54,14 @@ export async function GET(request: NextRequest) {
     }
 
     // 実際のデータをマージ
-    dailyProgress?.forEach(record => {
+    dailyProgress?.forEach((record: {
+      date: string;
+      questions_attempted?: number;
+      questions_correct?: number;
+      time_spent_minutes?: number;
+      sections_completed?: number;
+      module_name: string;
+    }) => {
       const date = record.date;
       if (progressByDate[date]) {
         progressByDate[date].totalQuestions += record.questions_attempted || 0;
@@ -102,7 +116,8 @@ export async function POST(request: NextRequest) {
     const today = format(new Date(), 'yyyy-MM-dd');
 
     // 既存のレコードをチェック
-    const { data: existing } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing } = await (supabase as any)
       .from('daily_learning_progress')
       .select('*')
       .eq('user_id', userId)
@@ -113,15 +128,18 @@ export async function POST(request: NextRequest) {
     let result;
     if (existing) {
       // 更新
-      const { data, error } = await supabase
+      const updateData = {
+        questions_attempted: (existing.questions_attempted || 0) + (questionsAttempted || 0),
+        questions_correct: (existing.questions_correct || 0) + (questionsCorrect || 0),
+        time_spent_minutes: (existing.time_spent_minutes || 0) + (timeSpentMinutes || 0),
+        sections_completed: (existing.sections_completed || 0) + (sectionsCompleted || 0),
+        updated_at: new Date().toISOString()
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from('daily_learning_progress')
-        .update({
-          questions_attempted: (existing.questions_attempted || 0) + (questionsAttempted || 0),
-          questions_correct: (existing.questions_correct || 0) + (questionsCorrect || 0),
-          time_spent_minutes: (existing.time_spent_minutes || 0) + (timeSpentMinutes || 0),
-          sections_completed: (existing.sections_completed || 0) + (sectionsCompleted || 0),
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', existing.id)
         .select()
         .single();
@@ -130,7 +148,8 @@ export async function POST(request: NextRequest) {
       result = data;
     } else {
       // 新規作成
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from('daily_learning_progress')
         .insert({
           user_id: userId,
@@ -158,10 +177,11 @@ export async function POST(request: NextRequest) {
 }
 
 // ストリーク情報の更新
-async function updateStreak(supabase: any, userId: string) {
+async function updateStreak(supabase: ReturnType<typeof getSupabaseAdmin>, userId: string) {
   const today = format(new Date(), 'yyyy-MM-dd');
 
-  const { data: streak } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: streak } = await (supabase as any)
     .from('learning_streaks')
     .select('*')
     .eq('user_id', userId)
@@ -169,7 +189,8 @@ async function updateStreak(supabase: any, userId: string) {
 
   if (!streak) {
     // 新規作成
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('learning_streaks')
       .insert({
         user_id: userId,
@@ -198,7 +219,8 @@ async function updateStreak(supabase: any, userId: string) {
       totalDays += 1;
     }
 
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('learning_streaks')
       .update({
         current_streak: newStreak,
