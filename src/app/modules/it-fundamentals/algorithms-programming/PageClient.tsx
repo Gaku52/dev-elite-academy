@@ -1310,59 +1310,11 @@ export default function AlgorithmsProgrammingPage() {
   const [quizAnswers, setQuizAnswers] = useState<{[key: string]: number}>({});
   const [showQuizResults, setShowQuizResults] = useState<{[key: string]: boolean}>({});
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
-  const [isInitialized, setIsInitialized] = useState(false);
 
   const { progress, saveProgress } = useLearningProgress('algorithms-programming');
 
   useEffect(() => {
-    // サーバーサイドで渡された初期データをチェック
-    const serverProgressElement = document.getElementById('server-progress-data');
-    if (serverProgressElement) {
-      try {
-        const serverProgress = JSON.parse(serverProgressElement.textContent || '[]');
-        if (serverProgress.length > 0 && !isInitialized) {
-          console.log('🚀 Loading initial server-side progress (algorithms-programming)...');
-          const completedSet = new Set<string>();
-          const answersMap: {[key: string]: number} = {};
-          const resultsMap: {[key: string]: boolean} = {};
-
-          serverProgress.forEach((p: { section_key: string; is_completed: boolean }) => {
-            const sectionKey = p.section_key;
-            if (p.is_completed) {
-              completedSet.add(sectionKey);
-              resultsMap[sectionKey] = true;
-
-              const parts = sectionKey.split('-');
-              if (parts.length >= 3) {
-                const moduleIndex = parseInt(parts[0]);
-                const sectionIndex = parseInt(parts[1]);
-                const quizIndex = parseInt(parts[2]);
-
-                if (!isNaN(moduleIndex) && !isNaN(sectionIndex) && !isNaN(quizIndex)) {
-                  const learningModule = learningModules[moduleIndex];
-                  if (learningModule && learningModule.sections[sectionIndex] && learningModule.sections[sectionIndex].quizzes[quizIndex]) {
-                    const correctAnswer = learningModule.sections[sectionIndex].quizzes[quizIndex].correct;
-                    answersMap[sectionKey] = correctAnswer;
-                  }
-                }
-              }
-            }
-          });
-
-          setCompletedQuizzes(completedSet);
-          setQuizAnswers(answersMap);
-          setShowQuizResults(resultsMap);
-          setIsInitialized(true);
-          console.log('✅ Initial server progress loaded (algorithms-programming):', { completed: completedSet.size, answers: Object.keys(answersMap).length });
-          return;
-        }
-      } catch (error) {
-        console.warn('Failed to parse server progress data:', error);
-      }
-    }
-
-    // フォールバック：クライアントサイドの進捗データを使用
-    if (progress.length > 0 && !isInitialized) {
+    if (progress.length > 0) {
       console.log('🔄 Restoring algorithms-programming progress state...');
       const completedSet = new Set<string>();
       const answersMap: {[key: string]: number} = {};
@@ -1394,10 +1346,9 @@ export default function AlgorithmsProgrammingPage() {
       setCompletedQuizzes(completedSet);
       setQuizAnswers(answersMap);
       setShowQuizResults(resultsMap);
-      setIsInitialized(true);
       console.log('✅ Algorithms-programming progress restored:', { completed: completedSet.size, answers: Object.keys(answersMap).length });
     }
-  }, [progress, isInitialized]);
+  }, [progress]);
 
   const currentModule = learningModules[activeModule];
   const currentSection = currentModule.sections[activeSection];
