@@ -1,8 +1,7 @@
 'use client';
 
-import { format, eachDayOfInterval, subDays, startOfWeek, getDay } from 'date-fns';
+import { format, eachDayOfInterval, subDays, getDay } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { Tooltip } from 'recharts';
 
 interface DailyData {
   date: string;

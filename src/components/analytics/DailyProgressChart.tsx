@@ -33,7 +33,15 @@ export default function DailyProgressChart({ data, chartType = 'line' }: DailyPr
   }));
 
   // カスタムツールチップ
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: DailyProgressData;
+    }>;
+    label?: string;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
