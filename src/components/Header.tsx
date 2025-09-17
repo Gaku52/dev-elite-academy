@@ -64,8 +64,8 @@ export default function Header() {
     try {
       await signOut();
       // Sign out successful
-    } catch (error) {
-      // Sign out error
+    } catch {
+      // Sign out error - silently handled
     }
   };
 

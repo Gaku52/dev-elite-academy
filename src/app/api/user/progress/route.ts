@@ -1,21 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-}
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET(request: Request) {
   try {
@@ -57,19 +42,19 @@ export async function GET(request: Request) {
     const sessions = sessionsResult.data || [];
 
     // 完了したコンテンツの計算
-    const completedContents = userProgress.filter(p => p.status === 'completed').length;
+    const completedContents = userProgress.filter((p: any) => p.status === 'completed').length;
     const totalContents = allContents.length;
 
     // 学習時間の計算
     const completedHours = userProgress
-      .filter(p => p.status === 'completed')
-      .reduce((total, p) => total + (p.learning_contents?.estimated_time || 0), 0) / 60;
+      .filter((p: any) => p.status === 'completed')
+      .reduce((total: number, p: any) => total + (p.learning_contents?.estimated_time || 0), 0) / 60;
 
-    const totalEstimatedHours = allContents.reduce((total, c) => total + (c.estimated_time || 0), 0) / 60;
+    const totalEstimatedHours = allContents.reduce((total: number, c: any) => total + (c.estimated_time || 0), 0) / 60;
 
     // 学習ストリークの計算（簡易版）
     let streak = 0;
-    const uniqueDates = [...new Set(sessions.map(s => s.session_date))].sort().reverse();
+    const uniqueDates = [...new Set(sessions.map((s: any) => s.session_date))].sort().reverse();
     
     for (let i = 0; i < uniqueDates.length; i++) {
       const currentDate = new Date(uniqueDates[i]);

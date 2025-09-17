@@ -1,21 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextRequest } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { handleAPIError, successResponse, validateRequired, APIError } from '@/lib/api-error-handler';
+import { LEARNING_CONFIG } from '@/constants/learning';
 
 // GET: ユーザーの進捗を取得
 export async function GET(request: NextRequest) {
@@ -24,12 +11,12 @@ export async function GET(request: NextRequest) {
   const contentId = searchParams.get('contentId');
 
   if (!userEmail) {
-    return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    return handleAPIError(new APIError(400, 'Email is required', 'MISSING_EMAIL'));
   }
 
   try {
     const supabaseAdmin = getSupabaseAdmin();
-    let query = supabaseAdmin
+    let query = (supabaseAdmin as any)
       .from('user_progress')
       .select('*, learning_contents(title, description)')
       .eq('user_email', userEmail);
@@ -42,10 +29,9 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(data || []);
+    return successResponse(data || []);
   } catch (error) {
-    console.error('Error fetching progress:', error);
-    return NextResponse.json({ error: 'Failed to fetch progress' }, { status: 500 });
+    return handleAPIError(error);
   }
 }
 
@@ -54,14 +40,11 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { userEmail, contentId, status, progressPercentage } = body;
 
-  if (!userEmail || !contentId) {
-    return NextResponse.json({ error: 'Email and contentId are required' }, { status: 400 });
-  }
-
   try {
+    validateRequired(body, ['userEmail', 'contentId']);
     const supabaseAdmin = getSupabaseAdmin();
     // 既存の進捗をチェック
-    const { data: existingProgress } = await supabaseAdmin
+    const { data: existingProgress } = await (supabaseAdmin as any)
       .from('user_progress')
       .select('*')
       .eq('user_email', userEmail)
@@ -73,19 +56,19 @@ export async function POST(request: NextRequest) {
     if (existingProgress) {
       // 更新
       const updateData: Record<string, unknown> = {
-        status: status || existingProgress.status,
-        progress_percentage: progressPercentage ?? existingProgress.progress_percentage,
+        status: status || (existingProgress as any).status,
+        progress_percentage: progressPercentage ?? (existingProgress as any).progress_percentage,
         last_accessed_at: new Date().toISOString()
       };
 
-      if (status === 'completed' && existingProgress.status !== 'completed') {
+      if (status === 'completed' && (existingProgress as any).status !== 'completed') {
         updateData.completed_at = new Date().toISOString();
       }
 
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await (supabaseAdmin as any)
         .from('user_progress')
         .update(updateData)
-        .eq('id', existingProgress.id)
+        .eq('id', (existingProgress as any).id)
         .select()
         .single();
 
@@ -93,12 +76,12 @@ export async function POST(request: NextRequest) {
       result = data;
     } else {
       // 新規作成
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await (supabaseAdmin as any)
         .from('user_progress')
         .insert({
           user_email: userEmail,
           content_id: contentId,
-          status: status || 'in_progress',
+          status: status || LEARNING_CONFIG.STATUS.IN_PROGRESS,
           progress_percentage: progressPercentage || 0,
           started_at: new Date().toISOString(),
           completed_at: status === 'completed' ? new Date().toISOString() : null
@@ -110,10 +93,9 @@ export async function POST(request: NextRequest) {
       result = data;
     }
 
-    return NextResponse.json(result);
+    return successResponse(result);
   } catch (error) {
-    console.error('Error saving progress:', error);
-    return NextResponse.json({ error: 'Failed to save progress' }, { status: 500 });
+    return handleAPIError(error);
   }
 }
 
@@ -122,14 +104,14 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
   const { userEmail, contentId, sectionType, sectionNumber, isCompleted } = body;
 
-  if (!userEmail || !contentId || !sectionType || sectionNumber === undefined) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-  }
-
   try {
+    validateRequired(body, ['userEmail', 'contentId', 'sectionType']);
+    if (sectionNumber === undefined) {
+      throw new APIError(400, 'Section number is required', 'MISSING_SECTION_NUMBER');
+    }
     const supabaseAdmin = getSupabaseAdmin();
     // セクション進捗を更新
-    const { data: sectionData, error: sectionError } = await supabaseAdmin
+    const { data: sectionData, error: sectionError } = await (supabaseAdmin as any)
       .from('section_progress')
       .upsert({
         user_email: userEmail,
@@ -147,14 +129,14 @@ export async function PUT(request: NextRequest) {
     if (sectionError) throw sectionError;
 
     // 全セクションの進捗を確認して全体進捗を更新
-    const { data: allSections } = await supabaseAdmin
+    const { data: allSections } = await (supabaseAdmin as any)
       .from('section_progress')
       .select('*')
       .eq('user_email', userEmail)
       .eq('content_id', contentId);
 
-    const totalSections = 4; // 現在は固定で4セクション
-    const completedSections = allSections?.filter(s => s.is_completed).length || 0;
+    const totalSections = LEARNING_CONFIG.DEFAULT_SECTIONS_COUNT;
+    const completedSections = allSections?.filter((s: any) => s.is_completed).length || 0;
     const progressPercentage = Math.round((completedSections / totalSections) * 100);
 
     // 全体進捗を更新
@@ -163,17 +145,16 @@ export async function PUT(request: NextRequest) {
       body: JSON.stringify({
         userEmail,
         contentId,
-        status: progressPercentage === 100 ? 'completed' : 'in_progress',
+        status: progressPercentage === LEARNING_CONFIG.PROGRESS_COMPLETE_THRESHOLD ? LEARNING_CONFIG.STATUS.COMPLETED : LEARNING_CONFIG.STATUS.IN_PROGRESS,
         progressPercentage
       })
     }));
 
-    return NextResponse.json({ 
-      section: sectionData, 
-      overallProgress: progressPercentage 
+    return successResponse({
+      section: sectionData,
+      overallProgress: progressPercentage
     });
   } catch (error) {
-    console.error('Error updating section progress:', error);
-    return NextResponse.json({ error: 'Failed to update section progress' }, { status: 500 });
+    return handleAPIError(error);
   }
 }
