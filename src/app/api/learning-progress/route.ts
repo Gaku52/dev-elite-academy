@@ -1,36 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.warn('⚠️ Supabase configuration missing, API will not function properly');
-}
-
-const supabase = supabaseUrl && supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-}) : null;
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextRequest } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { handleAPIError, successResponse, validateRequired, APIError } from '@/lib/api-error-handler';
+import type { LearningProgressRecord, LearningProgressInsert, LearningProgressUpdate } from '@/types/database';
 
 // 進捗取得 GET /api/learning-progress?userId=xxx&moduleName=xxx
 export async function GET(request: NextRequest) {
-  if (!supabase) {
-    return NextResponse.json(
-      { error: 'Supabase configuration missing' },
-      { status: 500 }
-    );
-  }
-
   try {
+    const supabase = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const moduleName = searchParams.get('moduleName');
 
     if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+      return handleAPIError(new APIError(400, 'userId is required', 'MISSING_USER_ID'));
     }
 
     let query = supabase
@@ -44,46 +27,37 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query.order('created_at', { ascending: true });
 
-    if (error) {
-      console.error('Database error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    if (error) throw error;
 
-    return NextResponse.json({ progress: data || [] });
+    return successResponse({ progress: data || [] });
   } catch (error) {
-    console.error('API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleAPIError(error);
   }
 }
 
 // 進捗保存/更新 POST /api/learning-progress
 export async function POST(request: NextRequest) {
-  if (!supabase) {
-    return NextResponse.json(
-      { error: 'Supabase configuration missing' },
-      { status: 500 }
-    );
-  }
-
   try {
+    const supabase = getSupabaseAdmin();
     const body = await request.json();
     const { userId, moduleName, sectionKey, isCompleted, isCorrect } = body;
 
-    if (!userId || !moduleName || !sectionKey) {
-      return NextResponse.json(
-        { error: 'userId, moduleName, and sectionKey are required' },
-        { status: 400 }
-      );
-    }
+    validateRequired(body, ['userId', 'moduleName', 'sectionKey']);
 
     // 既存の進捗を確認
-    const { data: existing } = await supabase
+    const { data: existingData, error: queryError } = await (supabase as any)
       .from('user_learning_progress')
       .select('*')
       .eq('user_id', userId)
       .eq('module_name', moduleName)
       .eq('section_key', sectionKey)
-      .single();
+      .maybeSingle();
+
+    if (queryError) {
+      throw queryError;
+    }
+
+    const existing = existingData as LearningProgressRecord | null;
 
     let result;
 
@@ -92,52 +66,49 @@ export async function POST(request: NextRequest) {
       const newAnswerCount = existing.answer_count + 1;
       const newCorrectCount = existing.correct_count + (isCorrect ? 1 : 0);
 
-      const { data, error } = await supabase
+      const updateData: LearningProgressUpdate = {
+        is_completed: isCompleted,
+        is_correct: isCorrect,
+        answer_count: newAnswerCount,
+        correct_count: newCorrectCount,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await (supabase as any)
         .from('user_learning_progress')
-        .update({
-          is_completed: isCompleted,
-          is_correct: isCorrect,
-          answer_count: newAnswerCount,
-          correct_count: newCorrectCount,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('user_id', userId)
         .eq('module_name', moduleName)
         .eq('section_key', sectionKey)
         .select()
         .single();
 
-      if (error) {
-        console.error('Update error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
-      }
+      if (error) throw error;
       result = data;
     } else {
       // 新規レコードを作成
-      const { data, error } = await supabase
+      const insertData: LearningProgressInsert = {
+        user_id: userId,
+        module_name: moduleName,
+        section_key: sectionKey,
+        is_completed: isCompleted,
+        is_correct: isCorrect,
+        answer_count: 1,
+        correct_count: isCorrect ? 1 : 0
+      };
+
+      const { data, error } = await (supabase as any)
         .from('user_learning_progress')
-        .insert({
-          user_id: userId,
-          module_name: moduleName,
-          section_key: sectionKey,
-          is_completed: isCompleted,
-          is_correct: isCorrect,
-          answer_count: 1,
-          correct_count: isCorrect ? 1 : 0
-        })
+        .insert(insertData)
         .select()
         .single();
 
-      if (error) {
-        console.error('Insert error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
-      }
+      if (error) throw error;
       result = data;
     }
 
-    return NextResponse.json({ progress: result });
+    return successResponse({ progress: result });
   } catch (error) {
-    console.error('API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleAPIError(error);
   }
 }
