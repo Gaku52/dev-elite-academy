@@ -116,27 +116,25 @@ const moduleNameMapping: Record<number, string> = {
 
 export default function ITFundamentalsPage() {
   const [progressData, setProgressData] = useState<{[key: number]: number}>({});
-  const { stats } = useLearningProgress();
+  const { progress } = useLearningProgress();
 
   useEffect(() => {
-    if (stats && stats.moduleStats) {
+    if (progress) {
       const calculatedProgress: {[key: number]: number} = {};
 
-      // 各モジュールの進捗率を計算
+      // 各モジュールの進捗率を計算（個々のページと完全に同じロジックを使用）
       Object.entries(moduleNameMapping).forEach(([topicId, moduleName]) => {
-        const moduleProgress = stats.moduleStats[moduleName];
         const totalQuizzes = moduleQuizCounts[moduleName] || 0;
 
-        if (moduleProgress && totalQuizzes > 0) {
-          const exactPercentage = (moduleProgress.completed / totalQuizzes) * 100;
-          let progressPercentage = Math.round(exactPercentage);
+        if (totalQuizzes > 0) {
+          // 個々のページと同じ計算: progress配列から該当モジュールの完了済み項目をカウント
+          const moduleProgress = progress.filter(p => p.module_name === moduleName && p.is_completed);
+          const completedCount = moduleProgress.length;
 
-          // ユーザー仕様に基づく調整: Network/Securityで9問正解(33.33%)の場合は32%として表示
-          if ((moduleName === 'network' || moduleName === 'security') && moduleProgress.completed === 9 && totalQuizzes === 27) {
-            progressPercentage = 32;
-          }
+          const exactPercentage = (completedCount / totalQuizzes) * 100;
+          const progressPercentage = Math.round(exactPercentage);
 
-          console.log(`📊 Module ${moduleName}: ${moduleProgress.completed}/${totalQuizzes} = ${exactPercentage.toFixed(2)}% → ${progressPercentage}%`);
+          console.log(`📊 Module ${moduleName}: ${completedCount}/${totalQuizzes} = ${exactPercentage.toFixed(2)}% → ${progressPercentage}%`);
           calculatedProgress[parseInt(topicId)] = progressPercentage;
         } else {
           calculatedProgress[parseInt(topicId)] = 0;
@@ -146,7 +144,7 @@ export default function ITFundamentalsPage() {
       console.log('📊 Calculated module progress:', calculatedProgress);
       setProgressData(calculatedProgress);
     }
-  }, [stats]);
+  }, [progress]);
 
   return (
     <div className="min-h-screen bg-white">
