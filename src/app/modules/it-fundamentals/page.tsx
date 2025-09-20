@@ -12,8 +12,8 @@ const moduleQuizCounts: Record<string, number> = {
   'computer-systems': 105,        // 実装済み - 105クイズ
   'algorithms-programming': 89,   // 実装済み - 89クイズ
   'database': 21,                 // 実装済み - 21クイズ
-  'network': 0,        // 未実装
-  'security': 0,       // 未実装
+  'network': 27,                  // 実装済み - 27クイズ
+  'security': 27,                 // 実装済み - 27クイズ
   'system-development': 0, // 未実装
   'management-legal': 0,   // 未実装
   'strategy': 0        // 未実装
