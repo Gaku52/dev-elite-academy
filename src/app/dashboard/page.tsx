@@ -1,5 +1,5 @@
-import { 
-  Clock, 
+import {
+  Clock,
   PlayCircle,
   BookOpen,
   Trophy,
@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/Header';
 import UserProgressTracker from '@/components/UserProgressTracker';
+import CategoryContentCount from '@/components/CategoryContentCount';
 import { getLearningPathUrl } from '@/lib/learning-paths';
 
 // サーバーサイドでのデータ取得
@@ -111,8 +112,11 @@ export default async function Dashboard() {
                     <p className="text-[#6F6F6F] text-sm">
                       {category.description}
                     </p>
-                    <div className="mt-4 text-xs text-[#8E9C78]">
-                      {learningContents.filter(content => content.category_id === category.id).length} コンテンツ
+                    <div className="mt-4">
+                      <CategoryContentCount
+                        categoryName={category.name}
+                        fallbackCount={learningContents.filter(content => content.category_id === category.id).length}
+                      />
                     </div>
                   </Link>
                 );
@@ -138,8 +142,11 @@ export default async function Dashboard() {
                   <p className="text-[#6F6F6F] text-sm">
                     {category.description}
                   </p>
-                  <div className="mt-4 text-xs text-[#8E9C78]">
-                    {learningContents.filter(content => content.category_id === category.id).length} コンテンツ
+                  <div className="mt-4">
+                    <CategoryContentCount
+                      categoryName={category.name}
+                      fallbackCount={learningContents.filter(content => content.category_id === category.id).length}
+                    />
                   </div>
                 </div>
               );
