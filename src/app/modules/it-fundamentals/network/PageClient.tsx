@@ -426,64 +426,113 @@ export default function NetworkLearningPage() {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [quizHistory, setQuizHistory] = useState<boolean[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [completedQuizzes, setCompletedQuizzes] = useState<Set<string>>(new Set());
+  const [quizAnswers, setQuizAnswers] = useState<{[key: string]: number}>({});
+  const [showQuizResults, setShowQuizResults] = useState<{[key: string]: boolean}>({});
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
 
   const currentModule = learningModules[currentModuleIndex];
   const currentSection = currentModule.sections[currentSectionIndex];
   const currentQuiz = currentSection.quizzes[currentQuizIndex];
 
-  const { saveProgress } = useLearningProgress('it-fundamentals-network');
+  const { progress, saveProgress } = useLearningProgress('network');
 
   useEffect(() => {
-    // Track section completion when a section is completed
-    const sectionKey = `network-${currentModuleIndex}-${currentSectionIndex}`;
-    if (completedSections.has(`${currentModuleIndex}-${currentSectionIndex}`)) {
-      saveProgress(sectionKey, true, true).catch(err => {
-        console.error('Failed to save progress:', err);
-      });
-    }
-  }, [completedSections, currentModuleIndex, currentSectionIndex, saveProgress]);
+    if (progress.length > 0) {
+      console.log('🔄 Restoring network progress state...');
+      const completedSet = new Set<string>();
+      const answersMap: {[key: string]: number} = {};
+      const resultsMap: {[key: string]: boolean} = {};
 
-  const handleAnswerSelect = (answerIndex: number) => {
+      progress.forEach((p) => {
+        const sectionKey = p.section_key;
+        if (p.is_completed) {
+          completedSet.add(sectionKey);
+          resultsMap[sectionKey] = true;
+
+          const parts = sectionKey.split('-');
+          if (parts.length >= 3) {
+            const moduleIndex = parseInt(parts[0]);
+            const sectionIndex = parseInt(parts[1]);
+            const quizIndex = parseInt(parts[2]);
+
+            if (!isNaN(moduleIndex) && !isNaN(sectionIndex) && !isNaN(quizIndex)) {
+              const learningModule = learningModules[moduleIndex];
+              if (learningModule && learningModule.sections[sectionIndex] && learningModule.sections[sectionIndex].quizzes[quizIndex]) {
+                const correctAnswer = learningModule.sections[sectionIndex].quizzes[quizIndex].correct;
+                answersMap[sectionKey] = correctAnswer;
+              }
+            }
+          }
+        }
+      });
+
+      setCompletedQuizzes(completedSet);
+      setQuizAnswers(answersMap);
+      setShowQuizResults(resultsMap);
+      console.log('✅ Network progress restored:', { completed: completedSet.size, answers: Object.keys(answersMap).length });
+    }
+  }, [progress]);
+
+  const handleAnswerSelect = async (answerIndex: number) => {
     if (showResult) return;
 
+    const quizKey = `${currentModuleIndex}-${currentSectionIndex}-${currentQuizIndex}`;
+
     setSelectedAnswer(answerIndex);
+    setQuizAnswers({...quizAnswers, [quizKey]: answerIndex});
     setShowResult(true);
     setShowExplanation(true);
+    setShowQuizResults({...showQuizResults, [quizKey]: true});
 
     const isCorrect = answerIndex === currentQuiz.correct;
     setQuizHistory([...quizHistory, isCorrect]);
 
     if (isCorrect) {
       setCorrectAnswers(correctAnswers + 1);
+      setCompletedQuizzes(new Set([...completedQuizzes, quizKey]));
     }
     setTotalQuestions(totalQuestions + 1);
+
+    // Save progress to database
+    try {
+      await saveProgress(quizKey, isCorrect, isCorrect);
+      console.log('✅ Network progress saved:', { section: quizKey, correct: isCorrect });
+    } catch (error) {
+      console.error('❌ Failed to save network progress:', error);
+    }
   };
 
   const handleNextQuiz = () => {
     if (currentQuizIndex < currentSection.quizzes.length - 1) {
-      setCurrentQuizIndex(currentQuizIndex + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
-      setShowExplanation(false);
+      const nextQuizIndex = currentQuizIndex + 1;
+      const nextQuizKey = `${currentModuleIndex}-${currentSectionIndex}-${nextQuizIndex}`;
+      setCurrentQuizIndex(nextQuizIndex);
+      setSelectedAnswer(quizAnswers[nextQuizKey] ?? null);
+      setShowResult(showQuizResults[nextQuizKey] ?? false);
+      setShowExplanation(showQuizResults[nextQuizKey] ?? false);
     } else {
       const sectionKey = `${currentModuleIndex}-${currentSectionIndex}`;
       setCompletedSections(new Set([...completedSections, sectionKey]));
 
       if (currentSectionIndex < currentModule.sections.length - 1) {
-        setCurrentSectionIndex(currentSectionIndex + 1);
+        const nextSectionIndex = currentSectionIndex + 1;
+        const nextQuizKey = `${currentModuleIndex}-${nextSectionIndex}-0`;
+        setCurrentSectionIndex(nextSectionIndex);
         setCurrentQuizIndex(0);
-        setSelectedAnswer(null);
-        setShowResult(false);
-        setShowExplanation(false);
+        setSelectedAnswer(quizAnswers[nextQuizKey] ?? null);
+        setShowResult(showQuizResults[nextQuizKey] ?? false);
+        setShowExplanation(showQuizResults[nextQuizKey] ?? false);
         setQuizHistory([]);
       } else if (currentModuleIndex < learningModules.length - 1) {
-        setCurrentModuleIndex(currentModuleIndex + 1);
+        const nextModuleIndex = currentModuleIndex + 1;
+        const nextQuizKey = `${nextModuleIndex}-0-0`;
+        setCurrentModuleIndex(nextModuleIndex);
         setCurrentSectionIndex(0);
         setCurrentQuizIndex(0);
-        setSelectedAnswer(null);
-        setShowResult(false);
-        setShowExplanation(false);
+        setSelectedAnswer(quizAnswers[nextQuizKey] ?? null);
+        setShowResult(showQuizResults[nextQuizKey] ?? false);
+        setShowExplanation(showQuizResults[nextQuizKey] ?? false);
         setQuizHistory([]);
       }
     }
@@ -491,10 +540,12 @@ export default function NetworkLearningPage() {
 
   const handlePreviousQuiz = () => {
     if (currentQuizIndex > 0) {
-      setCurrentQuizIndex(currentQuizIndex - 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
-      setShowExplanation(false);
+      const prevQuizIndex = currentQuizIndex - 1;
+      const prevQuizKey = `${currentModuleIndex}-${currentSectionIndex}-${prevQuizIndex}`;
+      setCurrentQuizIndex(prevQuizIndex);
+      setSelectedAnswer(quizAnswers[prevQuizKey] ?? null);
+      setShowResult(showQuizResults[prevQuizKey] ?? false);
+      setShowExplanation(showQuizResults[prevQuizKey] ?? false);
       const newHistory = [...quizHistory];
       newHistory.pop();
       setQuizHistory(newHistory);
@@ -502,12 +553,13 @@ export default function NetworkLearningPage() {
   };
 
   const handleSectionSelect = (moduleIndex: number, sectionIndex: number) => {
+    const quizKey = `${moduleIndex}-${sectionIndex}-0`;
     setCurrentModuleIndex(moduleIndex);
     setCurrentSectionIndex(sectionIndex);
     setCurrentQuizIndex(0);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setShowExplanation(false);
+    setSelectedAnswer(quizAnswers[quizKey] ?? null);
+    setShowResult(showQuizResults[quizKey] ?? false);
+    setShowExplanation(showQuizResults[quizKey] ?? false);
     setQuizHistory([]);
   };
 
