@@ -1320,7 +1320,8 @@ export default function DatabasePage() {
     setSidebarOpen(false);
   };
 
-  const localProgress = (completedSections.size / learningModules.reduce((acc, m) => acc + m.sections.length, 0)) * 100;
+  const totalSections = learningModules.reduce((acc, m) => acc + m.sections.length, 0);
+  const localProgress = (completedSections.size / totalSections) * 100;
 
   // 進捗リセット処理
   const handleResetProgress = async () => {
@@ -1468,6 +1469,25 @@ export default function DatabasePage() {
                   </div>
                 ))}
               </nav>
+
+              {/* 統計情報 */}
+              <div className="mt-6 pt-6 border-t">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">学習統計</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">総問題数</span>
+                    <span className="font-medium">{totalSections}問</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">完了済み</span>
+                    <span className="font-medium text-green-600">{completedSections.size}問</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">正答率</span>
+                    <span className="font-medium">{completedSections.size > 0 ? Math.round(localProgress) : 0}%</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1558,6 +1578,25 @@ export default function DatabasePage() {
                     </div>
                   ))}
                 </nav>
+
+                {/* 統計情報 (モバイル) */}
+                <div className="mt-6 pt-6 border-t">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">学習統計</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">総問題数</span>
+                      <span className="font-medium">{totalSections}問</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">完了済み</span>
+                      <span className="font-medium text-green-600">{completedSections.size}問</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">正答率</span>
+                      <span className="font-medium">{completedSections.size > 0 ? Math.round(localProgress) : 0}%</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1656,7 +1695,7 @@ export default function DatabasePage() {
                     ← 前のセクション
                   </button>
                   <div className="text-sm text-gray-500">
-                    {completedSections.size} / {learningModules.reduce((acc, m) => acc + m.sections.length, 0)} セクション完了
+                    {completedSections.size} / {totalSections} セクション完了
                     {loading && <span className="ml-2 text-blue-500">同期中...</span>}
                   </div>
                   <button

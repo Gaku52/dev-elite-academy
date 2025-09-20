@@ -563,8 +563,12 @@ export default function NetworkLearningPage() {
     setQuizHistory([]);
   };
 
-  const progressPercentage = Math.round((completedSections.size /
-    learningModules.reduce((acc, module) => acc + module.sections.length, 0)) * 100);
+  const totalQuizzes = learningModules.reduce((acc, module) =>
+    acc + module.sections.reduce((sectionAcc, section) =>
+      sectionAcc + section.quizzes.length, 0), 0);
+
+  const quizProgress = (completedQuizzes.size / totalQuizzes) * 100;
+  const progressPercentage = Math.round(quizProgress);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -647,6 +651,25 @@ export default function NetworkLearningPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* 統計情報 */}
+              <div className="mt-6 pt-6 border-t">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">学習統計</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">総問題数</span>
+                    <span className="font-medium">{totalQuizzes}問</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">完了済み</span>
+                    <span className="font-medium text-green-600">{completedQuizzes.size}問</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">正答率</span>
+                    <span className="font-medium">{completedQuizzes.size > 0 ? Math.round(quizProgress) : 0}%</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
