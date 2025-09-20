@@ -111,6 +111,14 @@ export async function GET(request: NextRequest) {
         'database': {
           total: progress.filter(p => p.module_name === 'database').length,
           completed: progress.filter(p => p.module_name === 'database' && p.is_completed).length
+        },
+        'network': {
+          total: progress.filter(p => p.module_name === 'network').length,
+          completed: progress.filter(p => p.module_name === 'network' && p.is_completed).length
+        },
+        'security': {
+          total: progress.filter(p => p.module_name === 'security').length,
+          completed: progress.filter(p => p.module_name === 'security' && p.is_completed).length
         }
       };
 
