@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, AlertCircle, Trophy } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, AlertCircle, Trophy } from 'lucide-react';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 
 interface Quiz {
@@ -923,7 +923,6 @@ export default function SystemDevelopmentModule() {
 
   const currentQuiz = quizData[currentQuizIndex];
   const progressPercentage = ((currentQuizIndex + 1) / quizData.length) * 100;
-  const answeredCount = answered.filter(a => a).length;
   const completedQuizzes = progress.filter(p => p.is_completed).length;
 
   if (showResults) {

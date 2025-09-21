@@ -11,12 +11,12 @@ import { useLearningProgress } from '@/hooks/useLearningProgress';
 const moduleQuizCounts: Record<string, number> = {
   'computer-systems': 105,        // 実装済み - 105クイズ
   'algorithms-programming': 89,   // 実装済み - 89クイズ
-  'database': 21,                 // 実装済み - 21クイズ
-  'network': 25,                  // 実装済み - 25クイズ
-  'security': 25,                 // 実装済み - 25クイズ
-  'system-development': 0, // 未実装
-  'management-legal': 0,   // 未実装
-  'strategy': 0        // 未実装
+  'database': 80,                 // 実装済み - 80クイズ（拡張済み）
+  'network': 100,                 // 実装済み - 100クイズ（拡張済み）
+  'security': 100,                // 実装済み - 100クイズ（拡張済み）
+  'system-development': 120,      // 実装済み - 120クイズ（拡張済み）
+  'management-legal': 100,        // 実装済み - 100クイズ（拡張済み）
+  'strategy': 100                 // 実装済み - 100クイズ（拡張済み）
 };
 
 const fundamentalTopics = [
