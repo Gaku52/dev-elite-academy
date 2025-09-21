@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, TrendingUp, RotateCcw, Database, Calculator, Code } from 'lucide-react';
+import { ArrowLeft, BookOpen, TrendingUp, RotateCcw, Database, Calculator, Code, Wifi, Shield, Building, Target, Users, Briefcase } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import DailyProgressChart from '@/components/analytics/DailyProgressChart';
 import LearningStreakCard from '@/components/analytics/LearningStreakCard';
@@ -48,6 +48,41 @@ const modules: ModuleInfo[] = [
     icon: Database,
     color: 'bg-green-500',
     href: '/modules/it-fundamentals/database'
+  },
+  {
+    key: 'network',
+    name: 'ネットワーク',
+    icon: Wifi,
+    color: 'bg-cyan-500',
+    href: '/modules/it-fundamentals/network'
+  },
+  {
+    key: 'security',
+    name: 'セキュリティ',
+    icon: Shield,
+    color: 'bg-red-500',
+    href: '/modules/it-fundamentals/security'
+  },
+  {
+    key: 'system-development',
+    name: 'システム開発技法',
+    icon: Code,
+    color: 'bg-indigo-500',
+    href: '/modules/it-fundamentals/system-development'
+  },
+  {
+    key: 'management-legal',
+    name: '経営・法務',
+    icon: Briefcase,
+    color: 'bg-amber-500',
+    href: '/modules/it-fundamentals/management-legal'
+  },
+  {
+    key: 'strategy',
+    name: 'ストラテジ',
+    icon: Target,
+    color: 'bg-emerald-500',
+    href: '/modules/it-fundamentals/strategy'
   }
 ];
 

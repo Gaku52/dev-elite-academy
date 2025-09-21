@@ -92,33 +92,58 @@ export async function GET(request: NextRequest) {
       }
 
       const progress = data || [];
-      const totalQuestions = progress.length;
+
+      // 実際のクイズ数を使用（回答済みの問題数ではなく）
+      const actualQuizCounts = {
+        'computer-systems': 105,
+        'algorithms-programming': 0, // 未実装
+        'database': 21,
+        'network': 26,
+        'security': 26,
+        'management-legal': 11,
+        'strategy': 11,
+        'system-development': 11
+      };
+
+      const totalQuestions = 105 + 0 + 21 + 26 + 26 + 11 + 11 + 11; // 211問
       const completedQuestions = progress.filter(p => p.is_completed).length;
       const correctAnswers = progress.reduce((sum, p) => sum + p.correct_count, 0);
       const totalAnswers = progress.reduce((sum, p) => sum + p.answer_count, 0);
       const correctRate = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
-      // モジュール別統計
+      // モジュール別統計（実際のクイズ数を使用）
       const moduleStats = {
         'computer-systems': {
-          total: progress.filter(p => p.module_name === 'computer-systems').length,
+          total: 105,
           completed: progress.filter(p => p.module_name === 'computer-systems' && p.is_completed).length
         },
         'algorithms-programming': {
-          total: progress.filter(p => p.module_name === 'algorithms-programming').length,
+          total: 0, // 未実装
           completed: progress.filter(p => p.module_name === 'algorithms-programming' && p.is_completed).length
         },
         'database': {
-          total: progress.filter(p => p.module_name === 'database').length,
+          total: 21,
           completed: progress.filter(p => p.module_name === 'database' && p.is_completed).length
         },
         'network': {
-          total: progress.filter(p => p.module_name === 'network').length,
+          total: 26,
           completed: progress.filter(p => p.module_name === 'network' && p.is_completed).length
         },
         'security': {
-          total: progress.filter(p => p.module_name === 'security').length,
+          total: 26,
           completed: progress.filter(p => p.module_name === 'security' && p.is_completed).length
+        },
+        'system-development': {
+          total: 11,
+          completed: progress.filter(p => p.module_name === 'system-development' && p.is_completed).length
+        },
+        'management-legal': {
+          total: 11,
+          completed: progress.filter(p => p.module_name === 'management-legal' && p.is_completed).length
+        },
+        'strategy': {
+          total: 11,
+          completed: progress.filter(p => p.module_name === 'strategy' && p.is_completed).length
         }
       };
 
