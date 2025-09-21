@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
 
       // 実際のクイズ数を使用（回答済みの問題数ではなく）
 
-      const totalQuestions = 105 + 0 + 21 + 26 + 26 + 11 + 11 + 11; // 211問
+      const totalQuestions = 105 + 88 + 21 + 26 + 26 + 11 + 11 + 11; // 299問
       const completedQuestions = progress.filter(p => p.is_completed).length;
       const correctAnswers = progress.reduce((sum, p) => sum + p.correct_count, 0);
       const totalAnswers = progress.reduce((sum, p) => sum + p.answer_count, 0);
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
           completed: progress.filter(p => p.module_name === 'computer-systems' && p.is_completed).length
         },
         'algorithms-programming': {
-          total: 0, // 未実装
+          total: 88,
           completed: progress.filter(p => p.module_name === 'algorithms-programming' && p.is_completed).length
         },
         'database': {

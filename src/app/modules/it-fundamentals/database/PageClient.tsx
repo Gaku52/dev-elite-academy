@@ -4085,6 +4085,2450 @@ END;
         }
       }
     ]
+  },
+  {
+    id: 6,
+    title: 'Advanced Database Administration',
+    sections: [
+      {
+        title: 'データベース監視とメンテナンス',
+        content: `データベースの安定稼働のための監視とメンテナンスについて学習します。
+
+**監視項目:**
+
+**パフォーマンス指標:**
+- CPU使用率
+- メモリ使用率
+- ディスクI/O
+- ネットワーク使用率
+- クエリ実行時間
+- 同時接続数
+
+**容量管理:**
+- データベースサイズ
+- ログファイルサイズ
+- 使用可能領域
+- 成長予測
+
+**可用性監視:**
+- サービス稼働状況
+- レプリケーション遅延
+- バックアップ状況
+- 接続性テスト
+
+**メンテナンス作業:**
+
+**統計情報の更新:**
+\`\`\`sql
+-- PostgreSQL
+ANALYZE table_name;
+
+-- MySQL
+ANALYZE TABLE table_name;
+
+-- SQL Server
+UPDATE STATISTICS table_name;
+
+-- Oracle
+EXEC DBMS_STATS.GATHER_TABLE_STATS('schema', 'table_name');
+\`\`\`
+
+**インデックスの再構築:**
+\`\`\`sql
+-- SQL Server
+ALTER INDEX ALL ON table_name REBUILD;
+
+-- Oracle
+ALTER INDEX index_name REBUILD;
+
+-- PostgreSQL
+REINDEX INDEX index_name;
+\`\`\`
+
+**断片化の解消:**
+\`\`\`sql
+-- MySQL
+OPTIMIZE TABLE table_name;
+
+-- SQL Server
+ALTER TABLE table_name REBUILD;
+\`\`\`
+
+**ログファイル管理:**
+\`\`\`sql
+-- トランザクションログのバックアップ
+BACKUP LOG database_name TO DISK = 'log_backup.trn';
+
+-- ログファイルの切り詰め
+DBCC SHRINKFILE(log_file_name);
+\`\`\`
+
+**自動化スクリプト:**
+\`\`\`sql
+-- 定期メンテナンスジョブ
+CREATE EVENT maintenance_job
+ON SCHEDULE EVERY 1 WEEK
+STARTS '2023-01-01 02:00:00'
+DO
+BEGIN
+    -- 統計情報更新
+    CALL UPDATE_TABLE_STATISTICS();
+
+    -- インデックス再構築
+    CALL REBUILD_FRAGMENTED_INDEXES();
+
+    -- データベース整合性チェック
+    CALL CHECK_DATABASE_INTEGRITY();
+END;
+\`\`\`
+
+**アラート設定:**
+- CPU使用率 > 80%
+- ディスク容量 < 10%
+- クエリ実行時間 > 30秒
+- デッドロック発生
+- レプリケーション遅延 > 5分
+
+**監視ツール:**
+- データベース固有監視ツール
+- システム監視ツール
+- アプリケーション監視ツール
+- ログ分析ツール`,
+        quiz: {
+          question: 'データベースのメンテナンスにおいて、統計情報の更新が重要な理由は何ですか？',
+          options: [
+            'データの整合性を保つため',
+            'クエリオプティマイザが適切な実行計画を作成するため',
+            'セキュリティを強化するため',
+            'データベースサイズを削減するため'
+          ],
+          correct: 1,
+          explanation: '統計情報は、クエリオプティマイザが効率的な実行計画を作成するために使用されます。統計情報が古いと、非効率な実行計画が選択され、性能が劣化する可能性があります。'
+        }
+      },
+      {
+        title: 'データベース移行・アップグレード',
+        content: `データベースの移行とアップグレードの戦略と手順について学習します。
+
+**移行の種類:**
+
+**同一DBMS内の移行:**
+- バージョンアップグレード
+- ハードウェア移行
+- クラウド移行
+
+**異なるDBMS間の移行:**
+- Oracle → PostgreSQL
+- MySQL → MariaDB
+- SQL Server → MySQL
+
+**移行計画:**
+
+**事前調査:**
+- 現行システムの調査
+- 移行対象の特定
+- 互換性の確認
+- 性能要件の分析
+
+**移行戦略の選択:**
+
+**ビッグバン移行:**
+- 一度に全システムを移行
+- ダウンタイムが必要
+- リスクが高いが期間は短い
+
+**段階的移行:**
+- 機能ごとに順次移行
+- 並行稼働期間
+- リスクは低いが複雑
+
+**並行稼働:**
+- 新旧システムを同時稼働
+- データ同期が必要
+- 最も安全だが複雑
+
+**移行手順:**
+
+**1. データスキーマ移行:**
+\`\`\`sql
+-- DDL変換例（Oracle → PostgreSQL）
+-- Oracle
+CREATE TABLE employees (
+    emp_id NUMBER(10) PRIMARY KEY,
+    emp_name VARCHAR2(100),
+    hire_date DATE
+);
+
+-- PostgreSQL
+CREATE TABLE employees (
+    emp_id SERIAL PRIMARY KEY,
+    emp_name VARCHAR(100),
+    hire_date DATE
+);
+\`\`\`
+
+**2. データ移行:**
+\`\`\`sql
+-- ETL処理例
+INSERT INTO target_table
+SELECT
+    CASE
+        WHEN source_status = 'A' THEN 'Active'
+        WHEN source_status = 'I' THEN 'Inactive'
+        ELSE 'Unknown'
+    END AS status,
+    UPPER(TRIM(source_name)) AS name,
+    TO_DATE(source_date, 'YYYY-MM-DD') AS created_date
+FROM source_table
+WHERE source_date >= '2020-01-01';
+\`\`\`
+
+**3. アプリケーション移行:**
+- SQL文の書き換え
+- 接続文字列の変更
+- ドライバーの更新
+- 設定ファイルの修正
+
+**データ移行ツール:**
+
+**ネイティブツール:**
+- Oracle Data Pump
+- MySQL Workbench Migration Wizard
+- SQL Server Migration Assistant
+- PostgreSQL pg_dump/pg_restore
+
+**サードパーティツール:**
+- AWS Database Migration Service
+- Azure Database Migration Service
+- Talend
+- Pentaho Data Integration
+
+**移行テスト:**
+
+**機能テスト:**
+- データ整合性確認
+- アプリケーション動作確認
+- パフォーマンステスト
+- セキュリティテスト
+
+**性能テスト:**
+\`\`\`sql
+-- 移行前後の性能比較
+EXPLAIN ANALYZE
+SELECT c.customer_name, COUNT(o.order_id) as order_count
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE c.registration_date >= '2023-01-01'
+GROUP BY c.customer_id, c.customer_name
+ORDER BY order_count DESC;
+\`\`\`
+
+**ロールバック計画:**
+- 移行失敗時の手順
+- データ復旧方法
+- サービス復旧時間
+- 影響範囲の特定
+
+**移行後の作業:**
+- 性能監視
+- データ整合性チェック
+- ユーザーフィードバック収集
+- ドキュメント更新
+
+**ベストプラクティス:**
+- 十分なテスト期間の確保
+- 段階的なアプローチ
+- 詳細な移行計画書
+- チーム間の連携
+- リスク管理`,
+        quiz: {
+          question: 'データベース移行において「ビッグバン移行」の特徴として正しいものはどれですか？',
+          options: [
+            '機能ごとに順次移行する',
+            '新旧システムを並行稼働させる',
+            '一度に全システムを移行する',
+            'データ同期を継続的に行う'
+          ],
+          correct: 2,
+          explanation: 'ビッグバン移行は、一度に全システムを新しい環境に移行する手法です。ダウンタイムが必要ですが、移行期間は短く、システム構成がシンプルになります。'
+        }
+      },
+      {
+        title: 'クラウドデータベース',
+        content: `クラウド環境でのデータベース運用について学習します。
+
+**クラウドデータベースの種類:**
+
+**IaaS（Infrastructure as a Service）:**
+- 仮想マシン上にDBMS構築
+- 完全な制御権
+- 運用負荷が高い
+- 例：EC2 + RDS Custom
+
+**PaaS（Platform as a Service）:**
+- マネージドデータベース
+- 運用作業の自動化
+- スケーラビリティ
+- 例：Amazon RDS、Azure SQL Database
+
+**SaaS（Software as a Service）:**
+- 完全に管理されたサービス
+- 設定のみで利用開始
+- カスタマイズ制限
+- 例：Amazon DynamoDB、Google Firestore
+
+**主要クラウドプロバイダーのサービス:**
+
+**Amazon Web Services (AWS):**
+- RDS: リレーショナルDB
+- DynamoDB: NoSQL
+- Redshift: データウェアハウス
+- Aurora: MySQL/PostgreSQL互換
+
+**Microsoft Azure:**
+- SQL Database: SQL Server互換
+- Cosmos DB: マルチモデルNoSQL
+- Synapse Analytics: データウェアハウス
+- Database for MySQL/PostgreSQL
+
+**Google Cloud Platform (GCP):**
+- Cloud SQL: MySQL/PostgreSQL
+- Firestore: ドキュメントDB
+- BigQuery: データウェアハウス
+- Spanner: 分散SQL
+
+**クラウドデータベースの利点:**
+
+**コスト効率:**
+- 初期投資不要
+- 使用量課金
+- 運用コスト削減
+- ライセンス費用削減
+
+**スケーラビリティ:**
+- 自動スケーリング
+- 読み取りレプリカ
+- 容量の動的拡張
+- 地理的分散
+
+**可用性:**
+- 自動バックアップ
+- フェイルオーバー
+- 災害復旧
+- SLA保証
+
+**運用負荷軽減:**
+- パッチ適用自動化
+- 監視とアラート
+- セキュリティ更新
+- メンテナンス作業
+
+**クラウド移行戦略:**
+
+**リフト&シフト:**
+- 既存システムをそのまま移行
+- 最小限の変更
+- 短期間での移行
+- クラウドネイティブ機能は未活用
+
+**リファクタリング:**
+- アプリケーション最適化
+- クラウドサービス活用
+- 性能向上とコスト削減
+- 開発工数が必要
+
+**設定例（AWS RDS）:**
+\`\`\`yaml
+# CloudFormation例
+RDSInstance:
+  Type: AWS::RDS::DBInstance
+  Properties:
+    DBName: !Ref 'DBName'
+    DBInstanceIdentifier: !Ref 'DBInstanceID'
+    DBInstanceClass: db.t3.micro
+    Engine: mysql
+    EngineVersion: '8.0.28'
+    MasterUsername: !Ref 'DBUser'
+    MasterUserPassword: !Ref 'DBPassword'
+    AllocatedStorage: '20'
+    StorageType: gp2
+    VPCSecurityGroups:
+      - !Ref DBSecurityGroup
+    MultiAZ: true
+    BackupRetentionPeriod: 7
+    DeletionProtection: true
+\`\`\`
+
+**セキュリティ考慮事項:**
+
+**ネットワークセキュリティ:**
+- VPC内配置
+- セキュリティグループ
+- プライベートサブネット
+- VPN/Direct Connect
+
+**データ暗号化:**
+- 保存時暗号化
+- 通信時暗号化
+- キー管理サービス
+- 透過的暗号化
+
+**アクセス制御:**
+- IAMロール
+- データベースユーザー管理
+- 最小権限原則
+- 監査ログ
+
+**コスト最適化:**
+
+**リザーブドインスタンス:**
+- 1年または3年契約
+- 大幅な割引
+- 予測可能なワークロード
+
+**スポットインスタンス:**
+- 開発・テスト環境
+- バッチ処理
+- 最大90%割引
+
+**自動スケーリング:**
+- 需要に応じた調整
+- 無駄なリソース削減
+- コスト効率の向上
+
+**モニタリングとアラート:**
+\`\`\`yaml
+# CloudWatch例
+DatabaseCPUAlarm:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: 'Database CPU utilization'
+    MetricName: CPUUtilization
+    Namespace: AWS/RDS
+    Statistic: Average
+    Period: 300
+    EvaluationPeriods: 2
+    Threshold: 80
+    ComparisonOperator: GreaterThanThreshold
+    AlarmActions:
+      - !Ref SNSTopic
+\`\`\``,
+        quiz: {
+          question: 'クラウドデータベースのPaaS型サービスの主な特徴はどれですか？',
+          options: [
+            '完全に自由にカスタマイズできる',
+            '運用作業が自動化されている',
+            '初期設定が不要で即座に利用開始できる',
+            '物理サーバーを直接管理する'
+          ],
+          correct: 1,
+          explanation: 'PaaS型のマネージドデータベースサービスは、パッチ適用、バックアップ、監視などの運用作業が自動化されており、ユーザーはアプリケーション開発に集中できます。'
+        }
+      },
+      {
+        title: 'データベースセキュリティの実装',
+        content: `実際のデータベースセキュリティ実装方法について学習します。
+
+**認証システム:**
+
+**データベース認証:**
+\`\`\`sql
+-- ユーザー作成
+CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'strong_password';
+
+-- パスワードポリシー設定
+ALTER USER 'app_user'@'localhost'
+PASSWORD EXPIRE INTERVAL 90 DAY
+PASSWORD HISTORY 5
+PASSWORD REQUIRE CURRENT;
+\`\`\`
+
+**統合認証（LDAP/Active Directory）:**
+\`\`\`sql
+-- SQL Server例
+CREATE LOGIN [DOMAIN\\username] FROM WINDOWS;
+CREATE USER [DOMAIN\\username] FOR LOGIN [DOMAIN\\username];
+\`\`\`
+
+**多要素認証（MFA）:**
+- データベース接続にMFA要求
+- 管理者アカウントは必須
+- アプリケーションアカウントは検討
+
+**アクセス制御の実装:**
+
+**最小権限の原則:**
+\`\`\`sql
+-- アプリケーション用ロール
+CREATE ROLE app_role;
+GRANT SELECT, INSERT, UPDATE ON sales_data TO app_role;
+GRANT SELECT ON product_data TO app_role;
+-- DELETE権限は付与しない
+
+-- 分析用ロール
+CREATE ROLE analyst_role;
+GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO analyst_role;
+-- 書き込み権限は付与しない
+\`\`\`
+
+**時間制限アクセス:**
+\`\`\`sql
+-- 業務時間のみアクセス可能
+CREATE POLICY business_hours_policy ON sensitive_table
+FOR ALL
+TO business_users
+USING (
+    EXTRACT(HOUR FROM CURRENT_TIME) BETWEEN 9 AND 17
+    AND EXTRACT(DOW FROM CURRENT_DATE) BETWEEN 1 AND 5
+);
+\`\`\`
+
+**データマスキング:**
+
+**静的データマスキング:**
+\`\`\`sql
+-- 開発環境用のマスクされたデータ作成
+UPDATE customer_dev
+SET
+    email = CONCAT('user', customer_id, '@example.com'),
+    phone = CONCAT('090-xxxx-', RIGHT(phone, 4)),
+    credit_card = 'xxxx-xxxx-xxxx-' + RIGHT(credit_card, 4);
+\`\`\`
+
+**動的データマスキング:**
+\`\`\`sql
+-- SQL Server例
+ALTER TABLE customers
+ALTER COLUMN email ADD MASKED WITH (FUNCTION = 'email()');
+
+ALTER TABLE customers
+ALTER COLUMN credit_card ADD MASKED WITH (FUNCTION = 'partial(0,"xxxx-xxxx-xxxx-",4)');
+\`\`\`
+
+**SQL インジェクション対策:**
+
+**パラメータ化クエリ:**
+\`\`\`sql
+-- 悪い例（SQLインジェクション脆弱性あり）
+-- SELECT * FROM users WHERE username = '" + username + "'
+
+-- 良い例（プリペアドステートメント）
+PREPARE stmt FROM 'SELECT * FROM users WHERE username = ?';
+SET @username = 'john_doe';
+EXECUTE stmt USING @username;
+\`\`\`
+
+**入力値検証:**
+\`\`\`sql
+-- ストアドプロシージャでの検証
+DELIMITER //
+CREATE PROCEDURE GetUserById(IN user_id INT)
+BEGIN
+    -- 入力値検証
+    IF user_id IS NULL OR user_id <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid user ID';
+    END IF;
+
+    SELECT * FROM users WHERE id = user_id;
+END //
+DELIMITER ;
+\`\`\`
+
+**データ暗号化の実装:**
+
+**列レベル暗号化:**
+\`\`\`sql
+-- 暗号化関数を使用
+CREATE TABLE encrypted_data (
+    id INT PRIMARY KEY,
+    username VARCHAR(100),
+    encrypted_ssn VARBINARY(255)
+);
+
+-- データ挿入時に暗号化
+INSERT INTO encrypted_data (id, username, encrypted_ssn)
+VALUES (1, 'john_doe', AES_ENCRYPT('123-45-6789', 'encryption_key'));
+
+-- データ取得時に復号化
+SELECT id, username, AES_DECRYPT(encrypted_ssn, 'encryption_key') as ssn
+FROM encrypted_data WHERE id = 1;
+\`\`\`
+
+**セキュリティ監査:**
+
+**ログイン監査:**
+\`\`\`sql
+-- 失敗したログイン試行の記録
+CREATE TABLE login_attempts (
+    attempt_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100),
+    ip_address VARCHAR(45),
+    attempt_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    success BOOLEAN,
+    failure_reason VARCHAR(255)
+);
+
+-- ログイン試行の記録
+INSERT INTO login_attempts (username, ip_address, success, failure_reason)
+VALUES ('user123', '192.168.1.100', FALSE, 'Invalid password');
+\`\`\`
+
+**データアクセス監査:**
+\`\`\`sql
+-- データアクセスの追跡
+CREATE TABLE data_access_log (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(100),
+    table_name VARCHAR(100),
+    operation VARCHAR(10),
+    record_count INT,
+    access_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    query_hash VARCHAR(64)
+);
+\`\`\`
+
+**セキュリティイベント監視:**
+
+**異常検知:**
+\`\`\`sql
+-- 通常と異なるアクセスパターンの検知
+SELECT
+    user_name,
+    COUNT(*) as query_count,
+    COUNT(DISTINCT table_name) as tables_accessed
+FROM data_access_log
+WHERE access_time >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+GROUP BY user_name
+HAVING query_count > 1000 OR tables_accessed > 20;
+\`\`\`
+
+**リアルタイムアラート:**
+- 権限昇格の試行
+- 大量データアクセス
+- 異常な時間帯のアクセス
+- 失敗したログイン試行の連続
+
+**セキュリティ設定のベストプラクティス:**
+- デフォルトパスワードの変更
+- 不要なサービスの無効化
+- 定期的なセキュリティパッチ適用
+- ファイアウォール設定
+- SSL/TLS証明書の更新`,
+        quiz: {
+          question: 'SQLインジェクション攻撃を防ぐ最も効果的な方法はどれですか？',
+          options: [
+            'データベースに接続するアプリケーションを制限する',
+            'パラメータ化クエリ（プリペアドステートメント）を使用する',
+            'データベースユーザーの権限を制限する',
+            'データを暗号化して保存する'
+          ],
+          correct: 1,
+          explanation: 'パラメータ化クエリ（プリペアドステートメント）を使用することで、SQL文とデータを分離し、悪意のあるSQL文の実行を防ぐことができます。これはSQLインジェクション対策の基本です。'
+        }
+      }
+    ]
+  },
+  {
+    title: 'データベース応用技術',
+    icon: '🚀',
+    sections: [
+      {
+        title: 'データマイニング・機械学習統合',
+        content: `データベースと機械学習を統合した分析手法について学習します。
+
+**データマイニング:**
+データベースから有用な知識やパターンを発見する技術
+
+**KDD（Knowledge Discovery in Databases）プロセス:**
+1. **データ選択:** 分析対象データの特定
+2. **前処理:** データクリーニング・変換
+3. **データマイニング:** パターン抽出
+4. **解釈・評価:** 結果の検証
+5. **知識活用:** ビジネス適用
+
+**代表的なデータマイニング手法:**
+
+**分類（Classification）:**
+- 決定木（Decision Tree）
+- ランダムフォレスト
+- サポートベクターマシン（SVM）
+- ナイーブベイズ
+
+**クラスタリング（Clustering）:**
+- k-means法
+- 階層クラスタリング
+- DBSCAN
+- ガウス混合モデル
+
+**アソシエーション分析:**
+- Aprioriアルゴリズム
+- FP-Growth
+- マーケットバスケット分析
+
+**時系列分析:**
+- ARIMA モデル
+- 季節分解
+- 異常検知
+
+**データベース内機械学習:**
+
+**SQL/MLステートメント:**
+\`\`\`sql
+-- BigQuery ML でのモデル作成例
+CREATE OR REPLACE MODEL dataset.customer_segmentation_model
+OPTIONS(model_type='kmeans', num_clusters=4) AS
+SELECT
+  customer_age,
+  annual_income,
+  spending_score
+FROM dataset.customer_data;
+
+-- 予測実行
+SELECT
+  customer_id,
+  predicted_cluster_label
+FROM ML.PREDICT(MODEL dataset.customer_segmentation_model,
+  (SELECT * FROM dataset.new_customers));
+\`\`\`
+
+**PostgreSQLでの機械学習拡張:**
+\`\`\`sql
+-- MADlib を使用した線形回帰
+SELECT madlib.linregr_train(
+  'housing_data',           -- source table
+  'housing_model',          -- model table
+  'price',                  -- dependent variable
+  'ARRAY[bedrooms, size, age]'  -- independent variables
+);
+
+-- 予測
+SELECT
+  customer_id,
+  madlib.linregr_predict(
+    ARRAY[bedrooms, size, age],
+    m.coef,
+    m.intercept
+  ) as predicted_price
+FROM new_houses, housing_model m;
+\`\`\`
+
+**ストリーミング分析:**
+
+**リアルタイム処理アーキテクチャ:**
+- Apache Kafka + Kafka Streams
+- Apache Storm
+- Apache Flink
+- AWS Kinesis
+
+**ストリーミングSQL:**
+\`\`\`sql
+-- Apache Flink SQL での例
+CREATE TABLE orders (
+  order_id BIGINT,
+  user_id BIGINT,
+  product_id BIGINT,
+  amount DECIMAL(10,2),
+  order_time TIMESTAMP(3),
+  WATERMARK FOR order_time AS order_time - INTERVAL '5' SECOND
+) WITH (
+  'connector' = 'kafka',
+  'topic' = 'orders',
+  'format' = 'json'
+);
+
+-- リアルタイム集計
+SELECT
+  user_id,
+  TUMBLE_START(order_time, INTERVAL '1' HOUR) as window_start,
+  COUNT(*) as order_count,
+  SUM(amount) as total_amount
+FROM orders
+GROUP BY user_id, TUMBLE(order_time, INTERVAL '1' HOUR);
+\`\`\`
+
+**データレイク統合:**
+
+**Delta Lake:**
+- ACID特性保証
+- スキーマエボリューション
+- タイムトラベル
+- データバージョニング
+
+**Apache Iceberg:**
+- 大規模分析テーブル形式
+- Hidden partitioning
+- スキーマエボリューション
+- ACID操作
+
+**実用例:**
+
+**推薦システム:**
+- 協調フィルタリング
+- コンテンツベースフィルタリング
+- ハイブリッド手法
+- ディープラーニング
+
+**不正検知:**
+- 異常検知アルゴリズム
+- リアルタイム監視
+- 機械学習モデル
+
+**顧客分析:**
+- RFM分析（Recency, Frequency, Monetary）
+- 顧客生涯価値（LTV）
+- チャーン予測`,
+        quiz: {
+          question: 'データマイニングのKDDプロセスで、最初に行う作業はどれですか？',
+          options: [
+            'データクリーニング',
+            'データ選択',
+            'パターン抽出',
+            '結果の解釈'
+          ],
+          correct: 1,
+          explanation: 'KDD（Knowledge Discovery in Databases）プロセスでは、まず分析対象となるデータを特定・選択することから始まります。これにより分析の方向性と範囲が決まります。'
+        }
+      },
+      {
+        title: 'データベース設計パターン',
+        content: `効率的なデータベース設計のパターンと手法について学習します。
+
+**設計パターンの分類:**
+
+**構造パターン:**
+- Entity-Attribute-Value (EAV)
+- Table Inheritance
+- Polymorphic Associations
+- Audit Trail
+
+**アクセスパターン:**
+- Repository Pattern
+- Data Access Object (DAO)
+- Unit of Work
+- Identity Map
+
+**パフォーマンスパターン:**
+- Lazy Loading
+- Eager Loading
+- Connection Pooling
+- Query Object
+
+**詳細な設計パターン:**
+
+**1. Entity-Attribute-Value (EAV)パターン:**
+動的な属性を持つエンティティの設計
+
+\`\`\`sql
+-- EAVテーブル設計
+CREATE TABLE entities (
+  entity_id INT PRIMARY KEY,
+  entity_type VARCHAR(50)
+);
+
+CREATE TABLE attributes (
+  attribute_id INT PRIMARY KEY,
+  attribute_name VARCHAR(100),
+  data_type VARCHAR(20)
+);
+
+CREATE TABLE entity_attributes (
+  entity_id INT,
+  attribute_id INT,
+  value TEXT,
+  FOREIGN KEY (entity_id) REFERENCES entities(entity_id),
+  FOREIGN KEY (attribute_id) REFERENCES attributes(attribute_id)
+);
+
+-- 使用例：商品の動的属性
+INSERT INTO entities VALUES (1, 'product');
+INSERT INTO attributes VALUES (1, 'color', 'string');
+INSERT INTO attributes VALUES (2, 'weight', 'decimal');
+INSERT INTO entity_attributes VALUES (1, 1, 'red');
+INSERT INTO entity_attributes VALUES (1, 2, '1.5');
+\`\`\`
+
+**2. Table Inheritance（テーブル継承）:**
+
+**単一テーブル継承（STI）:**
+\`\`\`sql
+CREATE TABLE employees (
+  id INT PRIMARY KEY,
+  type VARCHAR(20), -- 'manager', 'developer', 'designer'
+  name VARCHAR(100),
+  salary DECIMAL(10,2),
+  -- Manager specific
+  department VARCHAR(50),
+  -- Developer specific
+  programming_language VARCHAR(50),
+  -- Designer specific
+  design_tool VARCHAR(50)
+);
+\`\`\`
+
+**クラステーブル継承（CTI）:**
+\`\`\`sql
+CREATE TABLE employees (
+  id INT PRIMARY KEY,
+  name VARCHAR(100),
+  salary DECIMAL(10,2)
+);
+
+CREATE TABLE managers (
+  id INT PRIMARY KEY,
+  department VARCHAR(50),
+  FOREIGN KEY (id) REFERENCES employees(id)
+);
+
+CREATE TABLE developers (
+  id INT PRIMARY KEY,
+  programming_language VARCHAR(50),
+  FOREIGN KEY (id) REFERENCES employees(id)
+);
+\`\`\`
+
+**3. Audit Trail（監査証跡）パターン:**
+\`\`\`sql
+CREATE TABLE products (
+  id INT PRIMARY KEY,
+  name VARCHAR(100),
+  price DECIMAL(10,2),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by INT,
+  updated_by INT
+);
+
+CREATE TABLE product_audit_log (
+  log_id INT PRIMARY KEY AUTO_INCREMENT,
+  product_id INT,
+  operation_type VARCHAR(10), -- 'INSERT', 'UPDATE', 'DELETE'
+  old_values JSON,
+  new_values JSON,
+  changed_by INT,
+  changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- トリガーでの自動監査ログ記録
+DELIMITER //
+CREATE TRIGGER product_audit_update
+AFTER UPDATE ON products
+FOR EACH ROW
+BEGIN
+  INSERT INTO product_audit_log (
+    product_id, operation_type, old_values, new_values, changed_by
+  ) VALUES (
+    NEW.id, 'UPDATE',
+    JSON_OBJECT('name', OLD.name, 'price', OLD.price),
+    JSON_OBJECT('name', NEW.name, 'price', NEW.price),
+    NEW.updated_by
+  );
+END//
+DELIMITER ;
+\`\`\`
+
+**4. Polymorphic Associations（多相関連）:**
+\`\`\`sql
+CREATE TABLE comments (
+  id INT PRIMARY KEY,
+  commentable_type VARCHAR(50), -- 'Article', 'Video', 'Photo'
+  commentable_id INT,
+  content TEXT,
+  user_id INT,
+  created_at TIMESTAMP
+);
+
+-- 記事へのコメント
+INSERT INTO comments (commentable_type, commentable_id, content, user_id)
+VALUES ('Article', 123, 'Great article!', 456);
+
+-- 動画へのコメント
+INSERT INTO comments (commentable_type, commentable_id, content, user_id)
+VALUES ('Video', 789, 'Amazing video!', 456);
+\`\`\`
+
+**5. Soft Delete（論理削除）パターン:**
+\`\`\`sql
+CREATE TABLE users (
+  id INT PRIMARY KEY,
+  username VARCHAR(50),
+  email VARCHAR(100),
+  deleted_at TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 論理削除
+UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = 123;
+
+-- アクティブユーザーのみ取得
+SELECT * FROM users WHERE deleted_at IS NULL;
+
+-- 削除済みユーザーを含む全ユーザー
+SELECT * FROM users;
+\`\`\`
+
+**パフォーマンス最適化パターン:**
+
+**1. Read Replica パターン:**
+- 読み取り専用レプリカの活用
+- 読み書き分離
+- 負荷分散
+
+**2. Sharding パターン:**
+- 水平分割によるスケール
+- シャードキーの選択
+- クロスシャードクエリの回避
+
+**3. Caching パターン:**
+- Cache-aside
+- Write-through
+- Write-behind
+- Refresh-ahead
+
+**アンチパターンの回避:**
+
+**よくある設計ミス:**
+- Fear of NULL（NULL値の過剰回避）
+- One True Lookup Table（万能参照テーブル）
+- Entity-Attribute-Value の乱用
+- Magic Numbers（マジックナンバー）
+- Poor Man's Search Engine（検索機能の不適切実装）`,
+        quiz: {
+          question: 'Entity-Attribute-Value (EAV) パターンの主な用途はどれですか？',
+          options: [
+            '固定的な属性を持つエンティティの管理',
+            '動的な属性を持つエンティティの管理',
+            'パフォーマンスの最適化',
+            'セキュリティの強化'
+          ],
+          correct: 1,
+          explanation: 'EAVパターンは、属性が動的に変化したり、エンティティごとに異なる属性を持つ場合に使用されます。例えば、商品カテゴリごとに異なる仕様項目を持つ商品データベースなどで活用されます。'
+        }
+      },
+      {
+        title: 'データベースセキュリティ詳細',
+        content: `データベースセキュリティの詳細な対策と実装について学習します。
+
+**セキュリティ脅威の分類:**
+
+**認証・認可の脅威:**
+- 不正ログイン
+- 権限昇格攻撃
+- セッションハイジャック
+- ブルートフォース攻撃
+
+**データの脅威:**
+- SQLインジェクション
+- データ漏洩
+- データ改ざん
+- 内部者による不正アクセス
+
+**インフラの脅威:**
+- DoS/DDoS攻撃
+- ネットワーク盗聴
+- 中間者攻撃
+- 物理的セキュリティ侵害
+
+**詳細なセキュリティ対策:**
+
+**1. 強固な認証・認可システム:**
+
+**多要素認証（MFA）:**
+\`\`\`sql
+-- PostgreSQLでのロール管理
+CREATE ROLE app_readonly;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO app_readonly;
+
+CREATE ROLE app_readwrite;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_readwrite;
+
+-- ユーザー作成と権限割り当て
+CREATE USER analyst WITH PASSWORD 'strong_password';
+GRANT app_readonly TO analyst;
+
+-- 時間制限付きアクセス
+ALTER USER analyst VALID UNTIL '2024-12-31';
+\`\`\`
+
+**行レベルセキュリティ（RLS）:**
+\`\`\`sql
+-- PostgreSQLのRLS設定
+CREATE TABLE customer_data (
+  id SERIAL PRIMARY KEY,
+  customer_id INT,
+  data TEXT,
+  tenant_id INT
+);
+
+-- RLS有効化
+ALTER TABLE customer_data ENABLE ROW LEVEL SECURITY;
+
+-- ポリシー作成
+CREATE POLICY tenant_isolation ON customer_data
+FOR ALL TO app_user
+USING (tenant_id = current_setting('app.tenant_id')::INT);
+
+-- アプリケーションでのテナントID設定
+SET app.tenant_id = 123;
+SELECT * FROM customer_data; -- テナント123のデータのみ表示
+\`\`\`
+
+**2. データ暗号化:**
+
+**透過的データ暗号化（TDE）:**
+\`\`\`sql
+-- SQL Serverでの TDE 設定
+-- マスターキー作成
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'MyStrongPassword123!';
+
+-- 証明書作成
+CREATE CERTIFICATE TDECert WITH SUBJECT = 'TDE Certificate';
+
+-- データベース暗号化キー作成
+USE CustomerDB;
+CREATE DATABASE ENCRYPTION KEY
+WITH ALGORITHM = AES_256
+ENCRYPTION BY SERVER CERTIFICATE TDECert;
+
+-- TDE有効化
+ALTER DATABASE CustomerDB SET ENCRYPTION ON;
+\`\`\`
+
+**列レベル暗号化:**
+\`\`\`sql
+-- Always Encrypted (SQL Server)
+CREATE TABLE Customers (
+  CustomerID INT IDENTITY(1,1) PRIMARY KEY,
+  FirstName NVARCHAR(50),
+  LastName NVARCHAR(50),
+  SSN CHAR(11) COLLATE Latin1_General_BIN2
+    ENCRYPTED WITH (
+      COLUMN_ENCRYPTION_KEY = CEK_SSN,
+      ENCRYPTION_TYPE = DETERMINISTIC,
+      ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256'
+    ),
+  CreditCardNumber NVARCHAR(20) COLLATE Latin1_General_BIN2
+    ENCRYPTED WITH (
+      COLUMN_ENCRYPTION_KEY = CEK_CreditCard,
+      ENCRYPTION_TYPE = RANDOMIZED,
+      ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256'
+    )
+);
+\`\`\`
+
+**3. 監査とログ:**
+
+**詳細監査ログ:**
+\`\`\`sql
+-- PostgreSQLでの監査設定
+-- postgresql.conf での設定
+-- log_statement = 'all'
+-- log_duration = on
+-- log_line_prefix = '%t [%p-%l] %q%u@%d '
+
+-- pgAudit拡張の使用
+CREATE EXTENSION pgaudit;
+
+-- 監査設定
+ALTER SYSTEM SET pgaudit.log = 'write, ddl';
+ALTER SYSTEM SET pgaudit.log_catalog = off;
+ALTER SYSTEM SET pgaudit.log_parameter = on;
+
+-- セッションレベルでの監査
+SET pgaudit.log = 'read';
+SELECT * FROM sensitive_table; -- この操作が記録される
+\`\`\`
+
+**4. データマスキングと仮名化:**
+
+**動的データマスキング:**
+\`\`\`sql
+-- SQL Serverでの動的データマスキング
+ALTER TABLE Customers
+ALTER COLUMN FirstName ADD MASKED WITH (FUNCTION = 'partial(1,"XXX",1)');
+
+ALTER TABLE Customers
+ALTER COLUMN CreditCardNumber ADD MASKED WITH (FUNCTION = 'partial(4,"XXXX-XXXX-XXXX-",4)');
+
+-- マスクされていないデータを見る権限
+GRANT UNMASK TO DataAnalyst;
+\`\`\`
+
+**静的データマスキング:**
+\`\`\`sql
+-- 本番データから開発環境用データ作成
+CREATE TABLE dev_customers AS
+SELECT
+  customer_id,
+  CONCAT('Customer_', customer_id) AS name, -- 名前仮名化
+  CONCAT(LEFT(email, 3), '****@example.com') AS email, -- メール仮名化
+  '1990-01-01' AS birth_date, -- 生年月日固定値
+  address_prefecture, -- 都道府県は残す
+  NULL AS phone_number -- 電話番号削除
+FROM customers;
+\`\`\`
+
+**5. セキュリティベストプラクティス:**
+
+**接続セキュリティ:**
+- SSL/TLS暗号化通信
+- 証明書検証
+- 接続元IP制限
+- VPN/Private Link使用
+
+**アプリケーションセキュリティ:**
+- パラメータ化クエリ
+- 最小権限の原則
+- 接続プール設定
+- タイムアウト設定
+
+**運用セキュリティ:**
+- 定期的なセキュリティパッチ適用
+- 脆弱性スキャン
+- ペネトレーションテスト
+- インシデント対応計画
+
+**コンプライアンス対応:**
+
+**GDPR（EU一般データ保護規則）:**
+- データ削除権（Right to be forgotten）
+- データポータビリティ
+- プライバシー・バイ・デザイン
+
+**個人情報保護法（日本）:**
+- 個人データの適切な管理
+- 本人同意の取得
+- データ移転の制限
+
+**医療・金融業界規制:**
+- HIPAA（医療）
+- PCI DSS（決済）
+- SOX法（財務報告）`,
+        quiz: {
+          question: '行レベルセキュリティ（RLS）の主な目的はどれですか？',
+          options: [
+            'データベース全体へのアクセスを制御する',
+            'テーブル内の特定の行へのアクセスを制御する',
+            '列レベルでのデータ暗号化を行う',
+            'SQLインジェクション攻撃を防ぐ'
+          ],
+          correct: 1,
+          explanation: '行レベルセキュリティ（RLS）は、ユーザーやロールに応じてテーブル内の特定の行へのアクセスを制御する仕組みです。マルチテナントアプリケーションでテナント間のデータ分離に使用されます。'
+        }
+      },
+      {
+        title: '最新データベース技術',
+        content: `最新のデータベース技術とトレンドについて学習します。
+
+**次世代データベース技術:**
+
+**1. ベクトルデータベース:**
+AI・機械学習時代の新しいデータベース
+
+**特徴:**
+- 高次元ベクトルの効率的格納
+- 類似度検索に最適化
+- 埋め込み（Embedding）データの管理
+- リアルタイム推論サポート
+
+**主要なベクトルデータベース:**
+- **Pinecone:** フルマネージドベクトルDB
+- **Weaviate:** オープンソース、GraphQL API
+- **Milvus:** スケーラブルな分散アーキテクチャ
+- **Qdrant:** 高性能検索エンジン
+
+**使用例:**
+\`\`\`python
+# Pinecone でのベクトル検索例
+import pinecone
+
+# 初期化
+pinecone.init(api_key="your-api-key", environment="us-east1-gcp")
+
+# インデックス作成
+index_name = "product-recommendations"
+pinecone.create_index(index_name, dimension=384)
+index = pinecone.Index(index_name)
+
+# ベクトル挿入
+vectors = [
+    ("product-1", [0.1, 0.2, 0.3, ...], {"category": "electronics"}),
+    ("product-2", [0.4, 0.5, 0.6, ...], {"category": "books"})
+]
+index.upsert(vectors)
+
+# 類似度検索
+query_vector = [0.15, 0.25, 0.35, ...]
+results = index.query(
+    vector=query_vector,
+    top_k=10,
+    include_metadata=True
+)
+\`\`\`
+
+**2. リアルタイムデータベース:**
+
+**Firebase Realtime Database:**
+\`\`\`javascript
+// リアルタイム同期の例
+import { ref, onValue, push } from 'firebase/database';
+
+// データの監視
+const messagesRef = ref(database, 'messages');
+onValue(messagesRef, (snapshot) => {
+  const data = snapshot.val();
+  updateUI(data); // UIをリアルタイム更新
+});
+
+// データの追加
+const newMessageRef = push(messagesRef);
+set(newMessageRef, {
+  text: 'Hello World',
+  timestamp: Date.now(),
+  user: 'alice'
+});
+\`\`\`
+
+**3. マルチモデルデータベース:**
+
+**Azure Cosmos DB:**
+複数のデータモデルをサポート
+
+\`\`\`sql
+-- SQL API (DocumentDB)
+SELECT c.id, c.productName, c.price
+FROM containers c
+WHERE c.category = 'electronics'
+
+-- Gremlin API (Graph)
+g.V().hasLabel('person').has('name', 'alice')
+ .out('knows').hasLabel('person')
+ .values('name')
+
+-- Cassandra API
+SELECT * FROM products
+WHERE category = 'electronics'
+AND price > 100
+\`\`\`
+
+**4. サーバーレスデータベース:**
+
+**AWS Aurora Serverless:**
+\`\`\`yaml
+# AWS SAM template例
+AuroraServerlessCluster:
+  Type: AWS::RDS::DBCluster
+  Properties:
+    Engine: aurora-mysql
+    EngineMode: serverless
+    DatabaseName: !Ref DatabaseName
+    MasterUsername: !Ref MasterUsername
+    MasterUserPassword: !Ref MasterUserPassword
+    ScalingConfiguration:
+      AutoPause: true
+      MaxCapacity: 256
+      MinCapacity: 2
+      SecondsUntilAutoPause: 300
+\`\`\`
+
+**5. エッジデータベース:**
+
+**分散エッジコンピューティング:**
+- レイテンシの最小化
+- オフライン機能
+- データローカライゼーション
+
+**PouchDB/CouchDB:**
+\`\`\`javascript
+// オフライン対応の同期
+const localDB = new PouchDB('local-products');
+const remoteDB = new PouchDB('https://myserver.com/products');
+
+// 双方向同期
+localDB.sync(remoteDB, {
+  live: true,
+  retry: true
+}).on('change', function (change) {
+  console.log('同期完了:', change);
+}).on('error', function (err) {
+  console.log('同期エラー:', err);
+});
+\`\`\`
+
+**6. ブロックチェーンデータベース:**
+
+**分散台帳技術との統合:**
+- 改ざん不可能なデータ保存
+- スマートコントラクト連携
+- 分散合意メカニズム
+
+**Hyperledger Fabric 例:**
+\`\`\`javascript
+// チェーンコード（スマートコントラクト）
+async function createProduct(ctx, productId, name, price) {
+  const product = {
+    productId,
+    name,
+    price,
+    timestamp: new Date().toISOString(),
+    owner: ctx.clientIdentity.getID()
+  };
+
+  await ctx.stub.putState(productId, Buffer.from(JSON.stringify(product)));
+  return JSON.stringify(product);
+}
+\`\`\`
+
+**7. 量子耐性データベース:**
+
+**ポスト量子暗号:**
+- 量子コンピュータ時代への備え
+- 新しい暗号アルゴリズム採用
+- 長期的データセキュリティ
+
+**8. AIネイティブデータベース:**
+
+**自動最適化機能:**
+- 自動インデックス作成
+- クエリプラン最適化
+- 異常検知・自動修復
+
+**Oracle Autonomous Database:**
+\`\`\`sql
+-- AI による自動SQL調整
+ALTER SYSTEM SET "_optimizer_use_feedback" = TRUE;
+
+-- 自動インデックス管理
+EXEC DBMS_AUTO_INDEX.CONFIGURE('AUTO_INDEX_MODE', 'IMPLEMENT');
+
+-- 自動統計収集
+EXEC DBMS_STATS.SET_GLOBAL_PREFS('AUTO_STATS_EXTENSIONS', 'ON');
+\`\`\`
+
+**9. データメッシュアーキテクチャ:**
+
+**分散データ所有権:**
+- ドメイン指向の分散アーキテクチャ
+- データプロダクトとしての管理
+- セルフサーブ型データインフラ
+
+**実装例:**
+\`\`\`yaml
+# Data Product 定義
+apiVersion: v1
+kind: DataProduct
+metadata:
+  name: customer-analytics
+  domain: marketing
+spec:
+  datasets:
+    - name: customer-behavior
+      schema: customer_behavior_v1.avro
+      quality:
+        freshness: 1h
+        accuracy: 99.9%
+  apis:
+    - type: GraphQL
+      endpoint: /graphql/customer-analytics
+    - type: REST
+      endpoint: /api/v1/customers
+\`\`\`
+
+**10. 持続可能なデータベース:**
+
+**グリーンコンピューティング:**
+- エネルギー効率の最適化
+- カーボンフットプリント削減
+- 再生可能エネルギー活用
+
+**最適化手法:**
+- インテリジェントなデータティアリング
+- 使用頻度に基づくストレージ最適化
+- AIによる電力消費予測・制御`,
+        quiz: {
+          question: 'ベクトルデータベースが主に最適化されている処理はどれですか？',
+          options: [
+            '完全一致検索',
+            '範囲検索',
+            '類似度検索',
+            '集計処理'
+          ],
+          correct: 2,
+          explanation: 'ベクトルデータベースは、AI・機械学習で生成される高次元ベクトルデータの類似度検索に最適化されています。埋め込み（Embedding）データの管理や推薦システムに活用されます。'
+        }
+      },
+      {
+        title: 'データベース統合・移行',
+        content: `データベースの統合と移行の戦略と実装について学習します。
+
+**移行戦略の種類:**
+
+**1. ビッグバン移行:**
+- 一括での完全切り替え
+- ダウンタイムあり
+- リスクは高いが期間は短い
+
+**2. 段階的移行:**
+- 機能・モジュール単位での移行
+- ダウンタイム最小化
+- 複雑だが安全
+
+**3. パラレル運用:**
+- 新旧システム同時稼働
+- データ同期が必要
+- 最も安全だがコスト高
+
+**移行計画フェーズ:**
+
+**Phase 1: 現状分析・計画立案**
+
+**データベース監査:**
+\`\`\`sql
+-- MySQL での現状分析
+-- テーブル情報取得
+SELECT
+  TABLE_SCHEMA as 'Database',
+  TABLE_NAME as 'Table',
+  ROUND(((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024), 2) as 'Size (MB)',
+  TABLE_ROWS as 'Rows'
+FROM information_schema.TABLES
+WHERE TABLE_SCHEMA NOT IN ('information_schema', 'mysql', 'performance_schema')
+ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC;
+
+-- インデックス使用状況
+SELECT
+  OBJECT_SCHEMA,
+  OBJECT_NAME,
+  INDEX_NAME,
+  COUNT_FETCH,
+  COUNT_INSERT,
+  COUNT_UPDATE,
+  COUNT_DELETE
+FROM performance_schema.table_io_waits_summary_by_index_usage
+WHERE OBJECT_SCHEMA NOT IN ('mysql', 'performance_schema', 'information_schema')
+ORDER BY COUNT_FETCH DESC;
+\`\`\`
+
+**依存関係マッピング:**
+\`\`\`sql
+-- 外部キー制約の確認
+SELECT
+  CONSTRAINT_NAME,
+  TABLE_NAME,
+  COLUMN_NAME,
+  REFERENCED_TABLE_NAME,
+  REFERENCED_COLUMN_NAME
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE CONSTRAINT_SCHEMA = 'your_database'
+  AND REFERENCED_TABLE_NAME IS NOT NULL;
+\`\`\`
+
+**Phase 2: データマッピング・変換**
+
+**スキーマ変換例:**
+\`\`\`sql
+-- Oracle から PostgreSQL への変換例
+
+-- Oracle
+CREATE TABLE employees (
+  id NUMBER(10) PRIMARY KEY,
+  name VARCHAR2(100),
+  hire_date DATE,
+  salary NUMBER(10,2)
+);
+
+-- PostgreSQL
+CREATE TABLE employees (
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR(100),
+  hire_date DATE,
+  salary DECIMAL(10,2)
+);
+\`\`\`
+
+**データ型マッピング:**
+\`\`\`yaml
+# データ型変換マッピング定義
+oracle_to_postgresql:
+  NUMBER: DECIMAL
+  VARCHAR2: VARCHAR
+  DATE: DATE
+  TIMESTAMP: TIMESTAMP
+  CLOB: TEXT
+  BLOB: BYTEA
+  CHAR: CHAR
+
+sql_server_to_mysql:
+  INT: INT
+  NVARCHAR: VARCHAR
+  DATETIME: DATETIME
+  BIT: BOOLEAN
+  MONEY: DECIMAL(19,4)
+  UNIQUEIDENTIFIER: VARCHAR(36)
+\`\`\`
+
+**Phase 3: 移行ツールと手法**
+
+**AWS Database Migration Service (DMS):**
+\`\`\`json
+{
+  "ReplicationInstanceIdentifier": "migration-instance",
+  "ReplicationInstanceClass": "dms.t3.large",
+  "AllocatedStorage": 100,
+  "ReplicationSubnetGroupIdentifier": "migration-subnet-group",
+  "VpcSecurityGroupIds": ["sg-12345678"],
+  "MultiAZ": true,
+  "ReplicationTasks": [
+    {
+      "ReplicationTaskIdentifier": "full-load-task",
+      "SourceEndpointArn": "arn:aws:dms:region:account:endpoint:source",
+      "TargetEndpointArn": "arn:aws:dms:region:account:endpoint:target",
+      "MigrationType": "full-load-and-cdc",
+      "TableMappings": {
+        "rules": [
+          {
+            "rule-type": "selection",
+            "rule-id": "1",
+            "rule-name": "include-all-tables",
+            "object-locator": {
+              "schema-name": "public",
+              "table-name": "%"
+            },
+            "rule-action": "include"
+          }
+        ]
+      }
+    }
+  ]
+}
+\`\`\`
+
+**Azure Database Migration Service:**
+\`\`\`powershell
+# Azure DMS プロジェクト作成
+az dms project create
+  --service-name "MyDMSService"
+  --project-name "SQLToPostgreSQL"
+  --source-platform "SQL"
+  --target-platform "PostgreSQL"
+  --resource-group "MyResourceGroup"
+
+# 移行タスク実行
+az dms project task create
+  --service-name "MyDMSService"
+  --project-name "SQLToPostgreSQL"
+  --task-name "MigrateDatabase"
+  --source-connection-json @source-connection.json
+  --target-connection-json @target-connection.json
+  --database-options-json @database-options.json
+\`\`\`
+
+**Phase 4: データ同期・検証**
+
+**ストリーミングレプリケーション:**
+\`\`\`sql
+-- PostgreSQL の論理レプリケーション設定
+-- パブリッシャー側
+CREATE PUBLICATION migration_pub FOR ALL TABLES;
+
+-- サブスクライバー側
+CREATE SUBSCRIPTION migration_sub
+CONNECTION 'host=source-db port=5432 dbname=mydb user=replica_user'
+PUBLICATION migration_pub;
+
+-- レプリケーション状態確認
+SELECT * FROM pg_stat_subscription;
+SELECT * FROM pg_publication_tables;
+\`\`\`
+
+**データ整合性チェック:**
+\`\`\`sql
+-- レコード数比較
+SELECT 'source' as db, COUNT(*) as count FROM source_table
+UNION ALL
+SELECT 'target' as db, COUNT(*) as count FROM target_table;
+
+-- チェックサム比較
+SELECT
+  'source' as db,
+  MD5(GROUP_CONCAT(id, name, email ORDER BY id)) as checksum
+FROM source_users
+UNION ALL
+SELECT
+  'target' as db,
+  MD5(GROUP_CONCAT(id, name, email ORDER BY id)) as checksum
+FROM target_users;
+\`\`\`
+
+**Phase 5: カットオーバー・ロールバック計画**
+
+**カットオーバー手順:**
+\`\`\`bash
+#!/bin/bash
+# カットオーバースクリプト例
+
+echo "Starting cutover process..."
+
+# 1. アプリケーション停止
+echo "Stopping application..."
+systemctl stop myapp
+
+# 2. 最終データ同期
+echo "Final data sync..."
+pg_dump --data-only source_db | psql target_db
+
+# 3. DNS切り替え
+echo "Switching DNS..."
+aws route53 change-resource-record-sets --change-batch file://dns-change.json
+
+# 4. アプリケーション起動（新DB接続）
+echo "Starting application with new database..."
+systemctl start myapp
+
+# 5. ヘルスチェック
+echo "Health check..."
+curl -f http://localhost:8080/health || exit 1
+
+echo "Cutover completed successfully!"
+\`\`\`
+
+**ロールバック手順:**
+\`\`\`bash
+#!/bin/bash
+# ロールバックスクリプト例
+
+echo "Starting rollback process..."
+
+# 1. アプリケーション停止
+systemctl stop myapp
+
+# 2. DNS復旧
+aws route53 change-resource-record-sets --change-batch file://dns-rollback.json
+
+# 3. 旧データベースへの差分反映（必要に応じて）
+# mysqldump --single-transaction new_db | mysql old_db
+
+# 4. アプリケーション起動（旧DB接続）
+systemctl start myapp
+
+echo "Rollback completed!"
+\`\`\`
+
+**移行後の運用監視:**
+
+**パフォーマンス比較:**
+\`\`\`sql
+-- 移行前後のパフォーマンス比較
+WITH performance_metrics AS (
+  SELECT
+    'before_migration' as period,
+    AVG(query_time) as avg_query_time,
+    MAX(query_time) as max_query_time,
+    COUNT(*) as query_count
+  FROM migration_performance_before
+  UNION ALL
+  SELECT
+    'after_migration' as period,
+    AVG(query_time) as avg_query_time,
+    MAX(query_time) as max_query_time,
+    COUNT(*) as query_count
+  FROM migration_performance_after
+)
+SELECT * FROM performance_metrics;
+\`\`\`
+
+**移行成功の指標:**
+- データ整合性: 100%
+- アプリケーション可用性: 99.9%+
+- パフォーマンス劣化: 10%以下
+- 予定ダウンタイム内での完了`,
+        quiz: {
+          question: 'データベース移行におけるパラレル運用方式の特徴はどれですか？',
+          options: [
+            '一括での完全切り替えを行う',
+            '機能単位で段階的に移行する',
+            '新旧システムを同時稼働させる',
+            'ダウンタイムを最小化する'
+          ],
+          correct: 2,
+          explanation: 'パラレル運用方式では、新旧システムを同時に稼働させ、データ同期を取りながら徐々に移行を進めます。最も安全な手法ですが、運用コストが高くなります。'
+        }
+      },
+      {
+        title: 'データベース性能分析',
+        content: `データベースの詳細な性能分析手法について学習します。
+
+**性能分析の階層:**
+
+**1. システムレベル分析:**
+- CPU使用率
+- メモリ使用量
+- ディスクI/O
+- ネットワーク帯域
+
+**2. データベースレベル分析:**
+- 接続数
+- クエリ実行時間
+- インデックス効率
+- ロック競合
+
+**3. クエリレベル分析:**
+- 実行プラン
+- カーディナリティ
+- 結合効率
+- 述語選択性
+
+**詳細な性能監視:**
+
+**PostgreSQL Performance Insights:**
+\`\`\`sql
+-- 長時間実行クエリの特定
+SELECT
+  query,
+  calls,
+  total_time,
+  mean_time,
+  stddev_time,
+  (total_time / sum(total_time) OVER()) * 100 AS percentage
+FROM pg_stat_statements
+ORDER BY total_time DESC
+LIMIT 10;
+
+-- 待機イベント分析
+SELECT
+  wait_event_type,
+  wait_event,
+  COUNT(*) as wait_count,
+  AVG(wait_time_ms) as avg_wait_time
+FROM pg_stat_activity
+WHERE state = 'active'
+GROUP BY wait_event_type, wait_event
+ORDER BY wait_count DESC;
+
+-- インデックス使用状況
+SELECT
+  schemaname,
+  tablename,
+  indexname,
+  idx_tup_read,
+  idx_tup_fetch,
+  idx_tup_read::float / NULLIF(idx_tup_fetch, 0) as selectivity
+FROM pg_stat_user_indexes
+ORDER BY idx_tup_read DESC;
+\`\`\`
+
+**MySQL Performance Schema:**
+\`\`\`sql
+-- スロークエリ分析
+SELECT
+  digest_text,
+  count_star,
+  avg_timer_wait / 1000000000 as avg_time_sec,
+  sum_timer_wait / 1000000000 as total_time_sec
+FROM performance_schema.events_statements_summary_by_digest
+ORDER BY sum_timer_wait DESC
+LIMIT 10;
+
+-- メモリ使用量分析
+SELECT
+  event_name,
+  current_count_used,
+  current_size_allocated / 1024 / 1024 as current_mb,
+  high_count_used,
+  high_size_allocated / 1024 / 1024 as high_mb
+FROM performance_schema.memory_summary_global_by_event_name
+WHERE current_size_allocated > 0
+ORDER BY current_size_allocated DESC;
+
+-- テーブルI/O統計
+SELECT
+  object_schema,
+  object_name,
+  count_read,
+  count_write,
+  count_fetch,
+  count_insert,
+  count_update,
+  count_delete
+FROM performance_schema.table_io_waits_summary_by_table
+WHERE object_schema NOT IN ('mysql', 'performance_schema', 'information_schema')
+ORDER BY count_read + count_write DESC;
+\`\`\`
+
+**実行プラン詳細分析:**
+
+**PostgreSQL EXPLAIN ANALYZE:**
+\`\`\`sql
+-- 詳細実行プラン取得
+EXPLAIN (ANALYZE, BUFFERS, VERBOSE, FORMAT JSON)
+SELECT c.customer_name, COUNT(o.order_id) as order_count
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE c.created_date >= '2023-01-01'
+GROUP BY c.customer_id, c.customer_name
+HAVING COUNT(o.order_id) > 5
+ORDER BY order_count DESC;
+
+-- バッファ使用状況付き
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT * FROM large_table WHERE indexed_column = 'value';
+/*
+結果例:
+Index Scan using idx_indexed_column on large_table
+  (cost=0.43..8.45 rows=1 width=100)
+  (actual time=0.089..0.091 rows=1 loops=1)
+  Index Cond: (indexed_column = 'value'::text)
+  Buffers: shared hit=4
+Planning Time: 0.123 ms
+Execution Time: 0.132 ms
+*/
+\`\`\`
+
+**カーディナリティ分析:**
+\`\`\`sql
+-- 列の選択性分析
+SELECT
+  schemaname,
+  tablename,
+  attname,
+  n_distinct,
+  (n_distinct::float / reltuples) * 100 as selectivity_percent
+FROM pg_stats s
+JOIN pg_class c ON s.tablename = c.relname
+WHERE schemaname = 'public'
+  AND n_distinct > 1
+ORDER BY selectivity_percent DESC;
+
+-- 統計情報の更新
+ANALYZE verbose customers;
+
+-- 複合インデックスの効果測定
+CREATE INDEX CONCURRENTLY idx_customer_date_status
+ON orders (customer_id, order_date, status);
+
+-- インデックス効果の確認
+SELECT
+  pg_size_pretty(pg_relation_size('idx_customer_date_status')) as index_size,
+  pg_size_pretty(pg_relation_size('orders')) as table_size;
+\`\`\`
+
+**リソース消費分析:**
+
+**接続プール分析:**
+\`\`\`sql
+-- PostgreSQL 接続状態
+SELECT
+  state,
+  COUNT(*) as connection_count,
+  AVG(EXTRACT(epoch FROM (now() - state_change))) as avg_duration_sec
+FROM pg_stat_activity
+WHERE state IS NOT NULL
+GROUP BY state;
+
+-- アイドル接続の特定
+SELECT
+  pid,
+  usename,
+  application_name,
+  state,
+  state_change,
+  query_start,
+  query
+FROM pg_stat_activity
+WHERE state = 'idle in transaction'
+  AND state_change < now() - interval '5 minutes';
+\`\`\`
+
+**ロック競合分析:**
+\`\`\`sql
+-- PostgreSQL ロック待ちクエリ
+WITH lock_waits AS (
+  SELECT
+    blocked_locks.pid AS blocked_pid,
+    blocked_activity.usename AS blocked_user,
+    blocking_locks.pid AS blocking_pid,
+    blocking_activity.usename AS blocking_user,
+    blocked_activity.query AS blocked_statement,
+    blocking_activity.query AS current_statement_in_blocking_process
+  FROM pg_catalog.pg_locks blocked_locks
+  JOIN pg_catalog.pg_stat_activity blocked_activity
+    ON blocked_activity.pid = blocked_locks.pid
+  JOIN pg_catalog.pg_locks blocking_locks
+    ON blocking_locks.locktype = blocked_locks.locktype
+    AND blocking_locks.database IS NOT DISTINCT FROM blocked_locks.database
+    AND blocking_locks.relation IS NOT DISTINCT FROM blocked_locks.relation
+    AND blocking_locks.page IS NOT DISTINCT FROM blocked_locks.page
+    AND blocking_locks.tuple IS NOT DISTINCT FROM blocked_locks.tuple
+    AND blocking_locks.virtualxid IS NOT DISTINCT FROM blocked_locks.virtualxid
+    AND blocking_locks.transactionid IS NOT DISTINCT FROM blocked_locks.transactionid
+    AND blocking_locks.classid IS NOT DISTINCT FROM blocked_locks.classid
+    AND blocking_locks.objid IS NOT DISTINCT FROM blocked_locks.objid
+    AND blocking_locks.objsubid IS NOT DISTINCT FROM blocked_locks.objsubid
+    AND blocking_locks.pid != blocked_locks.pid
+  JOIN pg_catalog.pg_stat_activity blocking_activity
+    ON blocking_activity.pid = blocking_locks.pid
+  WHERE NOT blocked_locks.granted
+)
+SELECT * FROM lock_waits;
+\`\`\`
+
+**自動性能チューニング:**
+
+**PostgreSQL auto_explain:**
+\`\`\`sql
+-- postgresql.confでの設定
+-- shared_preload_libraries = 'auto_explain'
+-- auto_explain.log_min_duration = 1000  -- 1秒以上のクエリ
+-- auto_explain.log_analyze = true
+-- auto_explain.log_buffers = true
+-- auto_explain.log_timing = true
+-- auto_explain.log_nested_statements = true
+
+-- 設定の動的変更（セッション単位）
+LOAD 'auto_explain';
+SET auto_explain.log_min_duration = 0;
+SET auto_explain.log_analyze = true;
+
+-- この後実行されるクエリの実行プランが自動でログ出力される
+SELECT * FROM large_table WHERE complex_condition = 'value';
+\`\`\`
+
+**性能ベンチマーク:**
+
+**pgbench でのベンチマーク:**
+\`\`\`bash
+# データベース初期化
+pgbench -i -s 10 testdb  # スケール10でテストデータ作成
+
+# ベンチマーク実行
+pgbench -c 10 -j 2 -t 1000 testdb
+# -c: 同時接続数, -j: スレッド数, -t: トランザクション数
+
+# カスタムシナリオ実行
+pgbench -c 10 -j 2 -T 60 -f custom_scenario.sql testdb
+\`\`\`
+
+**カスタムベンチマークシナリオ:**
+\`\`\`sql
+-- custom_scenario.sql
+BEGIN;
+SELECT * FROM accounts WHERE aid = :aid;
+UPDATE accounts SET abalance = abalance + :delta WHERE aid = :aid;
+INSERT INTO history (tid, bid, aid, delta, mtime)
+VALUES (:tid, :bid, :aid, :delta, CURRENT_TIMESTAMP);
+COMMIT;
+\`\`\`
+
+**継続的性能監視:**
+\`\`\`python
+# Python での性能監視自動化例
+import psycopg2
+import time
+import json
+
+def collect_performance_metrics():
+    conn = psycopg2.connect("dbname=mydb user=monitor")
+    cur = conn.cursor()
+
+    # スロークエリ収集
+    cur.execute("""
+        SELECT query, calls, total_time, mean_time
+        FROM pg_stat_statements
+        WHERE mean_time > 1000  -- 1秒以上
+        ORDER BY total_time DESC LIMIT 10
+    """)
+
+    slow_queries = cur.fetchall()
+
+    # 接続数監視
+    cur.execute("SELECT count(*) FROM pg_stat_activity")
+    connection_count = cur.fetchone()[0]
+
+    # データベースサイズ
+    cur.execute("SELECT pg_database_size(current_database())")
+    db_size = cur.fetchone()[0]
+
+    metrics = {
+        'timestamp': time.time(),
+        'slow_queries': slow_queries,
+        'connection_count': connection_count,
+        'database_size': db_size
+    }
+
+    return metrics
+
+# 定期実行
+while True:
+    metrics = collect_performance_metrics()
+    print(json.dumps(metrics, indent=2))
+    time.sleep(300)  # 5分間隔
+\`\`\``,
+        quiz: {
+          question: 'PostgreSQLのpg_stat_statementsビューで確認できる情報はどれですか？',
+          options: [
+            'テーブルのサイズ情報',
+            '実行されたクエリの統計情報',
+            'インデックスの使用状況',
+            'ユーザーの接続状態'
+          ],
+          correct: 1,
+          explanation: 'pg_stat_statementsビューは、実行されたSQL文の統計情報（実行回数、合計実行時間、平均実行時間など）を提供し、性能分析に重要な情報源となります。'
+        }
+      },
+      {
+        title: 'グローバルデータベース',
+        content: `グローバル規模でのデータベース運用について学習します。
+
+**グローバルデータベースの課題:**
+
+**1. レイテンシ（遅延）:**
+- 地理的距離による通信遅延
+- ネットワーク品質の差
+- リアルタイム性要件との両立
+
+**2. データ主権・規制:**
+- GDPR（EU一般データ保護規則）
+- 個人情報保護法（日本）
+- データローカライゼーション要件
+
+**3. 一貫性vs可用性:**
+- CAP定理の制約
+- 結果的一貫性の許容範囲
+- 障害時のフェールオーバー
+
+**グローバル分散アーキテクチャ:**
+
+**1. マルチリージョン配置:**
+
+**AWS RDS Global Database:**
+\`\`\`yaml
+# CloudFormation例
+GlobalDatabase:
+  Type: AWS::RDS::GlobalCluster
+  Properties:
+    GlobalClusterIdentifier: my-global-cluster
+    Engine: aurora-mysql
+    EngineVersion: 5.7.mysql_aurora.2.07.2
+
+PrimaryCluster:
+  Type: AWS::RDS::DBCluster
+  Properties:
+    GlobalClusterIdentifier: !Ref GlobalDatabase
+    Engine: aurora-mysql
+    MasterUsername: admin
+    MasterUserPassword: !Ref DBPassword
+    DatabaseName: myapp
+
+SecondaryCluster:
+  Type: AWS::RDS::DBCluster
+  Properties:
+    GlobalClusterIdentifier: !Ref GlobalDatabase
+    Engine: aurora-mysql
+    SourceRegion: us-east-1  # プライマリリージョン
+\`\`\`
+
+**2. Google Cloud Spanner:**
+グローバル一貫性を保つ分散データベース
+
+\`\`\`sql
+-- インスタンス設定
+CREATE INSTANCE my-global-instance
+CONFIGURATION regional-us-central1
+DISPLAY_NAME "Global Application Database"
+NODE_COUNT 3;
+
+-- グローバルテーブル作成
+CREATE TABLE Users (
+  UserId STRING(36) NOT NULL,
+  Email STRING(255),
+  Name STRING(100),
+  Region STRING(10),
+  CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp=true)
+) PRIMARY KEY (UserId);
+
+-- リージョン分散クエリ
+SELECT Region, COUNT(*) as UserCount
+FROM Users
+GROUP BY Region;
+\`\`\`
+
+**3. データ分散戦略:**
+
+**地理的シャーディング:**
+\`\`\`python
+# アプリケーションレベルでの地理的ルーティング
+class GeoDatabaseRouter:
+    def __init__(self):
+        self.regions = {
+            'US': 'us-west-2.rds.amazonaws.com',
+            'EU': 'eu-west-1.rds.amazonaws.com',
+            'APAC': 'ap-northeast-1.rds.amazonaws.com'
+        }
+
+    def get_connection(self, user_region):
+        db_host = self.regions.get(user_region, self.regions['US'])
+        return connect_to_database(db_host)
+
+    def route_query(self, user_location, query):
+        # ユーザーの位置情報に基づいてDB選択
+        region = self.detect_region(user_location)
+        conn = self.get_connection(region)
+        return conn.execute(query)
+\`\`\`
+
+**データ同期戦略:**
+
+**1. 非同期レプリケーション:**
+\`\`\`sql
+-- MySQL Binlog レプリケーション設定
+-- マスター設定 (my.cnf)
+/*
+[mysqld]
+log-bin=mysql-bin
+server-id=1
+binlog-format=ROW
+gtid-mode=ON
+enforce-gtid-consistency=ON
+*/
+
+-- スレーブ設定
+CHANGE MASTER TO
+  MASTER_HOST='master.example.com',
+  MASTER_USER='replicator',
+  MASTER_PASSWORD='password',
+  MASTER_AUTO_POSITION=1;
+
+START SLAVE;
+
+-- レプリケーション遅延監視
+SHOW SLAVE STATUS\G
+-- Seconds_Behind_Master の値を監視
+\`\`\`
+
+**2. クロスリージョン同期:**
+\`\`\`javascript
+// DynamoDB Global Tables
+const AWS = require('aws-sdk');
+
+// 複数リージョンでのDynamoDB設定
+const dynamoUS = new AWS.DynamoDB({region: 'us-east-1'});
+const dynamoEU = new AWS.DynamoDB({region: 'eu-west-1'});
+const dynamoAP = new AWS.DynamoDB({region: 'ap-southeast-1'});
+
+// Global Tables有効化
+const params = {
+  GlobalTableName: 'Users',
+  ReplicationGroup: [
+    {RegionName: 'us-east-1'},
+    {RegionName: 'eu-west-1'},
+    {RegionName: 'ap-southeast-1'}
+  ]
+};
+
+dynamoUS.createGlobalTable(params, function(err, data) {
+  if (err) console.log(err);
+  else console.log('Global Table created:', data);
+});
+\`\`\`
+
+**コンフリクト解決:**
+
+**1. Last-Writer-Wins (LWW):**
+\`\`\`sql
+-- タイムスタンプベースの競合解決
+CREATE TABLE user_profiles (
+  user_id BIGINT PRIMARY KEY,
+  name VARCHAR(100),
+  email VARCHAR(255),
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  version BIGINT DEFAULT 1
+);
+
+-- 更新時のバージョンチェック
+UPDATE user_profiles
+SET name = 'New Name',
+    version = version + 1,
+    updated_at = CURRENT_TIMESTAMP
+WHERE user_id = 123
+  AND version = @expected_version;
+\`\`\`
+
+**2. Vector Clocks:**
+\`\`\`python
+# ベクタークロック実装例
+class VectorClock:
+    def __init__(self, node_id):
+        self.node_id = node_id
+        self.clock = {}
+
+    def tick(self):
+        self.clock[self.node_id] = self.clock.get(self.node_id, 0) + 1
+        return self.clock.copy()
+
+    def update(self, other_clock):
+        for node, timestamp in other_clock.items():
+            self.clock[node] = max(self.clock.get(node, 0), timestamp)
+        self.tick()
+
+    def happens_before(self, other_clock):
+        # このクロックが他のクロックより前かチェック
+        return (all(self.clock.get(node, 0) <= other_clock.get(node, 0)
+                   for node in set(self.clock.keys()) | set(other_clock.keys())) and
+                self.clock != other_clock)
+
+# 使用例
+node_a = VectorClock('A')
+node_b = VectorClock('B')
+
+# ノードAで操作実行
+clock_a1 = node_a.tick()  # {'A': 1}
+
+# ノードBで操作実行
+clock_b1 = node_b.tick()  # {'B': 1}
+
+# 同期
+node_a.update(clock_b1)   # {'A': 2, 'B': 1}
+\`\`\`
+
+**災害復旧・事業継続:**
+
+**1. RTO/RPO設計:**
+\`\`\`yaml
+# 災害復旧要件定義
+disaster_recovery:
+  rto: 4h  # Recovery Time Objective
+  rpo: 15m # Recovery Point Objective
+
+  primary_region: us-east-1
+  backup_regions:
+    - us-west-2
+    - eu-west-1
+
+  backup_strategy:
+    - type: continuous_backup
+      frequency: real-time
+      retention: 35days
+    - type: snapshot
+      frequency: daily
+      retention: 90days
+\`\`\`
+
+**2. 自動フェールオーバー:**
+\`\`\`python
+# ヘルスチェック＆フェールオーバー
+import time
+import requests
+
+class DatabaseFailover:
+    def __init__(self):
+        self.primary = 'primary.db.example.com'
+        self.secondary = 'secondary.db.example.com'
+        self.current = self.primary
+        self.health_check_interval = 30
+
+    def health_check(self, endpoint):
+        try:
+            response = requests.get(f'http://{endpoint}/health', timeout=5)
+            return response.status_code == 200
+        except:
+            return False
+
+    def failover(self):
+        if self.current == self.primary:
+            print("Failing over to secondary database")
+            self.current = self.secondary
+            # DNS更新、アプリケーション設定変更等
+            self.update_dns_record(self.secondary)
+        else:
+            print("Already running on secondary")
+
+    def monitor(self):
+        while True:
+            if not self.health_check(self.current):
+                print(f"Health check failed for {self.current}")
+                self.failover()
+            time.sleep(self.health_check_interval)
+\`\`\`
+
+**規制対応・データガバナンス:**
+
+**GDPR対応例:**
+\`\`\`sql
+-- 忘れられる権利（Right to be forgotten）実装
+CREATE TABLE user_deletions (
+  user_id BIGINT,
+  deletion_requested_at TIMESTAMP,
+  deletion_completed_at TIMESTAMP,
+  reason TEXT
+);
+
+-- 個人データ削除プロシージャ
+DELIMITER //
+CREATE PROCEDURE DeleteUserData(IN p_user_id BIGINT)
+BEGIN
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+
+  START TRANSACTION;
+
+  -- 削除リクエスト記録
+  INSERT INTO user_deletions (user_id, deletion_requested_at, reason)
+  VALUES (p_user_id, NOW(), 'GDPR Right to be forgotten');
+
+  -- 関連データ削除
+  DELETE FROM user_activities WHERE user_id = p_user_id;
+  DELETE FROM user_preferences WHERE user_id = p_user_id;
+  DELETE FROM user_profiles WHERE user_id = p_user_id;
+
+  -- 削除完了記録
+  UPDATE user_deletions
+  SET deletion_completed_at = NOW()
+  WHERE user_id = p_user_id AND deletion_completed_at IS NULL;
+
+  COMMIT;
+END//
+DELIMITER ;
+\`\`\`
+
+**データローカライゼーション:**
+\`\`\`sql
+-- 地域別データ分離
+CREATE TABLE user_data_eu (
+  user_id BIGINT PRIMARY KEY,
+  data JSON,
+  created_at TIMESTAMP,
+  CONSTRAINT region_check CHECK (JSON_EXTRACT(data, '$.region') = 'EU')
+);
+
+CREATE TABLE user_data_us (
+  user_id BIGINT PRIMARY KEY,
+  data JSON,
+  created_at TIMESTAMP,
+  CONSTRAINT region_check CHECK (JSON_EXTRACT(data, '$.region') = 'US')
+);
+
+-- 統合ビュー（管理用）
+CREATE VIEW global_users AS
+SELECT user_id, data, created_at, 'EU' as region FROM user_data_eu
+UNION ALL
+SELECT user_id, data, created_at, 'US' as region FROM user_data_us;
+\`\`\``,
+        quiz: {
+          question: 'CAP定理において、ネットワーク分断（Partition tolerance）が発生した場合に選択する必要があるものは？',
+          options: [
+            '一貫性（Consistency）と可用性（Availability）',
+            '一貫性（Consistency）と分断耐性（Partition tolerance）',
+            '可用性（Availability）と分断耐性（Partition tolerance）',
+            'すべてを同時に保つ'
+          ],
+          correct: 0,
+          explanation: 'CAP定理では、ネットワーク分断が発生した場合、一貫性（すべてのノードが同じデータを持つ）か可用性（システムが応答し続ける）のどちらかを選択する必要があります。両方を同時に満たすことはできません。'
+        }
+      }
+    ]
   }
 ];
 
