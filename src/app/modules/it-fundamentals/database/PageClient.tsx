@@ -3775,22 +3775,22 @@ FROM prepared_dataset;
 **実装例（BigQuery ML）:**
 \`\`\`sql
 -- 線形回帰モデルの作成
-CREATE OR REPLACE MODEL `project.dataset.sales_prediction_model`
+CREATE OR REPLACE MODEL \`project.dataset.sales_prediction_model\`
 OPTIONS(model_type='linear_reg') AS
 SELECT
     advertising_spend,
     seasonal_index,
     competitor_count,
     monthly_sales AS label
-FROM `project.dataset.sales_training_data`;
+FROM \`project.dataset.sales_training_data\`;
 
 -- 予測の実行
 SELECT
     predicted_label AS predicted_sales,
     advertising_spend,
     seasonal_index
-FROM ML.PREDICT(MODEL `project.dataset.sales_prediction_model`,
-    (SELECT * FROM `project.dataset.new_data`));
+FROM ML.PREDICT(MODEL \`project.dataset.sales_prediction_model\`,
+    (SELECT * FROM \`project.dataset.new_data\`));
 \`\`\``,
         quiz: {
           question: 'データマイニングにおけるアソシエーション分析の主な目的は何ですか？',
