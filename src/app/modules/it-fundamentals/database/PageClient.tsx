@@ -6527,6 +6527,3281 @@ SELECT user_id, data, created_at, 'US' as region FROM user_data_us;
           correct: 0,
           explanation: 'CAP定理では、ネットワーク分断が発生した場合、一貫性（すべてのノードが同じデータを持つ）か可用性（システムが応答し続ける）のどちらかを選択する必要があります。両方を同時に満たすことはできません。'
         }
+      },
+      {
+        title: 'データベース開発手法',
+        content: `データベース開発における手法とプロセスについて学習します。
+
+**データベース開発ライフサイクル:**
+
+**1. 要件分析フェーズ:**
+- 機能要件の特定
+- 非機能要件の定義
+- データ量・トランザクション量の予測
+- 性能要件の明確化
+
+**2. 概念設計フェーズ:**
+- ER図の作成
+- エンティティの特定
+- 関係性の定義
+- 業務ルールの表現
+
+**3. 論理設計フェーズ:**
+- テーブル設計
+- 正規化の適用
+- インデックス設計
+- 制約の定義
+
+**4. 物理設計フェーズ:**
+- ストレージ設計
+- パーティション設計
+- パフォーマンスチューニング
+- セキュリティ設計
+
+**アジャイル開発におけるデータベース:**
+
+**データベースリファクタリング:**
+\`\`\`sql
+-- マイグレーション例：列名変更
+-- ステップ1: 新しい列を追加
+ALTER TABLE customers ADD COLUMN full_name VARCHAR(100);
+
+-- ステップ2: データを移行
+UPDATE customers SET full_name = CONCAT(first_name, ' ', last_name);
+
+-- ステップ3: アプリケーション変更をデプロイ
+
+-- ステップ4: 古い列を削除（次のリリースで）
+ALTER TABLE customers DROP COLUMN first_name, DROP COLUMN last_name;
+\`\`\`
+
+**データベースバージョン管理:**
+\`\`\`sql
+-- Flyway マイグレーション例
+-- V1__Initial_schema.sql
+CREATE TABLE users (
+  id BIGSERIAL PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  email VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- V2__Add_user_profile.sql
+CREATE TABLE user_profiles (
+  user_id BIGINT PRIMARY KEY,
+  first_name VARCHAR(50),
+  last_name VARCHAR(50),
+  bio TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- V3__Add_email_verification.sql
+ALTER TABLE users ADD COLUMN email_verified BOOLEAN DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN verification_token VARCHAR(255);
+\`\`\`
+
+**テスト駆動データベース開発:**
+
+**単体テスト例:**
+\`\`\`sql
+-- PostgreSQLでのpgTAP使用例
+BEGIN;
+SELECT plan(5);
+
+-- テーブルの存在確認
+SELECT has_table('public', 'users', 'users table should exist');
+
+-- 列の存在確認
+SELECT has_column('public', 'users', 'email', 'users should have email column');
+
+-- 制約の確認
+SELECT has_pk('public', 'users', 'users should have primary key');
+
+-- データの確認
+INSERT INTO users (username, email) VALUES ('testuser', 'test@example.com');
+SELECT is(
+  (SELECT count(*) FROM users WHERE username = 'testuser'),
+  1::bigint,
+  'Should have one test user'
+);
+
+-- クリーンアップ
+DELETE FROM users WHERE username = 'testuser';
+
+SELECT finish();
+ROLLBACK;
+\`\`\`
+
+**データベースCICD:**
+
+**GitHub Actions例:**
+\`\`\`yaml
+# .github/workflows/database.yml
+name: Database CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths: ['database/**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run migrations
+      run: |
+        PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -f database/schema.sql
+
+    - name: Run tests
+      run: |
+        PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -f database/tests.sql
+
+    - name: Run performance tests
+      run: |
+        python scripts/performance_test.py
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Deploy to staging
+      run: |
+        flyway -url=jdbc:postgresql://staging-db:5432/mydb migrate
+
+    - name: Run smoke tests
+      run: |
+        python scripts/smoke_test.py staging
+
+    - name: Deploy to production
+      run: |
+        flyway -url=jdbc:postgresql://prod-db:5432/mydb migrate
+\`\`\`
+
+**データモデリング手法:**
+
+**ドメイン駆動設計（DDD）:**
+\`\`\`sql
+-- 境界付きコンテキストに基づくスキーマ設計
+-- ユーザー管理コンテキスト
+CREATE SCHEMA user_management;
+
+CREATE TABLE user_management.users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username VARCHAR(50) NOT NULL UNIQUE,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 注文管理コンテキスト
+CREATE SCHEMA order_management;
+
+CREATE TABLE order_management.orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL, -- 外部参照（異なるコンテキスト）
+  total_amount DECIMAL(10,2) NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- イベントストア（コンテキスト間連携）
+CREATE SCHEMA event_store;
+
+CREATE TABLE event_store.events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  aggregate_id UUID NOT NULL,
+  aggregate_type VARCHAR(50) NOT NULL,
+  event_type VARCHAR(50) NOT NULL,
+  event_data JSONB NOT NULL,
+  version INTEGER NOT NULL,
+  occurred_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+\`\`\`
+
+**マイクロサービス向けデータベース設計:**
+
+**Database per Service:**
+\`\`\`yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  user-service-db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: user_service
+      POSTGRES_USER: user_service
+      POSTGRES_PASSWORD: password
+
+  order-service-db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: order_service
+      POSTGRES_USER: order_service
+      POSTGRES_PASSWORD: password
+
+  product-service-db:
+    image: mongodb:5.0
+    environment:
+      MONGO_INITDB_DATABASE: product_service
+
+  analytics-service-db:
+    image: clickhouse/clickhouse-server:22
+    environment:
+      CLICKHOUSE_DB: analytics
+\`\`\`
+
+**イベントソーシング:**
+\`\`\`sql
+-- イベントストリーム設計
+CREATE TABLE event_streams (
+  stream_id UUID NOT NULL,
+  version INTEGER NOT NULL,
+  event_type VARCHAR(100) NOT NULL,
+  event_data JSONB NOT NULL,
+  metadata JSONB,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (stream_id, version)
+);
+
+-- プロジェクション（読み取りモデル）
+CREATE TABLE user_projections (
+  user_id UUID PRIMARY KEY,
+  username VARCHAR(50),
+  email VARCHAR(100),
+  status VARCHAR(20),
+  last_updated TIMESTAMP
+);
+
+-- イベントハンドラー例
+CREATE OR REPLACE FUNCTION handle_user_events()
+RETURNS TRIGGER AS $$
+BEGIN
+  CASE NEW.event_type
+    WHEN 'UserCreated' THEN
+      INSERT INTO user_projections (user_id, username, email, status, last_updated)
+      VALUES (
+        NEW.stream_id,
+        NEW.event_data->>'username',
+        NEW.event_data->>'email',
+        'active',
+        NEW.timestamp
+      );
+
+    WHEN 'UserDeactivated' THEN
+      UPDATE user_projections
+      SET status = 'inactive', last_updated = NEW.timestamp
+      WHERE user_id = NEW.stream_id;
+  END CASE;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER user_event_trigger
+  AFTER INSERT ON event_streams
+  FOR EACH ROW
+  EXECUTE FUNCTION handle_user_events();
+\`\`\`
+
+**データベース設計パターン:**
+
+**CQRS（Command Query Responsibility Segregation）:**
+\`\`\`sql
+-- コマンド側（書き込み最適化）
+CREATE TABLE commands.orders (
+  id UUID PRIMARY KEY,
+  customer_id UUID NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- クエリ側（読み取り最適化）
+CREATE TABLE queries.order_summaries (
+  order_id UUID PRIMARY KEY,
+  customer_name VARCHAR(100),
+  order_date DATE,
+  total_amount DECIMAL(10,2),
+  item_count INTEGER,
+  status VARCHAR(20)
+);
+
+-- ビューマテリアライゼーション
+CREATE MATERIALIZED VIEW queries.monthly_sales AS
+SELECT
+  DATE_TRUNC('month', order_date) as month,
+  COUNT(*) as order_count,
+  SUM(total_amount) as total_sales,
+  AVG(total_amount) as avg_order_value
+FROM queries.order_summaries
+WHERE status = 'completed'
+GROUP BY DATE_TRUNC('month', order_date);
+
+-- 定期更新
+CREATE OR REPLACE FUNCTION refresh_monthly_sales()
+RETURNS void AS $$
+BEGIN
+  REFRESH MATERIALIZED VIEW queries.monthly_sales;
+END;
+$$ LANGUAGE plpgsql;
+
+-- cron-style スケジューリング（pg_cron拡張使用）
+SELECT cron.schedule('refresh-monthly-sales', '0 2 * * *', 'SELECT refresh_monthly_sales();');
+\`\`\``,
+        quiz: {
+          question: 'データベースマイグレーションにおけるバージョン管理ツールFlyway の主な特徴はどれですか？',
+          options: [
+            'GUIベースの設計ツール',
+            'SQLファイルベースのマイグレーション管理',
+            'NoSQL専用のツール',
+            'データ分析に特化したツール'
+          ],
+          correct: 1,
+          explanation: 'Flywayは、SQLファイルベースでデータベースのマイグレーションを管理するツールです。バージョン番号付きのSQLファイルを実行して、データベーススキーマを段階的に更新できます。'
+        }
+      },
+      {
+        title: 'データベース運用監視',
+        content: `データベースの運用監視体制と手法について学習します。
+
+**監視の階層:**
+
+**1. インフラストラクチャ監視:**
+- CPU、メモリ、ディスク使用率
+- ネットワーク帯域・レイテンシ
+- ストレージI/O性能
+- ハードウェア故障検知
+
+**2. データベース監視:**
+- 接続数・セッション状態
+- スループット・レスポンス時間
+- ロック競合・デッドロック
+- バックアップ・レプリケーション状態
+
+**3. アプリケーション監視:**
+- クエリパフォーマンス
+- エラー率・例外
+- ビジネスメトリクス
+- ユーザーエクスペリエンス
+
+**監視ツール・システム:**
+
+**Prometheus + Grafana:**
+\`\`\`yaml
+# prometheus.yml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 10s
+    metrics_path: /metrics
+
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['mysqld-exporter:9104']
+    scrape_interval: 10s
+
+rule_files:
+  - "database_alerts.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+\`\`\`
+
+**アラートルール:**
+\`\`\`yaml
+# database_alerts.yml
+groups:
+- name: database_alerts
+  rules:
+  - alert: DatabaseDown
+    expr: up{job="postgres"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Database instance down"
+      description: "PostgreSQL instance {{ $labels.instance }} has been down for more than 1 minute."
+
+  - alert: HighConnectionCount
+    expr: pg_stat_database_numbackends > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High database connection count"
+      description: "Database {{ $labels.datname }} has {{ $value }} connections"
+
+  - alert: SlowQueries
+    expr: rate(mysql_slow_queries[5m]) > 0.1
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Increased slow queries detected"
+      description: "Slow query rate is {{ $value }} queries per second"
+
+  - alert: ReplicationLag
+    expr: mysql_slave_lag_seconds > 30
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "MySQL replication lag"
+      description: "Replication lag is {{ $value }} seconds"
+\`\`\`
+
+**カスタムメトリクス収集:**
+\`\`\`python
+# PostgreSQL カスタムメトリクス例
+import psycopg2
+import time
+from prometheus_client import start_http_server, Gauge, Counter
+
+# メトリクス定義
+db_size_gauge = Gauge('postgres_database_size_bytes', 'Database size in bytes', ['database'])
+active_connections_gauge = Gauge('postgres_active_connections', 'Number of active connections', ['database'])
+query_duration_gauge = Gauge('postgres_avg_query_duration_seconds', 'Average query duration', ['database'])
+deadlock_counter = Counter('postgres_deadlocks_total', 'Total deadlocks detected', ['database'])
+
+class DatabaseMonitor:
+    def __init__(self, connection_string):
+        self.connection_string = connection_string
+
+    def collect_metrics(self):
+        try:
+            conn = psycopg2.connect(self.connection_string)
+            cur = conn.cursor()
+
+            # データベースサイズ
+            cur.execute("""
+                SELECT datname, pg_database_size(datname)
+                FROM pg_database
+                WHERE datistemplate = false
+            """)
+            for db_name, size in cur.fetchall():
+                db_size_gauge.labels(database=db_name).set(size)
+
+            # アクティブ接続数
+            cur.execute("""
+                SELECT datname, count(*)
+                FROM pg_stat_activity
+                WHERE state = 'active'
+                GROUP BY datname
+            """)
+            for db_name, count in cur.fetchall():
+                active_connections_gauge.labels(database=db_name).set(count)
+
+            # 平均クエリ実行時間
+            cur.execute("""
+                SELECT schemaname, mean_time
+                FROM pg_stat_statements
+                WHERE calls > 0
+            """)
+            for schema, mean_time in cur.fetchall():
+                query_duration_gauge.labels(database=schema).set(mean_time / 1000)  # ms to seconds
+
+            # デッドロック検出
+            cur.execute("SELECT sum(deadlocks) FROM pg_stat_database")
+            deadlocks = cur.fetchone()[0] or 0
+            deadlock_counter.labels(database='all')._value._value = deadlocks
+
+            conn.close()
+
+        except Exception as e:
+            print(f"Error collecting metrics: {e}")
+
+def main():
+    monitor = DatabaseMonitor("postgresql://monitor:password@localhost/postgres")
+
+    # Prometheusメトリクスサーバー開始
+    start_http_server(8000)
+
+    while True:
+        monitor.collect_metrics()
+        time.sleep(30)  # 30秒間隔
+
+if __name__ == '__main__':
+    main()
+\`\`\`
+
+**ログ分析・集約:**
+
+**ELK Stack設定:**
+\`\`\`yaml
+# docker-compose.yml for ELK
+version: '3.8'
+services:
+  elasticsearch:
+    image: elasticsearch:7.14.0
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+
+  logstash:
+    image: logstash:7.14.0
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5044:5044"
+
+  kibana:
+    image: kibana:7.14.0
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+\`\`\`
+
+**Logstash設定:**
+\`\`\`ruby
+# logstash.conf
+input {
+  beats {
+    port => 5044
+  }
+}
+
+filter {
+  if [fields][type] == "postgresql" {
+    grok {
+      match => {
+        "message" => "%{TIMESTAMP_ISO8601:timestamp} \[%{NUMBER:pid}\] %{WORD:level}: %{GREEDYDATA:query}"
+      }
+    }
+
+    # スロークエリの検出
+    if [query] =~ /duration: \d+\.\d+ ms/ {
+      grok {
+        match => {
+          "query" => "duration: %{NUMBER:duration:float} ms"
+        }
+      }
+
+      if [duration] > 1000 {
+        mutate {
+          add_tag => ["slow_query"]
+        }
+      }
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["elasticsearch:9200"]
+    index => "database-logs-%{+YYYY.MM.dd}"
+  }
+}
+\`\`\`
+
+**自動化された運用タスク:**
+
+**Ansible Playbook例:**
+\`\`\`yaml
+# database_maintenance.yml
+---
+- name: Database Maintenance
+  hosts: database_servers
+  become: yes
+
+  tasks:
+    - name: Update database statistics
+      postgresql_query:
+        db: "{{ item }}"
+        query: "ANALYZE VERBOSE;"
+      loop: "{{ databases }}"
+
+    - name: Vacuum old data
+      postgresql_query:
+        db: "{{ item }}"
+        query: "VACUUM (ANALYZE, VERBOSE);"
+      loop: "{{ databases }}"
+
+    - name: Check replication status
+      postgresql_query:
+        db: postgres
+        query: "SELECT * FROM pg_stat_replication;"
+      register: replication_status
+
+    - name: Alert if replication lag
+      mail:
+        to: dba@company.com
+        subject: "Replication Lag Alert"
+        body: "Replication lag detected: {{ replication_status.query_result }}"
+      when: replication_status.query_result | selectattr('state', 'equalto', 'streaming') | list | length == 0
+
+    - name: Backup database
+      postgresql_db:
+        name: "{{ item }}"
+        state: dump
+        target: "/backup/{{ item }}_{{ ansible_date_time.date }}.sql"
+      loop: "{{ databases }}"
+
+    - name: Cleanup old backups
+      find:
+        paths: /backup
+        age: 7d
+        patterns: "*.sql"
+      register: old_backups
+
+    - name: Remove old backup files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_backups.files }}"
+\`\`\`
+
+**障害対応手順:**
+
+**ランブック例:**
+\`\`\`yaml
+# incident_response.yml
+procedures:
+  database_down:
+    severity: critical
+    steps:
+      1: "Check database process status: ps aux | grep postgres"
+      2: "Check system resources: df -h && free -m"
+      3: "Review database logs: tail -f /var/log/postgresql/postgresql.log"
+      4: "Attempt restart: systemctl restart postgresql"
+      5: "If restart fails, escalate to DBA team"
+      6: "Document incident in ticketing system"
+
+  slow_performance:
+    severity: high
+    steps:
+      1: "Identify slow queries: SELECT * FROM pg_stat_activity WHERE state = 'active' AND query_start < now() - interval '30 seconds'"
+      2: "Check for blocking queries: SELECT * FROM pg_locks WHERE NOT granted"
+      3: "Review recent query changes in application logs"
+      4: "Consider query termination: SELECT pg_terminate_backend(pid)"
+      5: "Update query statistics: ANALYZE"
+
+  high_connections:
+    severity: medium
+    steps:
+      1: "Check current connections: SELECT count(*) FROM pg_stat_activity"
+      2: "Identify connection sources: SELECT client_addr, count(*) FROM pg_stat_activity GROUP BY client_addr"
+      3: "Review application connection pooling configuration"
+      4: "Consider increasing max_connections if appropriate"
+      5: "Monitor for connection leaks in application"
+\`\`\`
+
+**パフォーマンス最適化の自動化:**
+\`\`\`python
+# 自動インデックス推奨システム
+import psycopg2
+import json
+
+class IndexRecommendationEngine:
+    def __init__(self, connection_string):
+        self.conn = psycopg2.connect(connection_string)
+
+    def analyze_slow_queries(self):
+        """スロークエリからインデックス推奨を生成"""
+        cur = self.conn.cursor()
+
+        # スロークエリ取得
+        cur.execute("""
+            SELECT query, mean_time, calls
+            FROM pg_stat_statements
+            WHERE mean_time > 1000  -- 1秒以上
+            ORDER BY mean_time DESC
+            LIMIT 10
+        """)
+
+        slow_queries = cur.fetchall()
+        recommendations = []
+
+        for query, mean_time, calls in slow_queries:
+            # クエリ解析（簡単な例）
+            if 'WHERE' in query and 'JOIN' in query:
+                # JOINとWHEREを含むクエリにインデックス推奨
+                recommendations.append({
+                    'query': query,
+                    'mean_time': mean_time,
+                    'calls': calls,
+                    'recommendation': 'Consider adding composite index on JOIN and WHERE columns',
+                    'priority': 'high' if mean_time > 5000 else 'medium'
+                })
+
+        return recommendations
+
+    def check_unused_indexes(self):
+        """未使用インデックスの検出"""
+        cur = self.conn.cursor()
+
+        cur.execute("""
+            SELECT
+                schemaname,
+                tablename,
+                indexname,
+                idx_tup_read,
+                idx_tup_fetch
+            FROM pg_stat_user_indexes
+            WHERE idx_tup_read = 0
+            AND indexname NOT LIKE '%_pkey'  -- 主キーは除外
+        """)
+
+        unused_indexes = cur.fetchall()
+        return [
+            {
+                'schema': schema,
+                'table': table,
+                'index': index,
+                'recommendation': f'Consider dropping unused index {index}',
+                'impact': 'Reduced storage and faster writes'
+            }
+            for schema, table, index, _, _ in unused_indexes
+        ]
+
+    def generate_report(self):
+        """最適化レポート生成"""
+        report = {
+            'timestamp': time.time(),
+            'index_recommendations': self.analyze_slow_queries(),
+            'unused_indexes': self.check_unused_indexes()
+        }
+
+        return json.dumps(report, indent=2)
+
+# 定期実行
+engine = IndexRecommendationEngine("postgresql://user:pass@localhost/db")
+report = engine.generate_report()
+print(report)
+\`\`\``,
+        quiz: {
+          question: 'データベース監視において、レプリケーション遅延を検知するために確認すべき主な指標はどれですか？',
+          options: [
+            'CPU使用率',
+            'ディスク容量',
+            'スレーブの遅延秒数',
+            '接続数'
+          ],
+          correct: 2,
+          explanation: 'レプリケーション遅延の監視では、スレーブ（レプリカ）がマスターからどれだけ遅れているかを示す「遅延秒数」が重要な指標です。MySQLでは Seconds_Behind_Master、PostgreSQLでは pg_stat_replication で確認できます。'
+        }
+      },
+      {
+        title: 'データベース容量設計',
+        content: `データベースの容量設計と容量管理について学習します。
+
+**容量設計の要素:**
+
+**1. データ容量予測:**
+- レコード数の成長予測
+- 1レコードあたりのサイズ
+- インデックスサイズ
+- 一時領域の使用量
+
+**2. I/O要件:**
+- 読み取りIOPS
+- 書き込みIOPS
+- スループット要件
+- レスポンス時間要件
+
+**3. 成長予測:**
+- ビジネス成長率
+- データ保存期間
+- アーカイブ戦略
+- 容量増加パターン
+
+**容量計算手法:**
+
+**テーブルサイズ計算:**
+\`\`\`sql
+-- PostgreSQL でのテーブルサイズ計算
+SELECT
+    schemaname,
+    tablename,
+    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as table_size,
+    pg_size_pretty(pg_relation_size(schemaname||'.'||tablename)) as data_size,
+    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename) - pg_relation_size(schemaname||'.'||tablename)) as index_size,
+    pg_stat_get_tuples_inserted(oid) as inserts,
+    pg_stat_get_tuples_updated(oid) as updates,
+    pg_stat_get_tuples_deleted(oid) as deletes
+FROM pg_tables pt
+JOIN pg_class pc ON pt.tablename = pc.relname
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+
+-- 成長率分析
+WITH monthly_growth AS (
+    SELECT
+        date_trunc('month', created_at) as month,
+        count(*) as new_records,
+        avg(octet_length(data_column::text)) as avg_record_size
+    FROM large_table
+    WHERE created_at >= current_date - interval '12 months'
+    GROUP BY date_trunc('month', created_at)
+    ORDER BY month
+)
+SELECT
+    month,
+    new_records,
+    avg_record_size,
+    new_records * avg_record_size as monthly_data_size,
+    sum(new_records * avg_record_size) OVER (ORDER BY month) as cumulative_size
+FROM monthly_growth;
+\`\`\`
+
+**容量予測モデル:**
+\`\`\`python
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from datetime import datetime, timedelta
+
+class DatabaseCapacityPlanner:
+    def __init__(self):
+        self.models = {}
+
+    def analyze_growth_pattern(self, historical_data):
+        """過去データから成長パターンを分析"""
+        df = pd.DataFrame(historical_data)
+        df['date'] = pd.to_datetime(df['date'])
+        df['days_since_start'] = (df['date'] - df['date'].min()).dt.days
+
+        # 線形回帰モデル
+        X = df[['days_since_start']].values
+        y = df['total_size_gb'].values
+
+        model = LinearRegression()
+        model.fit(X, y)
+
+        self.models['linear'] = model
+
+        # 成長率計算
+        daily_growth = model.coef_[0]
+        monthly_growth = daily_growth * 30
+        yearly_growth = daily_growth * 365
+
+        return {
+            'daily_growth_gb': daily_growth,
+            'monthly_growth_gb': monthly_growth,
+            'yearly_growth_gb': yearly_growth,
+            'r_squared': model.score(X, y)
+        }
+
+    def predict_capacity(self, days_ahead):
+        """将来の容量を予測"""
+        if 'linear' not in self.models:
+            raise ValueError("Growth pattern not analyzed yet")
+
+        model = self.models['linear']
+        current_day = 0  # 最新日を0とする
+        future_day = current_day + days_ahead
+
+        predicted_size = model.predict([[future_day]])[0]
+        return max(0, predicted_size)  # 負の値は0にクリップ
+
+    def capacity_planning_report(self, current_capacity_gb, threshold_percent=80):
+        """容量計画レポート生成"""
+        threshold_capacity = current_capacity_gb * threshold_percent / 100
+
+        # 閾値到達予測
+        days_to_threshold = 0
+        for days in range(1, 1825):  # 5年間チェック
+            predicted_size = self.predict_capacity(days)
+            if predicted_size >= threshold_capacity:
+                days_to_threshold = days
+                break
+
+        report = {
+            'current_capacity_gb': current_capacity_gb,
+            'threshold_capacity_gb': threshold_capacity,
+            'days_to_threshold': days_to_threshold,
+            'date_to_threshold': datetime.now() + timedelta(days=days_to_threshold),
+            'predictions': {
+                '30_days': self.predict_capacity(30),
+                '90_days': self.predict_capacity(90),
+                '1_year': self.predict_capacity(365),
+                '3_years': self.predict_capacity(1095)
+            }
+        }
+
+        return report
+
+# 使用例
+planner = DatabaseCapacityPlanner()
+
+# 過去12ヶ月のデータ例
+historical_data = [
+    {'date': '2023-01-01', 'total_size_gb': 100},
+    {'date': '2023-02-01', 'total_size_gb': 105},
+    {'date': '2023-03-01', 'total_size_gb': 112},
+    {'date': '2023-04-01', 'total_size_gb': 118},
+    {'date': '2023-05-01', 'total_size_gb': 125},
+    {'date': '2023-06-01', 'total_size_gb': 133},
+    {'date': '2023-07-01', 'total_size_gb': 140},
+    {'date': '2023-08-01', 'total_size_gb': 148},
+    {'date': '2023-09-01', 'total_size_gb': 156},
+    {'date': '2023-10-01', 'total_size_gb': 165},
+    {'date': '2023-11-01', 'total_size_gb': 174},
+    {'date': '2023-12-01', 'total_size_gb': 183}
+]
+
+growth_analysis = planner.analyze_growth_pattern(historical_data)
+capacity_report = planner.capacity_planning_report(current_capacity_gb=500)
+
+print(f"Monthly growth: {growth_analysis['monthly_growth_gb']:.2f} GB")
+print(f"Threshold reached in: {capacity_report['days_to_threshold']} days")
+\`\`\`
+
+**ストレージ階層化:**
+
+**データティアリング戦略:**
+\`\`\`sql
+-- PostgreSQL での tablespace を使用した階層化
+-- 高速SSD領域
+CREATE TABLESPACE fast_ssd LOCATION '/data/ssd';
+
+-- 標準SSD領域
+CREATE TABLESPACE standard_ssd LOCATION '/data/standard';
+
+-- 低速HDD領域（アーカイブ用）
+CREATE TABLESPACE archive_hdd LOCATION '/data/archive';
+
+-- テーブル作成時に階層指定
+-- ホット data（頻繁にアクセス）
+CREATE TABLE current_orders (
+    id SERIAL PRIMARY KEY,
+    customer_id INTEGER,
+    order_date DATE DEFAULT CURRENT_DATE,
+    total_amount DECIMAL(10,2)
+) TABLESPACE fast_ssd;
+
+-- ウォーム data（中程度のアクセス）
+CREATE TABLE order_history (
+    id SERIAL PRIMARY KEY,
+    customer_id INTEGER,
+    order_date DATE,
+    total_amount DECIMAL(10,2)
+) TABLESPACE standard_ssd;
+
+-- コールド data（稀にアクセス）
+CREATE TABLE archived_orders (
+    id SERIAL PRIMARY KEY,
+    customer_id INTEGER,
+    order_date DATE,
+    total_amount DECIMAL(10,2)
+) TABLESPACE archive_hdd;
+
+-- 自動アーカイブプロシージャ
+CREATE OR REPLACE FUNCTION archive_old_orders()
+RETURNS void AS $$
+BEGIN
+    -- 1年以上前のオーダーをアーカイブに移動
+    INSERT INTO archived_orders
+    SELECT * FROM current_orders
+    WHERE order_date < CURRENT_DATE - INTERVAL '1 year';
+
+    DELETE FROM current_orders
+    WHERE order_date < CURRENT_DATE - INTERVAL '1 year';
+
+    -- 統計情報更新
+    ANALYZE archived_orders;
+    ANALYZE current_orders;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 定期実行設定（pg_cron使用）
+SELECT cron.schedule('archive-orders', '0 2 1 * *', 'SELECT archive_old_orders();');
+\`\`\`
+
+**パーティション戦略:**
+\`\`\`sql
+-- 時系列データのパーティション（PostgreSQL 11+）
+CREATE TABLE measurements (
+    id SERIAL,
+    measured_at TIMESTAMP NOT NULL,
+    device_id INTEGER,
+    temperature DECIMAL(5,2),
+    humidity DECIMAL(5,2)
+) PARTITION BY RANGE (measured_at);
+
+-- 月別パーティション作成
+CREATE TABLE measurements_2023_01 PARTITION OF measurements
+FOR VALUES FROM ('2023-01-01') TO ('2023-02-01');
+
+CREATE TABLE measurements_2023_02 PARTITION OF measurements
+FOR VALUES FROM ('2023-02-01') TO ('2023-03-01');
+
+-- 自動パーティション作成
+CREATE OR REPLACE FUNCTION create_monthly_partition(table_name TEXT, start_date DATE)
+RETURNS void AS $$
+DECLARE
+    partition_name TEXT;
+    end_date DATE;
+BEGIN
+    partition_name := table_name || '_' || to_char(start_date, 'YYYY_MM');
+    end_date := start_date + INTERVAL '1 month';
+
+    EXECUTE format('CREATE TABLE %I PARTITION OF %I FOR VALUES FROM (%L) TO (%L)',
+                   partition_name, table_name, start_date, end_date);
+
+    -- インデックス作成
+    EXECUTE format('CREATE INDEX %I ON %I (device_id, measured_at)',
+                   partition_name || '_device_time_idx', partition_name);
+END;
+$$ LANGUAGE plpgsql;
+
+-- 将来のパーティション事前作成
+DO $$
+DECLARE
+    i INTEGER;
+    current_month DATE := date_trunc('month', CURRENT_DATE);
+BEGIN
+    FOR i IN 0..11 LOOP  -- 次の12ヶ月分
+        PERFORM create_monthly_partition('measurements', current_month + (i || ' months')::INTERVAL);
+    END LOOP;
+END;
+$$;
+\`\`\`
+
+**圧縮・最適化:**
+\`\`\`sql
+-- PostgreSQL での圧縮設定
+-- テーブル圧縮（TOAST設定）
+ALTER TABLE large_text_table ALTER COLUMN content SET STORAGE EXTERNAL;
+
+-- 列圧縮設定（PostgreSQL 14+）
+ALTER TABLE analytics_data ALTER COLUMN json_data SET COMPRESSION lz4;
+
+-- MySQL でのテーブル圧縮
+CREATE TABLE compressed_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    log_data JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+-- SQL Server での ページ圧縮
+ALTER TABLE large_fact_table REBUILD WITH (DATA_COMPRESSION = PAGE);
+
+-- Oracle での Advanced Compression
+ALTER TABLE transaction_history COMPRESS FOR OLTP;
+\`\`\`
+
+**容量アラート設定:**
+\`\`\`yaml
+# Prometheus アラート設定（容量監視）
+groups:
+- name: database_capacity
+  rules:
+  - alert: DatabaseDiskSpaceHigh
+    expr: (1 - (node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql"} / node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"})) * 100 > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Database disk space usage high"
+      description: "Database disk usage is {{ $value }}% on {{ $labels.instance }}"
+
+  - alert: DatabaseDiskSpaceCritical
+    expr: (1 - (node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql"} / node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"})) * 100 > 90
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Database disk space critically low"
+      description: "Database disk usage is {{ $value }}% on {{ $labels.instance }}"
+
+  - alert: DatabaseGrowthRate
+    expr: predict_linear(node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql"}[1w], 4*7*24*3600) < 0
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Database will run out of space"
+      description: "Database on {{ $labels.instance }} is predicted to run out of space in 4 weeks"
+\`\`\``,
+        quiz: {
+          question: 'データベースの容量設計において、データティアリング戦略の主な目的はどれですか？',
+          options: [
+            'データのセキュリティ向上',
+            'アクセス頻度に応じたストレージ最適化',
+            'バックアップ時間の短縮',
+            'レプリケーション性能の向上'
+          ],
+          correct: 1,
+          explanation: 'データティアリング戦略は、アクセス頻度や重要度に応じてデータを異なるストレージ階層（高速SSD、標準SSD、低速HDDなど）に配置することで、コストと性能のバランスを最適化する手法です。'
+        }
+      },
+      {
+        title: 'データベースバックアップ戦略',
+        content: `企業レベルのデータベースバックアップ戦略について学習します。
+
+**バックアップ戦略の設計:**
+
+**1. RTO/RPO要件:**
+- RTO (Recovery Time Objective): 復旧目標時間
+- RPO (Recovery Point Objective): 復旧目標時点
+- ビジネス影響度分析
+- コスト対効果分析
+
+**2. バックアップタイプ:**
+- 完全バックアップ（Full Backup）
+- 増分バックアップ（Incremental Backup）
+- 差分バックアップ（Differential Backup）
+- ログバックアップ（Transaction Log Backup）
+
+**3. バックアップ方式:**
+- 物理バックアップ vs 論理バックアップ
+- オンラインバックアップ vs オフラインバックアップ
+- ホットバックアップ vs コールドバックアップ
+
+**PostgreSQL バックアップ戦略:**
+
+**pg_dump/pg_dumpall（論理バックアップ）:**
+\`\`\`bash
+#!/bin/bash
+# logical_backup.sh
+
+# 設定
+DB_HOST="localhost"
+DB_PORT="5432"
+BACKUP_DIR="/backup/logical"
+RETENTION_DAYS=30
+DATE=$(date +%Y%m%d_%H%M%S)
+
+# データベースリスト取得
+DATABASES=$(psql -h $DB_HOST -p $DB_PORT -t -c "SELECT datname FROM pg_database WHERE datistemplate = false AND datname != 'postgres';" | xargs)
+
+# 各データベースをバックアップ
+for DB in $DATABASES; do
+    echo "Backing up database: $DB"
+
+    # カスタム形式でバックアップ（圧縮・並列復元可能）
+    pg_dump -h $DB_HOST -p $DB_PORT -U backup_user -Fc -Z 6 \
+            --verbose --no-password \
+            --file="$BACKUP_DIR/${DB}_${DATE}.backup" \
+            $DB
+
+    if [ $? -eq 0 ]; then
+        echo "Backup successful for $DB"
+
+        # バックアップファイルの検証
+        pg_restore --list "$BACKUP_DIR/${DB}_${DATE}.backup" > /dev/null
+        if [ $? -eq 0 ]; then
+            echo "Backup verification successful for $DB"
+        else
+            echo "ERROR: Backup verification failed for $DB"
+            exit 1
+        fi
+    else
+        echo "ERROR: Backup failed for $DB"
+        exit 1
+    fi
+done
+
+# 古いバックアップの削除
+find $BACKUP_DIR -name "*.backup" -mtime +$RETENTION_DAYS -delete
+
+# バックアップサイズレポート
+echo "Backup Summary:"
+ls -lh $BACKUP_DIR/*_${DATE}.backup | awk '{print $9, $5}'
+\`\`\`
+
+**WALアーカイブ（継続バックアップ）:**
+\`\`\`bash
+# postgresql.conf設定
+# wal_level = replica
+# archive_mode = on
+# archive_command = '/opt/postgresql/scripts/archive_wal.sh %p %f'
+# max_wal_senders = 3
+# wal_keep_segments = 32
+
+#!/bin/bash
+# archive_wal.sh
+WAL_PATH=$1
+WAL_FILE=$2
+ARCHIVE_DIR="/backup/wal_archive"
+
+# WALファイルをアーカイブディレクトリにコピー
+cp "$WAL_PATH" "$ARCHIVE_DIR/$WAL_FILE"
+
+# 結果を確認
+if [ $? -eq 0 ]; then
+    # S3にもバックアップ（オプション）
+    aws s3 cp "$ARCHIVE_DIR/$WAL_FILE" s3://my-db-backup/wal/ --storage-class STANDARD_IA
+    exit 0
+else
+    exit 1
+fi
+\`\`\`
+
+**物理バックアップ（pg_basebackup）:**
+\`\`\`bash
+#!/bin/bash
+# physical_backup.sh
+
+BACKUP_DIR="/backup/physical"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_PATH="$BACKUP_DIR/base_backup_$DATE"
+
+# ベースバックアップ作成
+pg_basebackup -h localhost -U replication_user \
+              -D "$BACKUP_PATH" \
+              -Ft -z -P -v \
+              --wal-method=include
+
+if [ $? -eq 0 ]; then
+    echo "Physical backup completed: $BACKUP_PATH"
+
+    # バックアップの整合性チェック
+    tar -tf "$BACKUP_PATH/base.tar.gz" > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Backup integrity check passed"
+    else
+        echo "ERROR: Backup integrity check failed"
+        rm -rf "$BACKUP_PATH"
+        exit 1
+    fi
+else
+    echo "ERROR: Physical backup failed"
+    exit 1
+fi
+
+# 古いバックアップの削除（7日以上古い）
+find $BACKUP_DIR -name "base_backup_*" -mtime +7 -exec rm -rf {} \;
+\`\`\`
+
+**MySQL バックアップ戦略:**
+
+**mysqldump（論理バックアップ）:**
+\`\`\`bash
+#!/bin/bash
+# mysql_logical_backup.sh
+
+# 設定
+MYSQL_USER="backup_user"
+MYSQL_PASSWORD="backup_password"
+MYSQL_HOST="localhost"
+BACKUP_DIR="/backup/mysql/logical"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+# 全データベースバックアップ
+mysqldump --user=$MYSQL_USER --password=$MYSQL_PASSWORD \
+          --host=$MYSQL_HOST \
+          --single-transaction \
+          --routines \
+          --triggers \
+          --events \
+          --all-databases \
+          --result-file="$BACKUP_DIR/all_databases_$DATE.sql"
+
+# 圧縮
+gzip "$BACKUP_DIR/all_databases_$DATE.sql"
+
+# 個別データベースバックアップ
+DATABASES=$(mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD \
+            --host=$MYSQL_HOST \
+            -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema|performance_schema|mysql|sys)")
+
+for DB in $DATABASES; do
+    echo "Backing up database: $DB"
+
+    mysqldump --user=$MYSQL_USER --password=$MYSQL_PASSWORD \
+              --host=$MYSQL_HOST \
+              --single-transaction \
+              --routines \
+              --triggers \
+              --events \
+              --databases $DB \
+              --result-file="$BACKUP_DIR/${DB}_$DATE.sql"
+
+    gzip "$BACKUP_DIR/${DB}_$DATE.sql"
+done
+
+echo "MySQL logical backup completed"
+\`\`\`
+
+**XtraBackup（物理バックアップ）:**
+\`\`\`bash
+#!/bin/bash
+# mysql_physical_backup.sh
+
+BACKUP_DIR="/backup/mysql/physical"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_PATH="$BACKUP_DIR/xtrabackup_$DATE"
+
+# 完全バックアップ
+xtrabackup --backup \
+           --target-dir="$BACKUP_PATH" \
+           --user=backup_user \
+           --password=backup_password \
+           --compress \
+           --compress-threads=4 \
+           --parallel=4
+
+if [ $? -eq 0 ]; then
+    echo "XtraBackup completed: $BACKUP_PATH"
+
+    # バックアップ準備（Apply log）
+    xtrabackup --prepare \
+               --target-dir="$BACKUP_PATH"
+
+    if [ $? -eq 0 ]; then
+        echo "Backup preparation completed"
+
+        # メタデータファイル作成
+        echo "Backup Date: $(date)" > "$BACKUP_PATH/backup_info.txt"
+        echo "MySQL Version: $(mysql --version)" >> "$BACKUP_PATH/backup_info.txt"
+        echo "Backup Size: $(du -sh $BACKUP_PATH | cut -f1)" >> "$BACKUP_PATH/backup_info.txt"
+    else
+        echo "ERROR: Backup preparation failed"
+        rm -rf "$BACKUP_PATH"
+        exit 1
+    fi
+else
+    echo "ERROR: XtraBackup failed"
+    exit 1
+fi
+
+# 古いバックアップ削除
+find $BACKUP_DIR -name "xtrabackup_*" -mtime +7 -exec rm -rf {} \;
+\`\`\`
+
+**クラウドバックアップ統合:**
+
+**AWS RDS自動バックアップ:**
+\`\`\`bash
+#!/bin/bash
+# rds_snapshot_management.sh
+
+# RDSインスタンス設定
+RDS_INSTANCE="production-database"
+REGION="us-east-1"
+
+# スナップショット作成
+SNAPSHOT_ID="${RDS_INSTANCE}-manual-$(date +%Y%m%d-%H%M%S)"
+
+aws rds create-db-snapshot \
+    --region $REGION \
+    --db-instance-identifier $RDS_INSTANCE \
+    --db-snapshot-identifier $SNAPSHOT_ID
+
+# スナップショット作成完了まで待機
+aws rds wait db-snapshot-completed \
+    --region $REGION \
+    --db-snapshot-identifier $SNAPSHOT_ID
+
+if [ $? -eq 0 ]; then
+    echo "RDS snapshot created: $SNAPSHOT_ID"
+
+    # クロスリージョンコピー
+    aws rds copy-db-snapshot \
+        --region us-west-2 \
+        --source-region $REGION \
+        --source-db-snapshot-identifier $SNAPSHOT_ID \
+        --target-db-snapshot-identifier "${SNAPSHOT_ID}-west"
+
+    echo "Cross-region copy initiated"
+else
+    echo "ERROR: RDS snapshot creation failed"
+    exit 1
+fi
+
+# 古いスナップショット削除（30日以上）
+OLD_SNAPSHOTS=$(aws rds describe-db-snapshots \
+                --region $REGION \
+                --db-instance-identifier $RDS_INSTANCE \
+                --snapshot-type manual \
+                --query "DBSnapshots[?SnapshotCreateTime<='$(date -d '30 days ago' --iso-8601)'].DBSnapshotIdentifier" \
+                --output text)
+
+for SNAPSHOT in $OLD_SNAPSHOTS; do
+    echo "Deleting old snapshot: $SNAPSHOT"
+    aws rds delete-db-snapshot \
+        --region $REGION \
+        --db-snapshot-identifier $SNAPSHOT
+done
+\`\`\`
+
+**復旧テスト自動化:**
+\`\`\`python
+#!/usr/bin/env python3
+# backup_validation.py
+
+import subprocess
+import tempfile
+import os
+import logging
+from datetime import datetime
+
+class BackupValidator:
+    def __init__(self, backup_path, test_db_config):
+        self.backup_path = backup_path
+        self.test_db_config = test_db_config
+        self.logger = logging.getLogger(__name__)
+
+    def validate_postgresql_backup(self):
+        """PostgreSQLバックアップの検証"""
+        try:
+            # 一時的なテストDBに復元
+            test_db = f"backup_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+            # テストDB作成
+            subprocess.run([
+                'createdb', '-h', self.test_db_config['host'],
+                '-U', self.test_db_config['user'], test_db
+            ], check=True)
+
+            # バックアップ復元
+            subprocess.run([
+                'pg_restore', '-h', self.test_db_config['host'],
+                '-U', self.test_db_config['user'],
+                '-d', test_db, self.backup_path
+            ], check=True)
+
+            # 基本的な整合性チェック
+            result = subprocess.run([
+                'psql', '-h', self.test_db_config['host'],
+                '-U', self.test_db_config['user'],
+                '-d', test_db, '-t',
+                '-c', 'SELECT count(*) FROM pg_tables WHERE schemaname = \'public\';'
+            ], capture_output=True, text=True, check=True)
+
+            table_count = int(result.stdout.strip())
+
+            if table_count > 0:
+                self.logger.info(f"Backup validation successful. Tables found: {table_count}")
+                validation_result = True
+            else:
+                self.logger.error("No tables found in restored database")
+                validation_result = False
+
+            # テストDB削除
+            subprocess.run([
+                'dropdb', '-h', self.test_db_config['host'],
+                '-U', self.test_db_config['user'], test_db
+            ], check=True)
+
+            return validation_result
+
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f"Backup validation failed: {e}")
+            return False
+
+    def generate_validation_report(self):
+        """検証レポート生成"""
+        report = {
+            'timestamp': datetime.now().isoformat(),
+            'backup_path': self.backup_path,
+            'validation_result': self.validate_postgresql_backup(),
+            'backup_size': os.path.getsize(self.backup_path),
+            'test_duration': None  # 実装で計測
+        }
+
+        return report
+
+# 使用例
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    test_config = {
+        'host': 'localhost',
+        'user': 'postgres'
+    }
+
+    validator = BackupValidator('/backup/mydb_20231201.backup', test_config)
+    report = validator.generate_validation_report()
+
+    print(f"Validation result: {report['validation_result']}")
+\`\`\``,
+        quiz: {
+          question: 'PostgreSQLのWAL（Write-Ahead Logging）アーカイブの主な目的はどれですか？',
+          options: [
+            'データベースの性能向上',
+            'ポイントインタイム復旧の実現',
+            'ディスク容量の削減',
+            'レプリケーションの設定'
+          ],
+          correct: 1,
+          explanation: 'WALアーカイブは、トランザクションログを継続的に保存することで、任意の時点（ポイントインタイム）への復旧を可能にします。これにより、障害発生直前の状態まで復旧することができます。'
+        }
+      },
+      {
+        title: 'データベース高可用性',
+        content: `データベースの高可用性設計と実装について学習します。
+
+**高可用性の要素:**
+
+**1. 可用性指標:**
+- SLA (Service Level Agreement)
+- アップタイム目標（99.9%, 99.99%, 99.999%）
+- MTBF (Mean Time Between Failures)
+- MTTR (Mean Time To Recovery)
+
+**2. 障害の種類:**
+- ハードウェア障害
+- ソフトウェア障害
+- ネットワーク障害
+- 人的ミス
+- 災害・環境障害
+
+**3. 高可用性アーキテクチャパターン:**
+- アクティブ/パッシブ構成
+- アクティブ/アクティブ構成
+- マルチマスター構成
+- 分散クラスター構成
+
+**PostgreSQL高可用性構成:**
+
+**ストリーミングレプリケーション:**
+\`\`\`bash
+# プライマリサーバー設定 (postgresql.conf)
+wal_level = replica
+max_wal_senders = 3
+wal_keep_segments = 64
+synchronous_standby_names = 'standby1,standby2'
+synchronous_commit = on
+
+# pg_hba.conf (レプリケーション用)
+host replication replicator 192.168.1.0/24 md5
+\`\`\`
+
+\`\`\`bash
+# スタンバイサーバー設定
+# recovery.conf (PostgreSQL 11以前) または postgresql.conf (12以降)
+standby_mode = 'on'
+primary_conninfo = 'host=192.168.1.10 port=5432 user=replicator password=password'
+trigger_file = '/tmp/postgresql.trigger'
+restore_command = 'cp /archive/%f %p'
+
+# ベースバックアップからスタンバイ構築
+pg_basebackup -h 192.168.1.10 -D /var/lib/postgresql/data -U replicator -P -v -R -W
+\`\`\`
+
+**自動フェイルオーバー（Patroni）:**
+\`\`\`yaml
+# patroni.yml
+scope: postgres-cluster
+namespace: /postgresql-cluster/
+name: postgres-node1
+
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: 192.168.1.11:8008
+
+etcd:
+  hosts: 192.168.1.20:2379,192.168.1.21:2379,192.168.1.22:2379
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 30
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+      parameters:
+        wal_level: replica
+        hot_standby: "on"
+        wal_keep_segments: 8
+        max_wal_senders: 10
+        max_replication_slots: 10
+        wal_log_hints: "on"
+
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+postgresql:
+  listen: 0.0.0.0:5432
+  connect_address: 192.168.1.11:5432
+  data_dir: /var/lib/postgresql/data
+  pgpass: /tmp/pgpass
+  authentication:
+    replication:
+      username: replicator
+      password: repl_password
+    superuser:
+      username: postgres
+      password: postgres_password
+
+watchdog:
+  mode: required
+  device: /dev/watchdog
+  safety_margin: 5
+
+tags:
+  nofailover: false
+  noloadbalance: false
+  clonefrom: false
+  nosync: false
+\`\`\`
+
+**HAProxy負荷分散設定:**
+\`\`\`
+# haproxy.cfg
+global
+    log stdout local0
+    maxconn 4096
+
+defaults
+    mode tcp
+    timeout connect 5s
+    timeout client 30s
+    timeout server 30s
+    log global
+
+frontend postgres_frontend
+    bind *:5000
+    default_backend postgres_backend
+
+backend postgres_backend
+    balance leastconn
+    option tcp-check
+    tcp-check expect string "is_master:t"
+
+    server postgres-1 192.168.1.11:5432 check port 8008 httpchk GET /master
+    server postgres-2 192.168.1.12:5432 check port 8008 httpchk GET /master backup
+    server postgres-3 192.168.1.13:5432 check port 8008 httpchk GET /master backup
+
+frontend postgres_readonly
+    bind *:5001
+    default_backend postgres_readonly_backend
+
+backend postgres_readonly_backend
+    balance roundrobin
+    option tcp-check
+    tcp-check expect string "is_running:t"
+
+    server postgres-1 192.168.1.11:5432 check port 8008 httpchk GET /replica
+    server postgres-2 192.168.1.12:5432 check port 8008 httpchk GET /replica
+    server postgres-3 192.168.1.13:5432 check port 8008 httpchk GET /replica
+\`\`\`
+
+**MySQL高可用性構成:**
+
+**MySQL InnoDB Cluster:**
+\`\`\`javascript
+// MySQL Shell でのクラスター構築
+// 各ノードでの準備
+dba.configureInstance('root@mysql-node1:3306')
+dba.configureInstance('root@mysql-node2:3306')
+dba.configureInstance('root@mysql-node3:3306')
+
+// クラスター作成
+var cluster = dba.createCluster('productionCluster')
+
+// ノード追加
+cluster.addInstance('root@mysql-node2:3306')
+cluster.addInstance('root@mysql-node3:3306')
+
+// クラスター状態確認
+cluster.status()
+
+// MySQL Router設定
+mysqlrouter --bootstrap root@mysql-node1:3306 --directory /opt/mysqlrouter --user mysqlrouter
+\`\`\`
+
+**Galera Cluster（MariaDB/MySQL）:**
+\`\`\`ini
+# galera.cnf
+[galera]
+wsrep_on=ON
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+wsrep_cluster_name="galera_cluster"
+wsrep_cluster_address="gcomm://192.168.1.11,192.168.1.12,192.168.1.13"
+wsrep_node_name="node1"
+wsrep_node_address="192.168.1.11"
+wsrep_sst_method=rsync
+
+binlog_format=row
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+innodb_doublewrite=1
+query_cache_size=0
+query_cache_type=0
+
+# ブートストラップ（初回のみ）
+galera_new_cluster
+
+# 他ノードの起動
+systemctl start mariadb
+\`\`\`
+
+**Redis高可用性（Sentinel）:**
+\`\`\`bash
+# redis.conf (マスター)
+bind 0.0.0.0
+port 6379
+save 900 1
+save 300 10
+save 60 10000
+
+# redis.conf (スレーブ)
+bind 0.0.0.0
+port 6379
+slaveof 192.168.1.11 6379
+slave-read-only yes
+
+# sentinel.conf
+bind 0.0.0.0
+port 26379
+sentinel monitor mymaster 192.168.1.11 6379 2
+sentinel auth-pass mymaster password
+sentinel down-after-milliseconds mymaster 5000
+sentinel parallel-syncs mymaster 1
+sentinel failover-timeout mymaster 10000
+\`\`\`
+
+**クラウド高可用性サービス:**
+
+**AWS RDS Multi-AZ:**
+\`\`\`yaml
+# CloudFormation テンプレート
+Resources:
+  DatabaseInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: production-db
+      Engine: postgres
+      EngineVersion: 13.7
+      DBInstanceClass: db.r5.xlarge
+      AllocatedStorage: 100
+      StorageType: gp2
+      StorageEncrypted: true
+
+      # Multi-AZ設定
+      MultiAZ: true
+
+      # バックアップ設定
+      BackupRetentionPeriod: 7
+      PreferredBackupWindow: "03:00-04:00"
+      PreferredMaintenanceWindow: "sun:04:00-sun:05:00"
+
+      # 監視
+      MonitoringInterval: 60
+      MonitoringRoleArn: !GetAtt MonitoringRole.Arn
+      EnablePerformanceInsights: true
+
+      # セキュリティ
+      VPCSecurityGroups:
+        - !Ref DatabaseSecurityGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+
+      DeletionProtection: true
+
+  # Read Replica
+  DatabaseReadReplica:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      SourceDBInstanceIdentifier: !Ref DatabaseInstance
+      DBInstanceClass: db.r5.large
+      PubliclyAccessible: false
+      Tags:
+        - Key: Name
+          Value: production-db-read-replica
+\`\`\`
+
+**障害検知・自動復旧:**
+\`\`\`python
+#!/usr/bin/env python3
+# database_health_monitor.py
+
+import time
+import psycopg2
+import smtplib
+import subprocess
+from datetime import datetime
+
+class DatabaseHealthMonitor:
+    def __init__(self, config):
+        self.config = config
+        self.last_check = None
+        self.consecutive_failures = 0
+
+    def check_database_health(self):
+        """データベースヘルスチェック"""
+        try:
+            conn = psycopg2.connect(
+                host=self.config['host'],
+                port=self.config['port'],
+                database=self.config['database'],
+                user=self.config['user'],
+                password=self.config['password'],
+                connect_timeout=5
+            )
+
+            cur = conn.cursor()
+
+            # 基本接続チェック
+            cur.execute("SELECT 1")
+
+            # レプリケーション状態チェック
+            cur.execute("""
+                SELECT client_addr, state, sync_state
+                FROM pg_stat_replication
+            """)
+            replication_status = cur.fetchall()
+
+            # 長時間実行クエリチェック
+            cur.execute("""
+                SELECT count(*)
+                FROM pg_stat_activity
+                WHERE state = 'active'
+                AND query_start < now() - interval '5 minutes'
+                AND query NOT LIKE '%pg_stat_activity%'
+            """)
+            long_queries = cur.fetchone()[0]
+
+            # ディスク容量チェック
+            cur.execute("""
+                SELECT pg_size_pretty(pg_database_size(current_database())) as db_size
+            """)
+            db_size = cur.fetchone()[0]
+
+            conn.close()
+
+            health_status = {
+                'timestamp': datetime.now(),
+                'status': 'healthy',
+                'replication_nodes': len(replication_status),
+                'long_running_queries': long_queries,
+                'database_size': db_size
+            }
+
+            self.consecutive_failures = 0
+            return health_status
+
+        except Exception as e:
+            self.consecutive_failures += 1
+
+            health_status = {
+                'timestamp': datetime.now(),
+                'status': 'unhealthy',
+                'error': str(e),
+                'consecutive_failures': self.consecutive_failures
+            }
+
+            return health_status
+
+    def handle_failure(self, health_status):
+        """障害対応処理"""
+        if self.consecutive_failures >= 3:
+            self.send_alert(health_status)
+
+            if self.consecutive_failures >= 5:
+                self.trigger_failover()
+
+    def send_alert(self, health_status):
+        """アラート送信"""
+        message = f"""
+        Database Health Alert
+
+        Status: {health_status['status']}
+        Time: {health_status['timestamp']}
+        Error: {health_status.get('error', 'N/A')}
+        Consecutive Failures: {health_status['consecutive_failures']}
+
+        Please investigate immediately.
+        """
+
+        # メール送信（実装省略）
+        print(f"ALERT: {message}")
+
+    def trigger_failover(self):
+        """フェイルオーバー実行"""
+        try:
+            # Patroni経由でフェイルオーバー実行
+            result = subprocess.run([
+                'patronictl', 'failover', 'postgres-cluster',
+                '--candidate', 'postgres-node2'
+            ], capture_output=True, text=True, timeout=30)
+
+            if result.returncode == 0:
+                print("Failover executed successfully")
+                self.send_alert({
+                    'status': 'failover_completed',
+                    'timestamp': datetime.now(),
+                    'details': result.stdout
+                })
+            else:
+                print(f"Failover failed: {result.stderr}")
+
+        except Exception as e:
+            print(f"Error during failover: {e}")
+
+    def run_monitoring(self):
+        """継続監視実行"""
+        while True:
+            health_status = self.check_database_health()
+
+            if health_status['status'] == 'unhealthy':
+                self.handle_failure(health_status)
+            else:
+                print(f"Database healthy at {health_status['timestamp']}")
+
+            time.sleep(30)  # 30秒間隔
+
+# 設定
+config = {
+    'host': 'localhost',
+    'port': 5432,
+    'database': 'postgres',
+    'user': 'monitor',
+    'password': 'monitor_password'
+}
+
+# 監視開始
+monitor = DatabaseHealthMonitor(config)
+monitor.run_monitoring()
+\`\`\``,
+        quiz: {
+          question: 'データベースの高可用性において、同期レプリケーションと非同期レプリケーションの主な違いはどれですか？',
+          options: [
+            'レプリケーションの方向性',
+            'データ整合性とパフォーマンスのトレードオフ',
+            'サポートするデータベースエンジンの種類',
+            'ネットワーク帯域の使用量'
+          ],
+          correct: 1,
+          explanation: '同期レプリケーションは全てのレプリカへの書き込み完了を待つためデータ整合性が高いが性能は低く、非同期レプリケーションは待機せずに応答するため性能は高いがデータ整合性にわずかなリスクがあります。'
+        }
+      },
+      {
+        title: 'データベース法規制対応',
+        content: `データベースに関わる法規制と コンプライアンス対応について学習します。
+
+**主要な法規制:**
+
+**1. 個人情報保護法（日本）:**
+- 個人情報の定義・分類
+- 取得・利用・提供の制限
+- 安全管理措置
+- 本人の権利保護
+
+**2. GDPR（EU一般データ保護規則）:**
+- 個人データの処理原則
+- 適法性・透明性・目的制限
+- データ最小化・正確性
+- 保存制限・完全性・機密性
+
+**3. SOX法（Sarbanes-Oxley Act）:**
+- 財務報告の内部統制
+- データの完全性・可用性
+- 監査証跡の保持
+- 変更管理プロセス
+
+**4. PCI DSS（Payment Card Industry Data Security Standard）:**
+- カード会員データの保護
+- 暗号化要件
+- アクセス制御
+- 脆弱性管理
+
+**GDPR対応実装:**
+
+**データ分類・ラベリング:**
+\`\`\`sql
+-- データ分類テーブル
+CREATE TABLE data_classification (
+    table_name VARCHAR(100),
+    column_name VARCHAR(100),
+    classification VARCHAR(20), -- 'public', 'internal', 'confidential', 'personal'
+    sensitivity_level INTEGER,  -- 1-5 (低-高)
+    data_subject_type VARCHAR(50), -- 'customer', 'employee', 'vendor'
+    legal_basis VARCHAR(100),   -- GDPR第6条の適法根拠
+    retention_period INTERVAL,
+    deletion_rule TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- データ分類の登録例
+INSERT INTO data_classification VALUES
+('customers', 'email', 'personal', 4, 'customer', 'consent', INTERVAL '7 years', 'Delete after contract termination + retention period'),
+('customers', 'phone', 'personal', 3, 'customer', 'legitimate_interest', INTERVAL '3 years', 'Delete when no longer needed for business purpose'),
+('employees', 'salary', 'confidential', 5, 'employee', 'contract', INTERVAL '10 years', 'Delete after employment + legal retention period');
+
+-- 個人データ検索機能
+CREATE OR REPLACE FUNCTION find_personal_data(subject_id TEXT, subject_type TEXT)
+RETURNS TABLE (
+    table_name TEXT,
+    column_name TEXT,
+    data_value TEXT,
+    classification TEXT
+) AS $$
+DECLARE
+    rec RECORD;
+    query_text TEXT;
+BEGIN
+    FOR rec IN
+        SELECT dc.table_name, dc.column_name, dc.classification
+        FROM data_classification dc
+        WHERE dc.data_subject_type = subject_type
+        AND dc.classification = 'personal'
+    LOOP
+        query_text := format('SELECT %L, %L, %I::TEXT, %L FROM %I WHERE id = %L',
+                           rec.table_name, rec.column_name, rec.column_name, rec.classification, rec.table_name, subject_id);
+
+        RETURN QUERY EXECUTE query_text;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+\`\`\`
+
+**忘れられる権利（Right to be forgotten）実装:**
+\`\`\`sql
+-- データ削除要求管理
+CREATE TABLE data_deletion_requests (
+    request_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    data_subject_id VARCHAR(100) NOT NULL,
+    data_subject_type VARCHAR(50) NOT NULL,
+    requester_email VARCHAR(255),
+    request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reason TEXT,
+    status VARCHAR(20) DEFAULT 'pending', -- pending, processing, completed, rejected
+    processed_date TIMESTAMP,
+    processed_by VARCHAR(100),
+    deletion_log JSONB,
+    legal_review_notes TEXT
+);
+
+-- 削除プロシージャ
+CREATE OR REPLACE FUNCTION process_deletion_request(request_uuid UUID)
+RETURNS JSONB AS $$
+DECLARE
+    request_rec RECORD;
+    deletion_log JSONB := '{}';
+    table_rec RECORD;
+    affected_rows INTEGER;
+    query_text TEXT;
+BEGIN
+    -- 削除要求取得
+    SELECT * INTO request_rec
+    FROM data_deletion_requests
+    WHERE request_id = request_uuid;
+
+    IF NOT FOUND THEN
+        RETURN '{"error": "Request not found"}';
+    END IF;
+
+    -- ステータス更新
+    UPDATE data_deletion_requests
+    SET status = 'processing', processed_date = CURRENT_TIMESTAMP
+    WHERE request_id = request_uuid;
+
+    -- 関連テーブルからデータ削除
+    FOR table_rec IN
+        SELECT DISTINCT dc.table_name
+        FROM data_classification dc
+        WHERE dc.data_subject_type = request_rec.data_subject_type
+        AND dc.classification = 'personal'
+    LOOP
+        -- データ削除実行
+        query_text := format('DELETE FROM %I WHERE %s = %L',
+                           table_rec.table_name,
+                           CASE request_rec.data_subject_type
+                               WHEN 'customer' THEN 'customer_id'
+                               WHEN 'employee' THEN 'employee_id'
+                               ELSE 'id'
+                           END,
+                           request_rec.data_subject_id);
+
+        EXECUTE query_text;
+        GET DIAGNOSTICS affected_rows = ROW_COUNT;
+
+        deletion_log := deletion_log || jsonb_build_object(
+            table_rec.table_name,
+            jsonb_build_object(
+                'deleted_rows', affected_rows,
+                'timestamp', CURRENT_TIMESTAMP
+            )
+        );
+    END LOOP;
+
+    -- 完了ステータス更新
+    UPDATE data_deletion_requests
+    SET status = 'completed', deletion_log = deletion_log
+    WHERE request_id = request_uuid;
+
+    RETURN deletion_log;
+END;
+$$ LANGUAGE plpgsql;
+\`\`\`
+
+**データポータビリティ（Data Portability）実装:**
+\`\`\`sql
+-- データエクスポート機能
+CREATE OR REPLACE FUNCTION export_personal_data(subject_id TEXT, subject_type TEXT)
+RETURNS JSONB AS $$
+DECLARE
+    export_data JSONB := '{}';
+    table_rec RECORD;
+    data_rec RECORD;
+    query_text TEXT;
+BEGIN
+    FOR table_rec IN
+        SELECT DISTINCT dc.table_name
+        FROM data_classification dc
+        WHERE dc.data_subject_type = subject_type
+        AND dc.classification IN ('personal', 'confidential')
+    LOOP
+        -- テーブルデータ取得
+        query_text := format('SELECT row_to_json(t) FROM %I t WHERE %s = %L',
+                           table_rec.table_name,
+                           CASE subject_type
+                               WHEN 'customer' THEN 'customer_id'
+                               WHEN 'employee' THEN 'employee_id'
+                               ELSE 'id'
+                           END,
+                           subject_id);
+
+        FOR data_rec IN EXECUTE query_text LOOP
+            export_data := export_data || jsonb_build_object(
+                table_rec.table_name,
+                COALESCE(export_data->table_rec.table_name, '[]'::jsonb) || data_rec.row_to_json
+            );
+        END LOOP;
+    END LOOP;
+
+    -- エクスポートログ記録
+    INSERT INTO data_export_log (subject_id, subject_type, export_timestamp, data_size)
+    VALUES (subject_id, subject_type, CURRENT_TIMESTAMP, length(export_data::text));
+
+    RETURN export_data;
+END;
+$$ LANGUAGE plpgsql;
+\`\`\`
+
+**監査証跡システム:**
+\`\`\`sql
+-- 監査ログテーブル
+CREATE TABLE audit_log (
+    log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    table_name VARCHAR(100) NOT NULL,
+    operation_type VARCHAR(10) NOT NULL, -- INSERT, UPDATE, DELETE
+    record_id VARCHAR(100),
+    old_values JSONB,
+    new_values JSONB,
+    user_id VARCHAR(100),
+    session_id VARCHAR(100),
+    client_ip INET,
+    application VARCHAR(100),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    compliance_tags TEXT[] -- 法規制タグ
+);
+
+-- 汎用監査トリガー関数
+CREATE OR REPLACE FUNCTION audit_trigger_function()
+RETURNS TRIGGER AS $$
+DECLARE
+    old_data JSONB;
+    new_data JSONB;
+    user_info RECORD;
+BEGIN
+    -- ユーザー情報取得
+    SELECT
+        current_setting('audit.user_id', true) as user_id,
+        current_setting('audit.session_id', true) as session_id,
+        current_setting('audit.client_ip', true) as client_ip,
+        current_setting('audit.application', true) as application
+    INTO user_info;
+
+    IF TG_OP = 'DELETE' THEN
+        old_data := row_to_json(OLD);
+        new_data := NULL;
+    ELSIF TG_OP = 'UPDATE' THEN
+        old_data := row_to_json(OLD);
+        new_data := row_to_json(NEW);
+    ELSIF TG_OP = 'INSERT' THEN
+        old_data := NULL;
+        new_data := row_to_json(NEW);
+    END IF;
+
+    INSERT INTO audit_log (
+        table_name, operation_type, record_id,
+        old_values, new_values,
+        user_id, session_id, client_ip, application,
+        compliance_tags
+    ) VALUES (
+        TG_TABLE_NAME, TG_OP,
+        COALESCE(NEW.id::TEXT, OLD.id::TEXT),
+        old_data, new_data,
+        user_info.user_id, user_info.session_id,
+        user_info.client_ip::INET, user_info.application,
+        ARRAY['gdpr', 'sox'] -- テーブルに応じて設定
+    );
+
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+-- 監査トリガー設定例
+CREATE TRIGGER customers_audit_trigger
+    AFTER INSERT OR UPDATE OR DELETE ON customers
+    FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+\`\`\`
+
+**データ保存期間管理:**
+\`\`\`sql
+-- データ保存期間ポリシー
+CREATE TABLE retention_policies (
+    policy_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    table_name VARCHAR(100),
+    retention_period INTERVAL,
+    deletion_criteria JSONB, -- 削除条件のJSON
+    legal_basis TEXT,
+    active BOOLEAN DEFAULT true,
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ポリシー例
+INSERT INTO retention_policies (table_name, retention_period, deletion_criteria, legal_basis)
+VALUES
+('customer_activities', INTERVAL '2 years', '{"condition": "last_activity_date < :cutoff_date"}', 'GDPR Article 5(1)(e) - storage limitation'),
+('audit_log', INTERVAL '7 years', '{"condition": "timestamp < :cutoff_date"}', 'SOX compliance requirement'),
+('session_logs', INTERVAL '90 days', '{"condition": "created_at < :cutoff_date"}', 'Business operational requirement');
+
+-- 自動削除プロシージャ
+CREATE OR REPLACE FUNCTION apply_retention_policies()
+RETURNS TABLE (
+    policy_id UUID,
+    table_name TEXT,
+    deleted_count INTEGER,
+    execution_time TIMESTAMP
+) AS $$
+DECLARE
+    policy_rec RECORD;
+    delete_query TEXT;
+    cutoff_date TIMESTAMP;
+    affected_rows INTEGER;
+BEGIN
+    FOR policy_rec IN
+        SELECT * FROM retention_policies WHERE active = true
+    LOOP
+        cutoff_date := CURRENT_TIMESTAMP - policy_rec.retention_period;
+
+        -- 削除クエリ構築
+        delete_query := format('DELETE FROM %I WHERE %s',
+                             policy_rec.table_name,
+                             replace(policy_rec.deletion_criteria->>'condition', ':cutoff_date', quote_literal(cutoff_date)));
+
+        EXECUTE delete_query;
+        GET DIAGNOSTICS affected_rows = ROW_COUNT;
+
+        -- 結果返却
+        policy_id := policy_rec.policy_id;
+        table_name := policy_rec.table_name;
+        deleted_count := affected_rows;
+        execution_time := CURRENT_TIMESTAMP;
+
+        RETURN NEXT;
+
+        -- 削除ログ記録
+        INSERT INTO retention_execution_log (policy_id, table_name, deleted_count, execution_time)
+        VALUES (policy_rec.policy_id, policy_rec.table_name, affected_rows, CURRENT_TIMESTAMP);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 定期実行設定
+SELECT cron.schedule('retention-cleanup', '0 2 * * *', 'SELECT apply_retention_policies();');
+\`\`\`
+
+**コンプライアンス レポート:**
+\`\`\`python
+#!/usr/bin/env python3
+# compliance_reporter.py
+
+import psycopg2
+import json
+from datetime import datetime, timedelta
+
+class ComplianceReporter:
+    def __init__(self, db_config):
+        self.db_config = db_config
+
+    def generate_gdpr_report(self, start_date, end_date):
+        """GDPR コンプライアンス レポート生成"""
+        conn = psycopg2.connect(**self.db_config)
+        cur = conn.cursor()
+
+        # データ削除要求統計
+        cur.execute("""
+            SELECT
+                status,
+                COUNT(*) as count,
+                AVG(EXTRACT(epoch FROM (processed_date - request_date))/3600) as avg_processing_hours
+            FROM data_deletion_requests
+            WHERE request_date BETWEEN %s AND %s
+            GROUP BY status
+        """, (start_date, end_date))
+
+        deletion_stats = cur.fetchall()
+
+        # データ違反インシデント
+        cur.execute("""
+            SELECT
+                incident_type,
+                COUNT(*) as incident_count,
+                SUM(affected_records) as total_affected_records
+            FROM data_breach_incidents
+            WHERE incident_date BETWEEN %s AND %s
+            GROUP BY incident_type
+        """, (start_date, end_date))
+
+        breach_stats = cur.fetchall()
+
+        # 監査ログ統計
+        cur.execute("""
+            SELECT
+                table_name,
+                operation_type,
+                COUNT(*) as operation_count
+            FROM audit_log
+            WHERE timestamp BETWEEN %s AND %s
+            AND 'gdpr' = ANY(compliance_tags)
+            GROUP BY table_name, operation_type
+            ORDER BY table_name, operation_type
+        """, (start_date, end_date))
+
+        audit_stats = cur.fetchall()
+
+        report = {
+            'report_type': 'GDPR Compliance',
+            'period': {'start': start_date.isoformat(), 'end': end_date.isoformat()},
+            'generated_at': datetime.now().isoformat(),
+            'deletion_requests': [
+                {'status': status, 'count': count, 'avg_processing_hours': hours}
+                for status, count, hours in deletion_stats
+            ],
+            'data_breaches': [
+                {'type': incident_type, 'count': count, 'affected_records': records}
+                for incident_type, count, records in breach_stats
+            ],
+            'audit_activity': [
+                {'table': table, 'operation': op, 'count': count}
+                for table, op, count in audit_stats
+            ]
+        }
+
+        conn.close()
+        return report
+
+    def check_compliance_status(self):
+        """コンプライアンス状況チェック"""
+        conn = psycopg2.connect(**self.db_config)
+        cur = conn.cursor()
+
+        issues = []
+
+        # 期限切れ削除要求チェック
+        cur.execute("""
+            SELECT COUNT(*)
+            FROM data_deletion_requests
+            WHERE status = 'pending'
+            AND request_date < CURRENT_TIMESTAMP - INTERVAL '30 days'
+        """)
+
+        overdue_deletions = cur.fetchone()[0]
+        if overdue_deletions > 0:
+            issues.append({
+                'type': 'overdue_deletion_requests',
+                'count': overdue_deletions,
+                'severity': 'high',
+                'description': 'Deletion requests pending for more than 30 days'
+            })
+
+        # 保存期間違反チェック
+        cur.execute("""
+            SELECT rp.table_name, COUNT(*) as violation_count
+            FROM retention_policies rp
+            JOIN LATERAL (
+                SELECT 1 FROM information_schema.tables t
+                WHERE t.table_name = rp.table_name
+            ) t ON true
+            WHERE rp.active = true
+            AND EXISTS (
+                SELECT 1 FROM information_schema.columns c
+                WHERE c.table_name = rp.table_name
+                AND c.column_name = 'created_at'
+            )
+            GROUP BY rp.table_name
+        """)
+
+        retention_violations = cur.fetchall()
+        for table_name, count in retention_violations:
+            if count > 0:
+                issues.append({
+                    'type': 'retention_policy_violation',
+                    'table': table_name,
+                    'count': count,
+                    'severity': 'medium',
+                    'description': f'Records exceeding retention period in {table_name}'
+                })
+
+        conn.close()
+
+        return {
+            'check_timestamp': datetime.now().isoformat(),
+            'compliant': len(issues) == 0,
+            'issues': issues
+        }
+
+# 使用例
+if __name__ == "__main__":
+    db_config = {
+        'host': 'localhost',
+        'database': 'production',
+        'user': 'compliance_user',
+        'password': 'password'
+    }
+
+    reporter = ComplianceReporter(db_config)
+
+    # 月次レポート生成
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+
+    gdpr_report = reporter.generate_gdpr_report(start_date, end_date)
+    compliance_status = reporter.check_compliance_status()
+
+    print("GDPR Report:", json.dumps(gdpr_report, indent=2))
+    print("Compliance Status:", json.dumps(compliance_status, indent=2))
+\`\`\``,
+        quiz: {
+          question: 'GDPR（EU一般データ保護規則）における「忘れられる権利」の実装で最も重要な技術的要件はどれですか？',
+          options: [
+            'データの暗号化',
+            '個人データの完全な削除と削除証跡の記録',
+            'アクセスログの詳細化',
+            'データのバックアップ頻度向上'
+          ],
+          correct: 1,
+          explanation: 'GDPRの忘れられる権利（Right to be forgotten）では、個人データを完全に削除し、その削除作業の証跡を適切に記録することが技術的に最も重要な要件です。単なる論理削除では不十分で、物理的な削除とその証明が必要です。'
+        }
+      }
+    ]
+  },
+  {
+    id: 8,
+    title: 'データベース総合演習',
+    sections: [
+      {
+        title: '分散データベースアーキテクチャ',
+        content: `分散データベースシステムの設計と実装について学習します。
+
+**分散データベースの特徴:**
+- **分散透明性**: ユーザーにとって単一のデータベースとして見える
+- **複製透明性**: データのコピーの存在を隠蔽
+- **断片化透明性**: データの分割を隠蔽
+- **位置透明性**: データの物理的位置を隠蔽
+
+**分散データベースのアーキテクチャ:**
+- **クライアント/サーバー型**: 集中管理
+- **ピアツーピア型**: 各ノードが対等
+- **マルチマスター型**: 複数の書き込み可能ノード
+
+**分散アルゴリズム:**
+- **2フェーズコミット**: 分散トランザクション制御
+- **Paxos**: 分散合意アルゴリズム
+- **Raft**: 分散レプリケーション
+- **PBFT**: ビザンチン障害耐性`,
+        quiz: {
+          question: '分散データベースにおける2フェーズコミットの主な目的は何ですか？',
+          options: [
+            'データの圧縮効率を向上させる',
+            '分散トランザクションの原子性を保証する',
+            'クエリの実行速度を向上させる',
+            'ネットワーク帯域を削減する'
+          ],
+          correct: 1,
+          explanation: '2フェーズコミット（2PC）は、分散環境において複数のノードにまたがるトランザクションの原子性（すべて成功するか、すべて失敗するか）を保証するためのプロトコルです。'
+        }
+      },
+      {
+        title: 'データベースベンチマーキング',
+        content: `データベースシステムの性能評価とベンチマーキング手法について学習します。
+
+**主要なベンチマーク:**
+- **TPC-C**: OLTP性能測定
+- **TPC-H**: OLAP性能測定
+- **TPC-E**: 株式取引システム
+- **YCSB**: NoSQLデータベース評価
+
+**性能指標:**
+- **スループット**: 単位時間あたりの処理量（TPS）
+- **レスポンス時間**: 処理完了までの時間
+- **レイテンシ**: 処理開始から完了までの遅延
+- **可用性**: システムの稼働率
+
+**負荷テスト手法:**
+- **段階的負荷増加**: 徐々に負荷を上げる
+- **ピーク負荷テスト**: 最大負荷での評価
+- **持続負荷テスト**: 長時間の安定性評価
+- **ストレステスト**: 限界を超えた負荷での評価`,
+        quiz: {
+          question: 'TPC-Cベンチマークが主に測定するデータベース性能は何ですか？',
+          options: [
+            'OLAP（分析処理）性能',
+            'OLTP（トランザクション処理）性能',
+            'バックアップ処理性能',
+            'データマイニング性能'
+          ],
+          correct: 1,
+          explanation: 'TPC-C（Transaction Processing Performance Council-C）は、OLTP（Online Transaction Processing）環境でのデータベース性能を測定する標準的なベンチマークです。'
+        }
+      },
+      {
+        title: 'データベース仮想化技術',
+        content: `データベースの仮想化技術とコンテナ化について学習します。
+
+**データベース仮想化の利点:**
+- **リソース利用効率**: ハードウェアの有効活用
+- **分離性**: 異なるデータベース間の独立性
+- **可搬性**: 環境間での移植が容易
+- **スケーラビリティ**: 動的なリソース調整
+
+**コンテナ化技術:**
+- **Docker**: 軽量なコンテナ技術
+- **Kubernetes**: コンテナオーケストレーション
+- **Persistent Volume**: 永続化ストレージ
+- **StatefulSet**: ステートフルアプリケーション管理
+
+**マイクロサービスアーキテクチャ:**
+- **Database per Service**: サービス毎のデータベース
+- **Event Sourcing**: イベントベースのデータ管理
+- **CQRS**: コマンドとクエリの分離
+- **Saga Pattern**: 分散トランザクション管理`,
+        quiz: {
+          question: 'マイクロサービスアーキテクチャにおける「Database per Service」パターンの主な利点は何ですか？',
+          options: [
+            'データの重複を完全に排除できる',
+            'サービス間の疎結合を実現できる',
+            'トランザクション管理が簡単になる',
+            'データの一貫性が自動的に保証される'
+          ],
+          correct: 1,
+          explanation: 'Database per Serviceパターンでは、各マイクロサービスが独自のデータベースを持つことで、サービス間の疎結合を実現し、独立したデプロイメントと進化を可能にします。'
+        }
+      },
+      {
+        title: 'データベースDevOps',
+        content: `データベース開発運用（DevOps）の実践について学習します。
+
+**データベースDevOpsの課題:**
+- **スキーマ変更管理**: バージョン管理と適用
+- **データマイグレーション**: 既存データの移行
+- **テスト自動化**: 品質保証の自動化
+- **継続的デプロイメント**: 安全な本番反映
+
+**ツールとプラクティス:**
+- **Flyway/Liquibase**: スキーママイグレーション
+- **Database as Code**: インフラストラクチャコード化
+- **CI/CD Pipeline**: 継続的インテグレーション
+- **Blue-Green Deployment**: ゼロダウンタイムデプロイ
+
+**品質管理:**
+- **単体テスト**: 個別機能のテスト
+- **統合テスト**: システム間連携テスト
+- **パフォーマンステスト**: 性能評価
+- **カオスエンジニアリング**: 障害耐性テスト`,
+        quiz: {
+          question: 'データベースのスキーママイグレーションツールの主な目的は何ですか？',
+          options: [
+            'データベースの性能を最適化する',
+            'スキーマ変更を安全にバージョン管理する',
+            'データのバックアップを自動化する',
+            'SQLクエリを高速化する'
+          ],
+          correct: 1,
+          explanation: 'FlywayやLiquibaseなどのスキーママイグレーションツールは、データベーススキーマの変更を安全にバージョン管理し、開発・テスト・本番環境間で一貫した適用を可能にします。'
+        }
+      },
+      {
+        title: 'エッジコンピューティングとデータベース',
+        content: `エッジコンピューティング環境でのデータベース技術について学習します。
+
+**エッジデータベースの特徴:**
+- **低レイテンシ**: 処理の高速化
+- **オフライン動作**: ネットワーク断絶時の継続動作
+- **軽量性**: リソース制約環境での動作
+- **自律性**: 中央管理なしでの動作
+
+**エッジデータベース技術:**
+- **SQLite**: 組み込みデータベース
+- **RocksDB**: 高性能キー・バリューストア
+- **LevelDB**: Google開発の軽量DB
+- **TinyDB**: Python軽量データベース
+
+**データ同期:**
+- **Event-driven Sync**: イベントベース同期
+- **Conflict Resolution**: 競合解決
+- **Eventually Consistent**: 結果整合性
+- **CRDT**: 競合フリーデータ型`,
+        quiz: {
+          question: 'エッジコンピューティング環境でのデータベースに最も重要な特性は何ですか？',
+          options: [
+            '大容量データの格納能力',
+            '複雑なJOIN処理能力',
+            '低レイテンシとオフライン動作',
+            '高度な分析機能'
+          ],
+          correct: 2,
+          explanation: 'エッジコンピューティング環境では、中央サーバーとの通信に制約があるため、低レイテンシでの処理とネットワーク断絶時のオフライン動作能力が最も重要です。'
+        }
+      },
+      {
+        title: 'データベースガバナンス',
+        content: `企業レベルでのデータベースガバナンスの実践について学習します。
+
+**データガバナンスの要素:**
+- **データ品質管理**: 正確性、完全性、一貫性
+- **データ分類**: 機密レベルの設定
+- **アクセス制御**: 適切な権限管理
+- **監査証跡**: 操作ログの記録
+
+**コンプライアンス要件:**
+- **GDPR**: EU一般データ保護規則
+- **SOX法**: 企業会計改革法
+- **PCI DSS**: カード業界セキュリティ基準
+- **HIPAA**: 医療保険の相互運用性法
+
+**データライフサイクル管理:**
+- **データ生成**: 作成時の品質確保
+- **データ利用**: 適切な利用制御
+- **データ保管**: 長期保存戦略
+- **データ廃棄**: 安全な削除**リスク管理:**
+- **データ漏洩対策**: 暗号化と監視
+- **障害対策**: BCP/DR計画
+- **変更管理**: 影響度評価とテスト
+- **インシデント対応**: 迅速な対応体制`,
+        quiz: {
+          question: 'データガバナンスにおける「データ分類」の主な目的は何ですか？',
+          options: [
+            'データの検索速度を向上させる',
+            'ストレージ容量を削減する',
+            '機密レベルに応じた適切な保護措置を適用する',
+            'データの圧縮率を向上させる'
+          ],
+          correct: 2,
+          explanation: 'データ分類は、データの機密レベルや重要度に応じて適切な保護措置（暗号化、アクセス制御、保管期間など）を適用するために行います。'
+        }
+      },
+      {
+        title: 'データベースオブザーバビリティ',
+        content: `データベースシステムの可観測性（オブザーバビリティ）について学習します。
+
+**オブザーバビリティの3本柱:**
+- **メトリクス**: 数値データによる性能指標
+- **ログ**: 詳細な操作記録
+- **トレース**: 処理の流れの追跡
+
+**監視対象:**
+- **パフォーマンス**: レスポンス時間、スループット
+- **リソース使用率**: CPU、メモリ、ディスク、ネットワーク
+- **エラー率**: 失敗したクエリの割合
+- **可用性**: システムの稼働状況
+
+**監視ツール:**
+- **Prometheus**: メトリクス収集とアラート
+- **Grafana**: 可視化ダッシュボード
+- **ELK Stack**: ログ分析基盤
+- **Jaeger**: 分散トレーシング
+
+**アラート戦略:**
+- **SLI/SLO**: サービスレベル指標/目標
+- **エラーバジェット**: 許容可能な障害レベル
+- **段階的エスカレーション**: 重要度に応じた通知
+- **ノイズ削減**: 不要なアラートの抑制`,
+        quiz: {
+          question: 'データベースオブザーバビリティの「3本柱」に含まれないものはどれですか？',
+          options: [
+            'メトリクス（指標）',
+            'ログ（記録）',
+            'バックアップ（複製）',
+            'トレース（追跡）'
+          ],
+          correct: 2,
+          explanation: 'オブザーバビリティの3本柱は、メトリクス（数値指標）、ログ（詳細記録）、トレース（処理追跡）です。バックアップは可用性の確保に重要ですが、オブザーバビリティの要素ではありません。'
+        }
+      },
+      {
+        title: 'データベースAI/ML統合',
+        content: `データベースと機械学習の統合技術について学習します。
+
+**AI/ML統合アプローチ:**
+- **In-Database ML**: データベース内でのML実行
+- **Feature Store**: 機械学習特徴量の管理
+- **Model Serving**: 学習済みモデルの配信
+- **AutoML**: 機械学習の自動化
+
+**主要なML対応データベース:**
+- **PostgreSQL**: MADlib拡張
+- **Oracle**: Oracle Machine Learning
+- **SQL Server**: ML Services
+- **BigQuery**: BigQuery ML
+
+**特徴量エンジニアリング:**
+- **データ前処理**: クリーニングと変換
+- **特徴量選択**: 重要な変数の選択
+- **次元削減**: PCA、t-SNE
+- **特徴量生成**: 新しい変数の作成
+
+**MLOps（機械学習運用）:**
+- **バージョン管理**: モデルとデータの管理
+- **A/Bテスト**: モデル性能の比較
+- **監視**: モデルドリフトの検出
+- **自動再学習**: 継続的なモデル更新`,
+        quiz: {
+          question: 'Feature Store（特徴量ストア）の主な目的は何ですか？',
+          options: [
+            'データベースの性能を向上させる',
+            '機械学習の特徴量を一元管理し再利用可能にする',
+            'SQLクエリを自動生成する',
+            'データの暗号化を強化する'
+          ],
+          correct: 1,
+          explanation: 'Feature Storeは、機械学習で使用する特徴量（特徴ベクトル）を一元的に管理し、複数のMLプロジェクト間で再利用可能にするシステムです。データの一貫性と開発効率を向上させます。'
+        }
+      },
+      {
+        title: 'グラフデータベース応用',
+        content: `グラフデータベースの高度な応用について学習します。
+
+**グラフアルゴリズム:**
+- **最短経路**: Dijkstra、A*アルゴリズム
+- **中心性**: PageRank、Betweenness Centrality
+- **コミュニティ検出**: Louvain、Label Propagation
+- **類似性**: Jaccard、Cosine Similarity
+
+**応用分野:**
+- **ソーシャルネットワーク分析**: 影響力の分析
+- **推薦システム**: 関係性ベースの推薦
+- **不正検知**: 異常なパターンの検出
+- **知識グラフ**: 知識の構造化と推論
+
+**グラフクエリ最適化:**
+- **インデックス戦略**: ノード・エッジの効率的検索
+- **パーティショニング**: グラフの分割
+- **キャッシュ戦略**: 頻繁アクセスデータの保持
+- **並列処理**: 大規模グラフの高速処理
+
+**Neo4j高度機能:**
+- **APOC**: 拡張プロシージャライブラリ
+- **Graph Data Science**: 機械学習統合
+- **Causal Clustering**: 高可用性クラスタ
+- **Bloom**: グラフ可視化ツール`,
+        quiz: {
+          question: 'グラフデータベースにおけるPageRankアルゴリズムの主な用途は何ですか？',
+          options: [
+            'グラフの最短経路を見つける',
+            'ノードの重要度や影響力を計算する',
+            'グラフのコミュニティを検出する',
+            'グラフの類似性を計算する'
+          ],
+          correct: 1,
+          explanation: 'PageRankは、グラフ内のノードの重要度や影響力を計算するアルゴリズムです。もともとGoogleの検索エンジンで使用され、現在はソーシャルネットワーク分析や推薦システムでも活用されています。'
+        }
+      },
+      {
+        title: 'ストリーミングデータベース',
+        content: `リアルタイムストリーミングデータ処理について学習します。
+
+**ストリーミング処理の特徴:**
+- **リアルタイム性**: 低遅延での処理
+- **継続性**: 終わりのないデータストリーム
+- **イベント時間**: データ生成時刻の考慮
+- **ウィンドウ処理**: 時間やイベント数による区切り
+
+**ストリーミングプラットフォーム:**
+- **Apache Kafka**: 分散ストリーミング基盤
+- **Apache Pulsar**: 次世代メッセージング
+- **Amazon Kinesis**: AWSストリーミングサービス
+- **Azure Event Hubs**: Azureストリーミングサービス
+
+**ストリーム処理エンジン:**
+- **Apache Flink**: 低遅延ストリーム処理
+- **Apache Spark Streaming**: バッチとストリームの統合
+- **Apache Storm**: リアルタイム処理
+- **ksqlDB**: SQLベースストリーム処理
+
+**ウィンドウ関数:**
+- **Tumbling Window**: 重複しない固定時間窓
+- **Sliding Window**: 重複する移動時間窓
+- **Session Window**: アクティビティベース窓
+- **Global Window**: 全データを対象とする窓`,
+        quiz: {
+          question: 'ストリーミングデータ処理における「Tumbling Window」の特徴は何ですか？',
+          options: [
+            '重複する時間窓で継続的に処理する',
+            '重複しない固定時間窓で処理する',
+            'ユーザーのアクティビティに基づいて窓を決める',
+            '全てのデータを一つの窓として処理する'
+          ],
+          correct: 1,
+          explanation: 'Tumbling Window（タンブリングウィンドウ）は、重複しない固定サイズの時間窓で、例えば1分間隔で区切られた独立した処理単位です。各ウィンドウは一度だけ処理されます。'
+        }
+      },
+      {
+        title: 'データベースパフォーマンス最適化',
+        content: `高度なデータベース性能最適化技術について学習します。
+
+**クエリ最適化高度技法:**
+- **統計情報の更新**: 正確なコスト見積もり
+- **ヒント句の活用**: オプティマイザへの指示
+- **実行計画の固定**: 安定した性能確保
+- **パラレル実行**: 並列処理による高速化
+
+**インデックス戦略:**
+- **複合インデックス**: 複数カラムの効率的検索
+- **部分インデックス**: 条件付きインデックス
+- **関数インデックス**: 計算結果のインデックス
+- **ビットマップインデックス**: 低カーディナリティ対応
+
+**ストレージ最適化:**
+- **パーティション戦略**: 水平分割による性能向上
+- **圧縮技術**: ストレージ効率化
+- **SSDとHDD**: 適材適所の配置
+- **NUMA考慮**: CPUとメモリの最適配置
+
+**メモリ管理:**
+- **バッファプール**: データページキャッシュ
+- **プランキャッシュ**: 実行計画の再利用
+- **ソート領域**: 大量データソート最適化
+- **ワーキングセット**: アクティブデータセット`,
+        quiz: {
+          question: 'データベースの「複合インデックス」で最も重要な設計原則は何ですか？',
+          options: [
+            'カラムを昇順で並べる',
+            '選択性の高いカラムを先頭に配置する',
+            '文字列カラムを最後に配置する',
+            '数値カラムのみを使用する'
+          ],
+          correct: 1,
+          explanation: '複合インデックスでは、選択性（カーディナリティ）の高いカラム、つまりより多くの異なる値を持つカラムを先頭に配置することで、検索効率を最大化できます。'
+        }
+      },
+      {
+        title: 'データベースセキュリティ高度技法',
+        content: `高度なデータベースセキュリティ技術について学習します。
+
+**高度な暗号化技術:**
+- **Transparent Data Encryption (TDE)**: 透過的データ暗号化
+- **Always Encrypted**: クライアント側暗号化
+- **Deterministic vs Randomized**: 決定的暗号化と確率的暗号化
+- **Key Management**: 暗号キーのライフサイクル管理
+
+**行レベルセキュリティ:**
+- **Virtual Private Database**: 仮想プライベートデータベース
+- **Fine-grained Access Control**: きめ細かいアクセス制御
+- **Context-aware Security**: コンテキスト対応セキュリティ
+- **Dynamic Data Masking**: 動的データマスキング
+
+**監査とコンプライアンス:**
+- **Database Activity Monitoring**: データベース活動監視
+- **Data Loss Prevention**: データ損失防止
+- **Compliance Reporting**: コンプライアンス報告
+- **Forensic Analysis**: フォレンジック分析
+
+**ゼロトラスト アーキテクチャ:**
+- **Identity-based Access**: アイデンティティベースアクセス
+- **Network Segmentation**: ネットワーク分離
+- **Continuous Verification**: 継続的検証
+- **Principle of Least Privilege**: 最小権限の原則`,
+        quiz: {
+          question: 'データベースの「Always Encrypted」技術の主な特徴は何ですか？',
+          options: [
+            'サーバー側でのみデータを暗号化する',
+            'クライアント側で暗号化し、サーバーでは暗号化されたまま処理する',
+            'ネットワーク通信のみを暗号化する',
+            'ログファイルのみを暗号化する'
+          ],
+          correct: 1,
+          explanation: 'Always Encryptedは、クライアント側でデータを暗号化し、データベースサーバー上では暗号化されたまま格納・処理される技術です。データベース管理者でも平文データにアクセスできません。'
+        }
+      },
+      {
+        title: 'データレイクとデータメッシュ',
+        content: `現代的なデータアーキテクチャについて学習します。
+
+**データレイクの概念:**
+- **スキーマオンリード**: 読み取り時にスキーマ適用
+- **多様なデータ形式**: 構造化・半構造化・非構造化
+- **スケーラブルストレージ**: オブジェクトストレージ活用
+- **メタデータ管理**: データカタログの重要性
+
+**データレイクハウス:**
+- **Delta Lake**: ACID特性をデータレイクに追加
+- **Apache Iceberg**: 大規模分析テーブル形式
+- **Apache Hudi**: 増分データ処理
+- **Lakehouse Architecture**: データレイクとDWHの融合
+
+**データメッシュアーキテクチャ:**
+- **Domain-oriented**: ドメイン指向の分散
+- **Data as a Product**: データの製品化
+- **Self-serve Platform**: セルフサービス基盤
+- **Federated Governance**: 連合ガバナンス
+
+**データ仮想化:**
+- **Logical Data Warehouse**: 論理的データウェアハウス
+- **Data Virtualization**: データソース統合
+- **Real-time Integration**: リアルタイム統合
+- **Query Federation**: クエリ連合`,
+        quiz: {
+          question: 'データメッシュアーキテクチャの基本原則に含まれないものはどれですか？',
+          options: [
+            'ドメイン指向の分散データ所有権',
+            'データの製品としての扱い',
+            '中央集権的なデータ管理',
+            'セルフサービスデータ基盤'
+          ],
+          correct: 2,
+          explanation: 'データメッシュアーキテクチャは、中央集権的な管理ではなく、ドメインごとの分散データ所有権、データの製品化、セルフサービス基盤、連合ガバナンスを基本原則とします。'
+        }
+      },
+      {
+        title: 'データベース自動化と運用',
+        content: `データベース運用の自動化技術について学習します。
+
+**自動化領域:**
+- **プロビジョニング**: 環境構築の自動化
+- **バックアップ**: 定期バックアップとリストア
+- **メンテナンス**: 統計情報更新、インデックス再構築
+- **スケーリング**: 負荷に応じた自動拡張
+
+**Infrastructure as Code:**
+- **Terraform**: インフラストラクチャ定義
+- **Ansible**: 設定管理自動化
+- **CloudFormation**: AWS専用テンプレート
+- **ARM Templates**: Azure専用テンプレート
+
+**データベース自動チューニング:**
+- **Automatic Workload Repository**: 作業負荷分析
+- **SQL Tuning Advisor**: SQL最適化支援
+- **Automatic Database Diagnostic Monitor**: 自動診断
+- **Memory Advisor**: メモリ設定最適化
+
+**運用監視自動化:**
+- **Health Checks**: 健全性自動監視
+- **Alerting**: 自動アラート生成
+- **Log Analysis**: ログ自動解析
+- **Capacity Planning**: 容量計画支援`,
+        quiz: {
+          question: 'Infrastructure as Code（IaC）をデータベース運用で使用する主な利点は何ですか？',
+          options: [
+            'データベースの処理速度が向上する',
+            'インフラストラクチャ構成の再現性と一貫性が確保される',
+            'データの圧縮率が向上する',
+            'SQLクエリが自動最適化される'
+          ],
+          correct: 1,
+          explanation: 'Infrastructure as Code（IaC）により、データベース環境の構成をコードとして管理することで、環境構築の再現性と一貫性が確保され、手作業による設定ミスを防げます。'
+        }
+      },
+      {
+        title: 'エンタープライズデータ戦略',
+        content: `企業レベルでのデータ戦略と意思決定について学習します。
+
+**データ戦略の要素:**
+- **データビジョン**: 組織のデータ活用目標
+- **データアーキテクチャ**: 技術基盤の設計
+- **データ組織**: 人材と責任体制
+- **データプロセス**: 業務プロセスの定義
+
+**データ成熟度モデル:**
+- **Initial**: 個別最適化段階
+- **Managed**: 部門レベル管理
+- **Defined**: 全社標準化
+- **Quantitatively Managed**: 定量的管理
+- **Optimizing**: 継続的最適化
+
+**データ投資対効果:**
+- **ROI計算**: 投資収益率分析
+- **TCO分析**: 総所有コスト評価
+- **Value Assessment**: 価値評価モデル
+- **Risk Analysis**: リスク分析
+
+**データドリブン文化:**
+- **データリテラシー**: データ活用能力向上
+- **Change Management**: 変革管理
+- **Training Program**: 教育プログラム
+- **Success Metrics**: 成功指標設定`,
+        quiz: {
+          question: 'データ成熟度モデルにおける「Quantitatively Managed」段階の特徴は何ですか？',
+          options: [
+            '個別部門での最適化が行われている',
+            '全社での標準化が完了している',
+            'データを定量的に測定・管理している',
+            '継続的な最適化が行われている'
+          ],
+          correct: 2,
+          explanation: 'Quantitatively Managed段階では、データの品質、利用状況、成果などを定量的に測定し、メトリクスベースでデータ管理を行う段階です。'
+        }
+      },
+      {
+        title: 'データベース災害復旧とBCP',
+        content: `データベースの災害復旧と事業継続計画について学習します。
+
+**災害復旧戦略:**
+- **Recovery Time Objective (RTO)**: 目標復旧時間
+- **Recovery Point Objective (RPO)**: 目標復旧時点
+- **Maximum Tolerable Downtime (MTD)**: 最大許容停止時間
+- **Work Recovery Time (WRT)**: 業務復旧時間
+
+**バックアップ戦略:**
+- **Full Backup**: 完全バックアップ
+- **Incremental Backup**: 増分バックアップ
+- **Differential Backup**: 差分バックアップ
+- **Continuous Data Protection**: 継続的データ保護
+
+**地理的分散:**
+- **Multi-Region Deployment**: 複数地域展開
+- **Cross-Region Replication**: 地域間レプリケーション
+- **Disaster Recovery Site**: 災害復旧サイト
+- **Cold/Warm/Hot Standby**: 待機系の種類
+
+**BCP（事業継続計画）:**
+- **Business Impact Analysis**: 事業影響度分析
+- **Risk Assessment**: リスク評価
+- **Recovery Procedures**: 復旧手順書
+- **Testing and Training**: テストと訓練`,
+        quiz: {
+          question: 'RPO（Recovery Point Objective）とRTO（Recovery Time Objective）の関係で正しいものはどれですか？',
+          options: [
+            'RPOとRTOは常に同じ値になる',
+            'RPOは許容データ損失量、RTOは許容復旧時間を表す',
+            'RPOが短いほどRTOも短くなる',
+            'RPOとRTOは相互に無関係である'
+          ],
+          correct: 1,
+          explanation: 'RPO（Recovery Point Objective）は災害発生時に許容できるデータ損失量（時間）を表し、RTO（Recovery Time Objective）は許容できる復旧時間を表します。両者は独立した指標です。'
+        }
+      },
+      {
+        title: 'データベース技術の未来展望',
+        content: `データベース技術の将来動向について学習します。
+
+**新興技術トレンド:**
+- **Quantum Databases**: 量子データベース
+- **DNA Storage**: DNA記憶装置
+- **Brain-Computer Interface**: 脳コンピュータインターフェース
+- **Neuromorphic Computing**: ニューロモーフィック計算
+
+**AI統合の進化:**
+- **Autonomous Database**: 自律データベース
+- **AI-Powered Query Optimization**: AI駆動クエリ最適化
+- **Intelligent Data Management**: インテリジェントデータ管理
+- **Predictive Maintenance**: 予測保守
+
+**エッジとIoTの拡大:**
+- **Edge-Native Databases**: エッジネイティブDB
+- **IoT Data Management**: IoTデータ管理
+- **Real-time Analytics**: リアルタイム分析
+- **5G Integration**: 5G統合
+
+**持続可能性:**
+- **Green Computing**: グリーンコンピューティング
+- **Energy-Efficient Databases**: 省エネルギーDB
+- **Carbon Footprint Reduction**: 炭素排出量削減
+- **Sustainable Data Centers**: 持続可能なデータセンター
+
+**次世代インターフェース:**
+- **Natural Language Queries**: 自然言語クエリ
+- **Voice-Activated Databases**: 音声制御DB
+- **Augmented Reality Integration**: AR統合
+- **Conversational AI**: 対話型AI`,
+        quiz: {
+          question: '「Autonomous Database」の最も重要な特徴は何ですか？',
+          options: [
+            'データを自動的に削除する',
+            'AIによる自動管理・最適化・セキュリティ確保',
+            'クラウドでのみ動作する',
+            'SQLを使用しない'
+          ],
+          correct: 1,
+          explanation: 'Autonomous Database（自律データベース）は、AI技術を活用してデータベースの管理、最適化、セキュリティ確保を自動的に行う次世代データベースシステムです。人的介入を最小限に抑えます。'
+        }
+      },
+      {
+        title: '総合演習：データベース設計実践',
+        content: `実際のビジネス要件に基づくデータベース設計の総合演習です。
+
+**要件分析プロセス:**
+- **ビジネス要件定義**: 業務要求の明確化
+- **機能要件定義**: システム機能の特定
+- **非機能要件定義**: 性能・可用性・セキュリティ
+- **制約条件整理**: 技術的・予算的制約
+
+**設計プロセス:**
+- **概念設計**: ERモデル作成
+- **論理設計**: 正規化とリレーション定義
+- **物理設計**: インデックス・パーティション設計
+- **実装設計**: DDL・DML作成
+
+**設計検証:**
+- **設計レビュー**: 複数の視点での検証
+- **プロトタイピング**: 概念実証
+- **性能検証**: 負荷テスト
+- **セキュリティ監査**: 脆弱性評価
+
+**実装後評価:**
+- **性能監視**: 継続的パフォーマンス監視
+- **利用状況分析**: 実際の使用パターン分析
+- **改善提案**: 最適化機会の特定
+- **進化計画**: 将来拡張の計画`,
+        quiz: {
+          question: 'データベース設計における概念設計フェーズの主な成果物は何ですか？',
+          options: [
+            'DDL（Data Definition Language）スクリプト',
+            'ER（Entity-Relationship）モデル',
+            'インデックス設計書',
+            'パフォーマンステスト結果'
+          ],
+          correct: 1,
+          explanation: '概念設計フェーズでは、ビジネス要件を分析してエンティティとその関係を明確にし、ER（Entity-Relationship）モデルを作成します。これが論理設計・物理設計の基盤となります。'
+        }
+      },
+      {
+        title: '最終総括：データベース技術者の道',
+        content: `データベース技術者としてのキャリア形成について学習します。
+
+**技術スキルの発展:**
+- **基礎技術習得**: SQL、データモデリング
+- **専門分野特化**: OLTP、OLAP、NoSQL、クラウド
+- **新技術対応**: AI/ML、エッジ、量子技術
+- **アーキテクチャ設計**: システム全体設計能力
+
+**ビジネススキル:**
+- **要件定義**: ビジネス要求の理解
+- **プロジェクト管理**: 計画・実行・監視
+- **コミュニケーション**: ステークホルダーとの対話
+- **コスト意識**: ROI・TCO分析能力
+
+**継続学習:**
+- **技術トレンド追跡**: 最新技術情報収集
+- **実践経験蓄積**: プロジェクト経験
+- **コミュニティ参加**: 技術者ネットワーク
+- **認定資格取得**: 専門性の証明
+
+**キャリアパス:**
+- **データベース管理者**: 運用・保守専門
+- **データアーキテクト**: 設計・戦略専門
+- **データサイエンティスト**: 分析・洞察専門
+- **CTOやテクニカルリーダー**: 技術責任者
+
+**社会への貢献:**
+- **デジタル変革支援**: DX推進
+- **データ活用促進**: ビジネス価値創出
+- **技術標準化**: 業界標準貢献
+- **次世代育成**: 技術者教育`,
+        quiz: {
+          question: 'データベース技術者として最も重要な継続学習の要素は何ですか？',
+          options: [
+            '最新の製品機能のみを学習する',
+            '特定のベンダー技術に特化する',
+            '基礎理論と新技術動向の両方をバランス良く学習する',
+            '認定資格のみに集中する'
+          ],
+          correct: 2,
+          explanation: 'データベース技術者には、不変の基礎理論（リレーショナル理論、トランザクション理論など）の深い理解と、AI、クラウド、エッジなどの新技術動向への対応の両方が重要です。バランスの取れた継続学習が成功の鍵となります。'
+        }
+      },
+      {
+        title: 'データベースアーキテクチャ設計演習',
+        content: `実践的なデータベースアーキテクチャ設計の総合演習です。
+
+**設計要求分析:**
+- **スケーラビリティ要件**: 将来の成長に対応
+- **可用性要件**: ダウンタイム許容度
+- **性能要件**: レスポンス時間とスループット
+- **セキュリティ要件**: データ保護レベル
+
+**アーキテクチャパターン:**
+- **単一データベース**: シンプルな構成
+- **マスター・スレーブ**: 読み取り性能向上
+- **シャーディング**: 水平分散
+- **マイクロサービス**: サービス分離
+
+**技術選択:**
+- **RDBMS vs NoSQL**: 用途に応じた選択
+- **オンプレミス vs クラウド**: 運用モデル
+- **同期 vs 非同期**: 整合性とパフォーマンス
+- **リアルタイム vs バッチ**: 処理方式
+
+**設計文書化:**
+- **システム構成図**: 全体アーキテクチャ
+- **データフロー図**: データの流れ
+- **ER図**: データモデル
+- **非機能要件仕様**: 性能・可用性・セキュリティ`,
+        quiz: {
+          question: 'データベースアーキテクチャ設計で最初に決定すべき最も重要な要素は何ですか？',
+          options: [
+            '使用するデータベース製品',
+            '非機能要件（性能・可用性・拡張性）',
+            'ハードウェアの仕様',
+            'プログラミング言語'
+          ],
+          correct: 1,
+          explanation: 'データベースアーキテクチャ設計では、まず非機能要件（性能、可用性、拡張性、セキュリティなど）を明確にすることが最重要です。これらがアーキテクチャ選択の基準となります。'
+        }
+      },
+      {
+        title: 'データベース技術総合まとめ',
+        content: `データベース技術の総合的な理解を深めるまとめです。
+
+**技術の進化:**
+- **1970年代**: リレーショナルモデルの提唱
+- **1980-1990年代**: 商用RDBMSの普及
+- **2000年代**: オープンソース化、Web対応
+- **2010年代**: NoSQL、ビッグデータ、クラウド
+- **2020年代**: AI統合、自律型、エッジ対応
+
+**現在の主要技術:**
+- **リレーショナルDB**: 確立された信頼性
+- **NoSQLデータベース**: 特定用途への最適化
+- **NewSQL**: RDBMSの進化形
+- **クラウドデータベース**: 運用の簡素化
+
+**将来展望:**
+- **AI統合**: 自動最適化、自然言語インターフェース
+- **量子技術**: 暗号化とコンピューティング
+- **エッジコンピューティング**: 分散処理の拡大
+- **持続可能性**: 省エネルギー技術
+
+**学習継続のポイント:**
+- **基礎理論の習得**: 普遍的な原理の理解
+- **実践経験の蓄積**: プロジェクトでの実装
+- **新技術への対応**: 継続的な学習
+- **コミュニティ参加**: 知識の共有と拡大`,
+        quiz: {
+          question: 'データベース技術者として今後最も重要になる能力は何ですか？',
+          options: [
+            '特定のデータベース製品の深い知識',
+            '基礎理論の理解と新技術への適応力',
+            'プログラミングスキルのみ',
+            '運用ツールの操作技能'
+          ],
+          correct: 1,
+          explanation: 'データベース技術者には、変わらない基礎理論（正規化、ACID特性、トランザクション理論など）の深い理解と、AI、クラウド、エッジなど急速に進化する新技術への適応力の両方が重要です。'
+        }
       }
     ]
   }
