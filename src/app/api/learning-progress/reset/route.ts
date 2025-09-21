@@ -94,16 +94,6 @@ export async function GET(request: NextRequest) {
       const progress = data || [];
 
       // 実際のクイズ数を使用（回答済みの問題数ではなく）
-      const actualQuizCounts = {
-        'computer-systems': 105,
-        'algorithms-programming': 0, // 未実装
-        'database': 21,
-        'network': 26,
-        'security': 26,
-        'management-legal': 11,
-        'strategy': 11,
-        'system-development': 11
-      };
 
       const totalQuestions = 105 + 0 + 21 + 26 + 26 + 11 + 11 + 11; // 211問
       const completedQuestions = progress.filter(p => p.is_completed).length;
