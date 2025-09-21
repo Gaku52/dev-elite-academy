@@ -375,7 +375,24 @@ export default function LearningStatsPage() {
             <div className="space-y-4">
               {modules.map((module) => {
                 const moduleStats = stats?.moduleStats?.[module.key];
-                const progress = moduleStats ? Math.round((moduleStats.completed / Math.max(moduleStats.total, 1)) * 100) : 0;
+                const total = moduleStats?.total || 0;
+                const completed = moduleStats?.completed || 0;
+
+                // total=0の場合は未実装として特別処理
+                let progress: number;
+                let displayText: string;
+                let progressBarWidth: number;
+
+                if (total === 0) {
+                  progress = 0;
+                  displayText = `${completed} / ${total} (未実装)`;
+                  progressBarWidth = 0;
+                } else {
+                  progress = Math.round((completed / total) * 100);
+                  displayText = `${completed} / ${total} (${progress}%)`;
+                  progressBarWidth = Math.min(progress, 100); // 100%を超えないように制限
+                }
+
                 const Icon = module.icon;
 
                 return (
@@ -387,13 +404,13 @@ export default function LearningStatsPage() {
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-medium text-gray-900">{module.name}</span>
                         <span className="text-sm text-gray-600">
-                          {moduleStats?.completed || 0} / {moduleStats?.total || 0} ({progress}%)
+                          {displayText}
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
                           className={`${module.color} h-2 rounded-full transition-all duration-300`}
-                          style={{ width: `${progress}%` }}
+                          style={{ width: `${progressBarWidth}%` }}
                         />
                       </div>
                     </div>
