@@ -16,7 +16,7 @@ const moduleQuizCounts: Record<string, number> = {
   'security': 100,                // 実装済み - 100クイズ（拡張済み）
   'system-development': 120,      // 実装済み - 120クイズ（拡張済み）
   'management-legal': 100,        // 実装済み - 100クイズ（拡張済み）
-  'strategy': 100                 // 実装済み - 100クイズ（拡張済み）
+  'strategy': 96                  // 実装済み - 96クイズ（拡張済み）
 };
 
 const fundamentalTopics = [
