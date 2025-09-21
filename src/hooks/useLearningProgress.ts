@@ -31,6 +31,8 @@ export function useLearningProgress(moduleName?: string) {
   const [stats, setStats] = useState<LearningStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
+  const [totalSessionTime, setTotalSessionTime] = useState<number>(0);
 
   // 現在のユーザーIDを取得
   const getCurrentUserId = useCallback(async () => {
@@ -123,6 +125,19 @@ export function useLearningProgress(moduleName?: string) {
     loadData();
   }, [fetchProgress, fetchStats, getCurrentUserId, moduleName]);
 
+  // セッション時間をリセット
+  const resetSessionTime = useCallback(() => {
+    setSessionStartTime(Date.now());
+    setTotalSessionTime(0);
+  }, []);
+
+  // 現在のセッション時間を取得（分）
+  const getCurrentSessionMinutes = useCallback(() => {
+    const currentTime = Date.now();
+    const sessionTimeMs = currentTime - sessionStartTime + totalSessionTime;
+    return Math.max(1, Math.round(sessionTimeMs / 60000)); // 最低1分
+  }, [sessionStartTime, totalSessionTime]);
+
   // 進捗を保存
   const saveProgress = useCallback(async (
     sectionKey: string,
@@ -184,12 +199,41 @@ export function useLearningProgress(moduleName?: string) {
       // 統計情報を更新
       await fetchStats(userId);
 
+      // 日次統計の記録
+      try {
+        const sessionMinutes = getCurrentSessionMinutes();
+        console.log('📊 Recording daily progress...', { sessionMinutes });
+        const dailyResponse = await fetch('/api/learning-analytics/daily-progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            moduleName,
+            questionsAttempted: 1,
+            questionsCorrect: isCorrect ? 1 : 0,
+            timeSpentMinutes: sessionMinutes,
+            sectionsCompleted: isCompleted ? 1 : 0
+          }),
+        });
+
+        if (dailyResponse.ok) {
+          console.log('✅ Daily progress recorded successfully');
+        } else {
+          console.warn('⚠️ Failed to record daily progress:', dailyResponse.status);
+        }
+      } catch (dailyErr) {
+        console.warn('⚠️ Daily progress recording failed:', dailyErr);
+        // 日次統計の失敗は致命的エラーにしない
+      }
+
       return data.progress;
     } catch (err) {
       console.error('Error saving progress:', err);
       throw err;
     }
-  }, [getCurrentUserId, moduleName, fetchStats]);
+  }, [getCurrentUserId, moduleName, fetchStats, getCurrentSessionMinutes]);
 
   // 進捗をリセット
   const resetProgress = useCallback(async (targetModule?: string) => {
@@ -255,6 +299,8 @@ export function useLearningProgress(moduleName?: string) {
     resetProgress,
     getSectionProgress,
     isSectionCompleted,
+    resetSessionTime,
+    getCurrentSessionMinutes,
     refetch: () => {
       const refetch = async () => {
         const userId = await getCurrentUserId();
