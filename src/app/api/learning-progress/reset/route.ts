@@ -226,7 +226,7 @@ export async function GET(request: NextRequest) {
     if (action === 'cycles') {
       // 周回別統計を取得（テーブルが存在しない場合のフォールバック付き）
       let cycleStats = [];
-      let cycleError = null;
+      let cycleError: { message: string } | null = null;
 
       try {
         const { data, error } = await supabase
@@ -237,14 +237,16 @@ export async function GET(request: NextRequest) {
 
         cycleStats = data || [];
         cycleError = error;
-      } catch (error: any) {
+      } catch (error: unknown) {
         // cycle_statisticsテーブル/ビューが存在しない場合
-        if (error.message?.includes('cycle_statistics') || error.code === 'PGRST106') {
+        const errorMessage = error instanceof Error ? error.message : '';
+        const errorCode = (error as { code?: string })?.code;
+        if (errorMessage.includes('cycle_statistics') || errorCode === 'PGRST106') {
           console.warn('cycle_statistics view not found. Migration 005_fix_cycle_support.sql needs to be executed.');
           cycleStats = [];
           cycleError = null;
         } else {
-          cycleError = error;
+          cycleError = error as { message: string };
         }
       }
 
@@ -259,7 +261,7 @@ export async function GET(request: NextRequest) {
 
       // 現在の最大周回数を取得（cycle_numberカラムが存在しない場合のフォールバック付き）
       let currentCycle = 1;
-      let maxCycleError = null;
+      let maxCycleError: { message: string } | null = null;
 
       try {
         const { data: maxCycleData, error } = await supabase
@@ -270,18 +272,20 @@ export async function GET(request: NextRequest) {
           .limit(1);
 
         if (error) {
-          maxCycleError = error;
+          maxCycleError = error as { message: string };
         } else {
           currentCycle = maxCycleData?.[0]?.cycle_number || 1;
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         // cycle_numberカラムが存在しない場合
-        if (error.message?.includes('cycle_number') || error.code === 'PGRST103') {
+        const errorMessage = error instanceof Error ? error.message : '';
+        const errorCode = (error as { code?: string })?.code;
+        if (errorMessage.includes('cycle_number') || errorCode === 'PGRST103') {
           console.warn('cycle_number column not found. Migration 005_fix_cycle_support.sql needs to be executed.');
           currentCycle = 1;
           maxCycleError = null;
         } else {
-          maxCycleError = error;
+          maxCycleError = error as { message: string };
         }
       }
 
