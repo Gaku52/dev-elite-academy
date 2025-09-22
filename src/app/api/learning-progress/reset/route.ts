@@ -224,32 +224,76 @@ export async function GET(request: NextRequest) {
     }
 
     if (action === 'cycles') {
-      // 周回別統計を取得
-      const { data: cycleStats, error: cycleError } = await supabase
-        .from('cycle_statistics')
-        .select('*')
-        .eq('user_id', userId)
-        .order('cycle_number', { ascending: true });
+      // 周回別統計を取得（テーブルが存在しない場合のフォールバック付き）
+      let cycleStats = [];
+      let cycleError = null;
+
+      try {
+        const { data, error } = await supabase
+          .from('cycle_statistics')
+          .select('*')
+          .eq('user_id', userId)
+          .order('cycle_number', { ascending: true });
+
+        cycleStats = data || [];
+        cycleError = error;
+      } catch (error: any) {
+        // cycle_statisticsテーブル/ビューが存在しない場合
+        if (error.message?.includes('cycle_statistics') || error.code === 'PGRST106') {
+          console.warn('cycle_statistics view not found. Migration 005_fix_cycle_support.sql needs to be executed.');
+          cycleStats = [];
+          cycleError = null;
+        } else {
+          cycleError = error;
+        }
+      }
 
       if (cycleError) {
         console.error('Cycle stats error:', cycleError);
-        return NextResponse.json({ error: cycleError.message }, { status: 500 });
+        return NextResponse.json({
+          error: cycleError.message,
+          migrationRequired: true,
+          migrationFile: '005_fix_cycle_support.sql'
+        }, { status: 500 });
       }
 
-      // 現在の最大周回数を取得
-      const { data: maxCycleData, error: maxCycleError } = await supabase
-        .from('user_learning_progress')
-        .select('cycle_number')
-        .eq('user_id', userId)
-        .order('cycle_number', { ascending: false })
-        .limit(1);
+      // 現在の最大周回数を取得（cycle_numberカラムが存在しない場合のフォールバック付き）
+      let currentCycle = 1;
+      let maxCycleError = null;
+
+      try {
+        const { data: maxCycleData, error } = await supabase
+          .from('user_learning_progress')
+          .select('cycle_number')
+          .eq('user_id', userId)
+          .order('cycle_number', { ascending: false })
+          .limit(1);
+
+        if (error) {
+          maxCycleError = error;
+        } else {
+          currentCycle = maxCycleData?.[0]?.cycle_number || 1;
+        }
+      } catch (error: any) {
+        // cycle_numberカラムが存在しない場合
+        if (error.message?.includes('cycle_number') || error.code === 'PGRST103') {
+          console.warn('cycle_number column not found. Migration 005_fix_cycle_support.sql needs to be executed.');
+          currentCycle = 1;
+          maxCycleError = null;
+        } else {
+          maxCycleError = error;
+        }
+      }
 
       if (maxCycleError) {
         console.error('Max cycle error:', maxCycleError);
-        return NextResponse.json({ error: maxCycleError.message }, { status: 500 });
+        return NextResponse.json({
+          error: maxCycleError.message,
+          migrationRequired: true,
+          migrationFile: '005_fix_cycle_support.sql'
+        }, { status: 500 });
       }
 
-      const currentCycle = maxCycleData?.[0]?.cycle_number || 1;
       const nextCycle = currentCycle + 1;
 
       return NextResponse.json({
