@@ -41,7 +41,11 @@ export default function CycleStatistics({ userId, moduleName }: CycleStatisticsP
 
       const response = await fetch(`/api/learning-progress/reset?${params}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch cycle statistics');
+        const errorData = await response.json();
+        if (errorData.migrationRequired) {
+          throw new Error(`Migration required: ${errorData.migrationFile}\n\nPlease execute the migration SQL in Supabase Dashboard.`);
+        }
+        throw new Error(errorData.error || 'Failed to fetch cycle statistics');
       }
 
       const data = await response.json();
@@ -105,9 +109,43 @@ export default function CycleStatistics({ userId, moduleName }: CycleStatisticsP
   }
 
   if (error) {
+    const isMigrationError = error.includes('Migration required');
+
     return (
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <p className="text-red-600 text-center">エラー: {error}</p>
+        <div className="text-center">
+          <div className="mb-4">
+            {isMigrationError ? (
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                  🔧 データベース設定が必要です
+                </h3>
+                <p className="text-yellow-700 mb-4">
+                  周回記録システムを使用するには、データベースマイグレーションの実行が必要です。
+                </p>
+                <div className="bg-yellow-100 rounded p-3 mb-4">
+                  <h4 className="font-semibold text-yellow-800 mb-2">実行手順:</h4>
+                  <ol className="text-left text-yellow-700 text-sm space-y-1">
+                    <li>1. Supabase Dashboard にログイン</li>
+                    <li>2. SQL Editor を開く</li>
+                    <li>3. <code className="bg-yellow-200 px-1 rounded">005_fix_cycle_support.sql</code> を実行</li>
+                  </ol>
+                </div>
+                <p className="text-yellow-600 text-sm">
+                  実行後、この画面を再読み込みしてください。
+                </p>
+              </div>
+            ) : (
+              <p className="text-red-600">エラー: {error}</p>
+            )}
+          </div>
+          <button
+            onClick={fetchCycleStats}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            再試行
+          </button>
+        </div>
       </div>
     );
   }
