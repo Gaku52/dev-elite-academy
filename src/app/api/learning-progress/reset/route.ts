@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
 
       // 実際のクイズ数を使用（回答済みの問題数ではなく）
 
-      const totalQuestions = 105 + 88 + 21 + 26 + 26 + 11 + 11 + 11; // 299問
+      const totalQuestions = 105 + 89 + 80 + 100 + 100 + 120 + 100 + 96; // 790問
       const completedQuestions = progress.filter(p => p.is_completed).length;
       const correctAnswers = progress.reduce((sum, p) => sum + p.correct_count, 0);
       const totalAnswers = progress.reduce((sum, p) => sum + p.answer_count, 0);
@@ -108,31 +108,31 @@ export async function GET(request: NextRequest) {
           completed: progress.filter(p => p.module_name === 'computer-systems' && p.is_completed).length
         },
         'algorithms-programming': {
-          total: 88,
+          total: 89,
           completed: progress.filter(p => p.module_name === 'algorithms-programming' && p.is_completed).length
         },
         'database': {
-          total: 21,
+          total: 80,
           completed: progress.filter(p => p.module_name === 'database' && p.is_completed).length
         },
         'network': {
-          total: 26,
+          total: 100,
           completed: progress.filter(p => p.module_name === 'network' && p.is_completed).length
         },
         'security': {
-          total: 26,
+          total: 100,
           completed: progress.filter(p => p.module_name === 'security' && p.is_completed).length
         },
         'system-development': {
-          total: 11,
+          total: 120,
           completed: progress.filter(p => p.module_name === 'system-development' && p.is_completed).length
         },
         'management-legal': {
-          total: 11,
+          total: 100,
           completed: progress.filter(p => p.module_name === 'management-legal' && p.is_completed).length
         },
         'strategy': {
-          total: 11,
+          total: 96,
           completed: progress.filter(p => p.module_name === 'strategy' && p.is_completed).length
         }
       };
