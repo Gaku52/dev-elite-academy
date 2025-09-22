@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase';
 import DailyProgressChart from '@/components/analytics/DailyProgressChart';
 import LearningStreakCard from '@/components/analytics/LearningStreakCard';
 import LearningHeatmap from '@/components/analytics/LearningHeatmap';
+import ResetConfirmationDialog from '@/components/ResetConfirmationDialog';
+import CycleStatistics from '@/components/CycleStatistics';
 
 interface LearningStats {
   totalQuestions: number;
@@ -90,6 +92,27 @@ export default function LearningStatsPage() {
   const [stats, setStats] = useState<LearningStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [cycleData, setCycleData] = useState<{
+    currentCycle: number;
+    nextCycle: number;
+    cycleStats: {
+      cycle_number: number;
+      total_questions: number;
+      completed_questions: number;
+      correct_questions: number;
+      completion_rate: number;
+      cycle_start_date: string;
+      cycle_last_update: string;
+    }[];
+    resetPreview: {
+      preservedData: string[];
+      resetData: string[];
+      benefits: string[];
+    };
+  } | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'cycles'>('overview');
   interface DailyProgressData {
     date: string;
     totalQuestions: number;
@@ -166,39 +189,67 @@ export default function LearningStatsPage() {
     }
   };
 
-  const resetAllProgress = async () => {
-    if (!window.confirm('すべての学習進捗をリセットしますか？この操作は元に戻せません。')) {
-      return;
-    }
-
+  const fetchCycleData = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const params = new URLSearchParams({
+        userId: user.id,
+        action: 'cycles'
+      });
+
+      const response = await fetch(`/api/learning-progress/reset?${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCycleData(data);
+      }
+    } catch (err) {
+      console.error('Error fetching cycle data:', err);
+    }
+  };
+
+  const handleResetProgress = async (resetType: 'safe' | 'complete') => {
+    try {
+      setResetLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         alert('ログインが必要です');
         return;
       }
 
-      const url = new URL('/api/learning-progress/reset', window.location.origin);
-      url.searchParams.set('userId', user.id);
-
-      const response = await fetch(url.toString(), {
-        method: 'DELETE',
+      const response = await fetch('/api/learning-progress/reset', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          resetType
+        }),
       });
 
       if (!response.ok) {
         throw new Error(`Failed to reset progress: ${response.status}`);
       }
 
-      alert('すべての進捗をリセットしました');
-      fetchStats(); // 統計を再取得
+      const result = await response.json();
+      alert(result.message);
+
+      // データを再取得
+      await fetchStats();
+      await fetchCycleData();
     } catch (error) {
       console.error('Failed to reset progress:', error);
       alert('進捗のリセットに失敗しました');
+    } finally {
+      setResetLoading(false);
     }
   };
 
   useEffect(() => {
     fetchStats();
+    fetchCycleData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange]);
 
@@ -252,16 +303,43 @@ export default function LearningStatsPage() {
               </div>
             </div>
             <button
-              onClick={resetAllProgress}
+              onClick={() => setShowResetDialog(true)}
               className="flex items-center px-4 py-2 text-red-600 hover:text-red-800 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              全進捗リセット
+              進捗リセット
             </button>
           </div>
 
-          {/* ストリーク情報 */}
-          {streakData && <LearningStreakCard streakData={streakData} />}
+          {/* タブナビゲーション */}
+          <div className="flex space-x-1 mb-6">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                activeTab === 'overview'
+                  ? 'bg-blue-500 text-white'
+                  : 'text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              概要統計
+            </button>
+            <button
+              onClick={() => setActiveTab('cycles')}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                activeTab === 'cycles'
+                  ? 'bg-blue-500 text-white'
+                  : 'text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              周回別統計
+            </button>
+          </div>
+
+          {/* タブコンテンツ */}
+          {activeTab === 'overview' && (
+            <>
+              {/* ストリーク情報 */}
+              {streakData && <LearningStreakCard streakData={streakData} />}
 
           {/* 期間選択とチャートタイプ選択 */}
           <div className="flex flex-wrap gap-4 my-6">
@@ -465,7 +543,36 @@ export default function LearningStatsPage() {
               </div>
             </div>
           </div>
+            </>
+          )}
+
+          {/* 周回別統計タブ */}
+          {activeTab === 'cycles' && (
+            <div className="mt-6">
+              <CycleStatistics
+                userId="" // ユーザーIDはコンポーネント内で取得
+              />
+            </div>
+          )}
         </div>
+
+        {/* リセット確認ダイアログ */}
+        {showResetDialog && cycleData && (
+          <ResetConfirmationDialog
+            isOpen={showResetDialog}
+            onClose={() => setShowResetDialog(false)}
+            onConfirm={handleResetProgress}
+            currentCycle={cycleData.currentCycle || 1}
+            nextCycle={cycleData.nextCycle || 2}
+            cycleStats={cycleData.cycleStats || []}
+            resetPreview={cycleData.resetPreview || {
+              preservedData: [],
+              resetData: [],
+              benefits: []
+            }}
+            isLoading={resetLoading}
+          />
+        )}
       </div>
     </div>
   );
