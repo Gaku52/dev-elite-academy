@@ -549,9 +549,7 @@ export default function LearningStatsPage() {
           {/* 周回別統計タブ */}
           {activeTab === 'cycles' && (
             <div className="mt-6">
-              <CycleStatistics
-                userId="" // ユーザーIDはコンポーネント内で取得
-              />
+              <CycleStatistics />
             </div>
           )}
         </div>
