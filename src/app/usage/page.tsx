@@ -51,8 +51,12 @@ async function getUsageStats() {
     let learningSessionsCount = 0;
     let userLearningProgressCount = 0;
     let dailyProgressCount = 0;
+    let dailyLearningProgressCount = 0;
+    let learningStreaksCount = 0;
+    let profilesCount = 0;
     let authUsersCount = 0;
 
+    // 旧進捗システム
     try {
       const [userProgressResult, sectionProgressResult, learningSessionsResult] = await Promise.all([
         supabaseAdmin.from('user_progress').select('*', { count: 'exact' }),
@@ -67,7 +71,7 @@ async function getUsageStats() {
       console.log('Original progress tables not found:', error);
     }
 
-    // 新しい進捗追跡テーブルの情報取得
+    // 新進捗システム
     try {
       const [userLearningResult, dailyProgressResult] = await Promise.all([
         supabaseAdmin.from('user_learning_progress').select('*', { count: 'exact' }),
@@ -78,6 +82,27 @@ async function getUsageStats() {
       dailyProgressCount = dailyProgressResult.count || 0;
     } catch (error) {
       console.log('New learning progress tables not found:', error);
+    }
+
+    // 分析・エンゲージメントテーブル
+    try {
+      const [dailyLearningResult, streaksResult] = await Promise.all([
+        supabaseAdmin.from('daily_learning_progress').select('*', { count: 'exact' }),
+        supabaseAdmin.from('learning_streaks').select('*', { count: 'exact' })
+      ]);
+
+      dailyLearningProgressCount = dailyLearningResult.count || 0;
+      learningStreaksCount = streaksResult.count || 0;
+    } catch (error) {
+      console.log('Analytics tables not found:', error);
+    }
+
+    // ユーザー関連テーブル
+    try {
+      const profilesResult = await supabaseAdmin.from('profiles').select('*', { count: 'exact' });
+      profilesCount = profilesResult.count || 0;
+    } catch (error) {
+      console.log('Profiles table not found:', error);
     }
 
     // 3. 認証ユーザー数取得
@@ -105,18 +130,24 @@ async function getUsageStats() {
       learningSessionsCount +
       userLearningProgressCount +
       dailyProgressCount +
+      dailyLearningProgressCount +
+      learningStreaksCount +
+      profilesCount +
       authUsersCount;
 
     // より現実的なサイズ推定（テーブル構造とインデックスを考慮）
     const baseTableSize = {
-      categories: (categoriesResult.count || 0) * 0.5,      // 0.5KB per record
-      learning_contents: (contentsResult.count || 0) * 2.0, // 2KB per record (larger content)
-      user_progress: userProgressCount * 0.3,               // 0.3KB per record
-      section_progress: sectionProgressCount * 0.2,         // 0.2KB per record
-      learning_sessions: learningSessionsCount * 0.2,       // 0.2KB per record
-      user_learning_progress: userLearningProgressCount * 0.4, // 0.4KB per record
-      daily_progress: dailyProgressCount * 0.3,             // 0.3KB per record
-      auth_users: authUsersCount * 0.8                      // 0.8KB per record
+      categories: (categoriesResult.count || 0) * 0.5,           // 0.5KB per record
+      learning_contents: (contentsResult.count || 0) * 2.0,      // 2KB per record (larger content)
+      user_progress: userProgressCount * 0.3,                    // 0.3KB per record
+      section_progress: sectionProgressCount * 0.2,              // 0.2KB per record
+      learning_sessions: learningSessionsCount * 0.2,            // 0.2KB per record
+      user_learning_progress: userLearningProgressCount * 0.4,   // 0.4KB per record
+      daily_progress: dailyProgressCount * 0.3,                  // 0.3KB per record
+      daily_learning_progress: dailyLearningProgressCount * 0.35,// 0.35KB per record
+      learning_streaks: learningStreaksCount * 0.25,             // 0.25KB per record
+      profiles: profilesCount * 0.6,                             // 0.6KB per record
+      auth_users: authUsersCount * 0.8                           // 0.8KB per record
     };
 
     const estimatedDbSizeMB = Math.max(
@@ -124,9 +155,12 @@ async function getUsageStats() {
       Object.values(baseTableSize).reduce((sum, size) => sum + size, 0) / 1024 // Convert to MB
     );
 
-    // 5. 月間推定活動量（仮想データ - 実際のメトリクスが利用可能になるまで）
-    const estimatedMonthlyRequests = Math.min(50000, Math.max(100, totalRecords * 10));
-    const estimatedMonthlyBandwidthGB = Math.min(5, Math.max(0.01, estimatedDbSizeMB * 0.1));
+    // 5. 月間推定活動量（より正確な計算）
+    // アクティブテーブル数に基づく推定
+    const activeTablesCount = 11; // 実際に使用中のテーブル数
+    const averageRequestsPerTable = totalRecords > 0 ? Math.ceil(totalRecords / activeTablesCount) * 50 : 100;
+    const estimatedMonthlyRequests = Math.min(50000, Math.max(100, averageRequestsPerTable));
+    const estimatedMonthlyBandwidthGB = Math.min(5, Math.max(0.01, estimatedDbSizeMB * 0.15));
 
     return {
       // 基本テーブル
@@ -139,6 +173,9 @@ async function getUsageStats() {
       learning_sessions_count: learningSessionsCount,
       user_learning_progress_count: userLearningProgressCount,
       daily_progress_count: dailyProgressCount,
+      daily_learning_progress_count: dailyLearningProgressCount,
+      learning_streaks_count: learningStreaksCount,
+      profiles_count: profilesCount,
       
       // 認証
       auth_users_count: authUsersCount,
@@ -153,7 +190,9 @@ async function getUsageStats() {
       
       // メタデータ
       last_updated: new Date().toISOString(),
-      detailed_size_breakdown: baseTableSize
+      detailed_size_breakdown: baseTableSize,
+      active_tables_count: 11,
+      monitored_tables_count: Object.keys(baseTableSize).length
     };
   } catch (error) {
     console.error('Usage stats fetch error:', error);
@@ -252,10 +291,26 @@ export default async function UsagePage() {
     {
       name: '日次統計レコード',
       icon: <Activity className="w-6 h-6" />,
-      current: usageStats?.daily_progress_count || 0,
+      current: (usageStats?.daily_progress_count || 0) + (usageStats?.daily_learning_progress_count || 0),
       limit: 10000, // 推定値
       unit: '件',
-      description: '日次学習統計データ'
+      description: '日次学習統計データ（全テーブル合計）'
+    },
+    {
+      name: '学習ストリーク',
+      icon: <TrendingUp className="w-6 h-6" />,
+      current: usageStats?.learning_streaks_count || 0,
+      limit: 5000, // 推定値
+      unit: '件',
+      description: '連続学習日数の追跡データ'
+    },
+    {
+      name: 'プロファイルデータ',
+      icon: <Server className="w-6 h-6" />,
+      current: usageStats?.profiles_count || 0,
+      limit: 50000, // 推定値
+      unit: '件',
+      description: 'ユーザープロファイル拡張データ'
     }
   ];
 
@@ -276,10 +331,36 @@ export default async function UsagePage() {
           </p>
         </div>
 
+        {/* 監視状況サマリー */}
+        <div className="card-modern p-6 mb-8 bg-green-50 border-green-200">
+          <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
+            <CheckCircle className="w-6 h-6 mr-2 text-green-500" />
+            データベース監視状況
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+            <div>
+              <p className="text-green-700">監視中テーブル</p>
+              <p className="text-black font-mono">{usageStats?.monitored_tables_count || 0} / {usageStats?.active_tables_count || 11}</p>
+            </div>
+            <div>
+              <p className="text-green-700">総レコード数</p>
+              <p className="text-black font-mono">{usageStats?.total_records?.toLocaleString() || 0}</p>
+            </div>
+            <div>
+              <p className="text-green-700">DB使用量</p>
+              <p className="text-black font-mono">{usageStats?.estimated_db_size_mb?.toFixed(2) || '0.00'} MB</p>
+            </div>
+            <div>
+              <p className="text-green-700">最終更新</p>
+              <p className="text-black font-mono text-xs">{usageStats?.last_updated ? new Date(usageStats.last_updated).toLocaleTimeString('ja-JP') : '取得中'}</p>
+            </div>
+          </div>
+        </div>
+
         {/* 無料プラン概要 */}
         <div className="card-modern p-6 mb-8 bg-blue-50 border-blue-200">
           <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
-            <CheckCircle className="w-6 h-6 mr-2 text-blue-500" />
+            <AlertTriangle className="w-6 h-6 mr-2 text-blue-500" />
             Supabase無料プラン制限
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
