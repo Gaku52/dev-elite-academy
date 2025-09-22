@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { BarChart3, TrendingUp, Clock, Award, RotateCcw, Calendar } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface CycleStats {
   cycle_number: number;
@@ -17,17 +18,19 @@ interface CycleStats {
 }
 
 interface CycleStatisticsProps {
-  userId: string;
   moduleName?: string;
 }
 
-export default function CycleStatistics({ userId, moduleName }: CycleStatisticsProps) {
+export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
   const [cycleStats, setCycleStats] = useState<CycleStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCycle, setSelectedCycle] = useState<number | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const fetchCycleStats = useCallback(async () => {
+    if (!userId) return;
+
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -58,7 +61,28 @@ export default function CycleStatistics({ userId, moduleName }: CycleStatisticsP
   }, [userId, moduleName]);
 
   useEffect(() => {
-    fetchCycleStats();
+    const getUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setUserId(user.id);
+        } else {
+          setError('User not authenticated');
+          setLoading(false);
+        }
+      } catch (err) {
+        setError('Failed to get user');
+        setLoading(false);
+      }
+    };
+
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchCycleStats();
+    }
   }, [userId, moduleName, fetchCycleStats]);
 
   const groupedByModule = cycleStats.reduce((acc, stat) => {
