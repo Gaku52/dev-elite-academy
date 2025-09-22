@@ -49,6 +49,8 @@ async function getUsageStats() {
     let userProgressCount = 0;
     let sectionProgressCount = 0;
     let learningSessionsCount = 0;
+    let userLearningProgressCount = 0;
+    let dailyProgressCount = 0;
     let authUsersCount = 0;
 
     try {
@@ -62,7 +64,20 @@ async function getUsageStats() {
       sectionProgressCount = sectionProgressResult.count || 0;
       learningSessionsCount = learningSessionsResult.count || 0;
     } catch (error) {
-      console.log('Progress tables not found, they may not be created yet:', error);
+      console.log('Original progress tables not found:', error);
+    }
+
+    // 新しい進捗追跡テーブルの情報取得
+    try {
+      const [userLearningResult, dailyProgressResult] = await Promise.all([
+        supabaseAdmin.from('user_learning_progress').select('*', { count: 'exact' }),
+        supabaseAdmin.from('daily_progress').select('*', { count: 'exact' })
+      ]);
+
+      userLearningProgressCount = userLearningResult.count || 0;
+      dailyProgressCount = dailyProgressResult.count || 0;
+    } catch (error) {
+      console.log('New learning progress tables not found:', error);
     }
 
     // 3. 認証ユーザー数取得
@@ -82,12 +97,14 @@ async function getUsageStats() {
     }
 
     // 4. データベースサイズの精密推定
-    const totalRecords = 
-      (categoriesResult.count || 0) + 
+    const totalRecords =
+      (categoriesResult.count || 0) +
       (contentsResult.count || 0) +
       userProgressCount +
-      sectionProgressCount + 
+      sectionProgressCount +
       learningSessionsCount +
+      userLearningProgressCount +
+      dailyProgressCount +
       authUsersCount;
 
     // より現実的なサイズ推定（テーブル構造とインデックスを考慮）
@@ -97,6 +114,8 @@ async function getUsageStats() {
       user_progress: userProgressCount * 0.3,               // 0.3KB per record
       section_progress: sectionProgressCount * 0.2,         // 0.2KB per record
       learning_sessions: learningSessionsCount * 0.2,       // 0.2KB per record
+      user_learning_progress: userLearningProgressCount * 0.4, // 0.4KB per record
+      daily_progress: dailyProgressCount * 0.3,             // 0.3KB per record
       auth_users: authUsersCount * 0.8                      // 0.8KB per record
     };
 
@@ -118,6 +137,8 @@ async function getUsageStats() {
       user_progress_count: userProgressCount,
       section_progress_count: sectionProgressCount,
       learning_sessions_count: learningSessionsCount,
+      user_learning_progress_count: userLearningProgressCount,
+      daily_progress_count: dailyProgressCount,
       
       // 認証
       auth_users_count: authUsersCount,
@@ -199,10 +220,10 @@ export default async function UsagePage() {
     {
       name: '学習進捗レコード',
       icon: <CheckCircle className="w-6 h-6" />,
-      current: (usageStats?.user_progress_count || 0) + (usageStats?.section_progress_count || 0),
+      current: (usageStats?.user_progress_count || 0) + (usageStats?.section_progress_count || 0) + (usageStats?.user_learning_progress_count || 0),
       limit: 50000, // 推定値
       unit: '件',
-      description: 'ユーザーの学習進捗データ'
+      description: 'ユーザーの学習進捗データ（全テーブル合計）'
     },
     {
       name: '学習セッション',
@@ -227,6 +248,14 @@ export default async function UsagePage() {
       limit: 2000, // レコード/MB (効率値)
       unit: 'rec/MB',
       description: 'データベースの格納効率（高いほど良い）'
+    },
+    {
+      name: '日次統計レコード',
+      icon: <Activity className="w-6 h-6" />,
+      current: usageStats?.daily_progress_count || 0,
+      limit: 10000, // 推定値
+      unit: '件',
+      description: '日次学習統計データ'
     }
   ];
 

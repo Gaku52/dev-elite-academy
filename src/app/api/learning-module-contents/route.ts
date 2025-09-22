@@ -40,9 +40,9 @@ export async function GET(request: NextRequest) {
         { name: 'データベース', isImplemented: true },
         { name: 'ネットワーク', isImplemented: true },
         { name: 'セキュリティ', isImplemented: true },
-        { name: 'システム開発', isImplemented: false },
-        { name: '経営・法務', isImplemented: false },
-        { name: 'ストラテジ', isImplemented: false }
+        { name: 'システム開発', isImplemented: true },
+        { name: '経営・法務', isImplemented: true },
+        { name: 'ストラテジ', isImplemented: true }
       ];
 
       const implementedCount = implementedModules.filter(module => module.isImplemented).length;
