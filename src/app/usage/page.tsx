@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/Header';
-import { 
-  Database, 
+import GrowthPredictionDisplay from '@/components/GrowthPredictionDisplay';
+import {
+  Database,
   Activity,
   AlertTriangle,
   CheckCircle,
@@ -455,10 +456,19 @@ export default async function UsagePage() {
           })}
         </div>
 
+        {/* 成長予測と制限到達予測 */}
+        <div className="card-modern p-6 mb-8 bg-purple-50 border-purple-200">
+          <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
+            <TrendingUp className="w-6 h-6 mr-2 text-purple-600" />
+            成長予測とタイムライン
+          </h2>
+          <GrowthPredictionDisplay />
+        </div>
+
         {/* 有料プラン移行判断 */}
         <div className="card-modern p-6 mb-8 bg-[#8E9C78]/10 border-[#8E9C78]/20">
           <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
-            <TrendingUp className="w-6 h-6 mr-2 text-[#8E9C78]" />
+            <AlertTriangle className="w-6 h-6 mr-2 text-[#8E9C78]" />
             有料プラン移行判断
           </h2>
           
