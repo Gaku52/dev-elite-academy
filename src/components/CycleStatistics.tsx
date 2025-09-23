@@ -70,7 +70,7 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
           setError('User not authenticated');
           setLoading(false);
         }
-      } catch (err) {
+      } catch {
         setError('Failed to get user');
         setLoading(false);
       }
