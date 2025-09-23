@@ -117,8 +117,6 @@ export default function NetworkPage() {
     }
   };
 
-
-
   const canGoNext = activeSection < currentModule.sections.length - 1 || activeModule < learningModules.length - 1;
   const canGoPrevious = activeSection > 0 || activeModule > 0;
 
@@ -132,89 +130,148 @@ export default function NetworkPage() {
     total + module.sections.reduce((sectionTotal, section) =>
       sectionTotal + section.quizzes.length, 0), 0);
   const completedTotal = completedQuizzes.size;
+  const quizProgress = totalQuizzes > 0 ? (completedTotal / totalQuizzes) * 100 : 0;
+  const sectionQuizProgress = currentSection.quizzes.filter((_, index) =>
+    completedQuizzes.has(`${activeModule}-${activeSection}-${index}`)).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen bg-gray-50">
+      {/* モバイルヘッダー */}
       <LearningHeader
         title="ネットワーク"
-        description="ネットワーク技術とプロトコルの基礎"
         backLink="/modules/it-fundamentals"
-        backLinkText="IT基礎一覧に戻る"
+        backLinkText="戻る"
         completedCount={completedTotal}
         totalCount={totalQuizzes}
-        progress={totalQuizzes > 0 ? Math.round((completedTotal / totalQuizzes) * 100) : 0}
-        icon={<BookOpen className="w-6 h-6 text-white" />}
+        progress={quizProgress}
+        isMobile={true}
       />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container max-w-7xl mx-auto px-4 py-4 lg:py-8">
+        {/* デスクトップヘッダー */}
+        <LearningHeader
+          title="ネットワーク"
+          description="ネットワーク技術とプロトコルの基礎を体系的に学習"
+          backLink="/modules/it-fundamentals"
+          backLinkText="IT基礎に戻る"
+          completedCount={completedTotal}
+          totalCount={totalQuizzes}
+          progress={quizProgress}
+          isMobile={false}
+        />
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* サイドバー */}
-          <ModuleSidebar
+          {/* サイドバー - デスクトップ */}
+          <div className="hidden lg:block lg:col-span-1">
+            <ModuleSidebar
+              modules={learningModules}
+              activeModule={activeModule}
+              activeSection={activeSection}
+              completedQuizzes={completedQuizzes}
+              totalQuizzes={totalQuizzes}
+              onModuleSelect={handleNavigate}
+              onSectionSelect={(sectionIndex) => {
+                setActiveSection(sectionIndex);
+                setCurrentQuizIndex(0);
+              }}
+            />
+          </div>
+
+          {/* モバイルナビゲーション */}
+          <MobileNavigation
             modules={learningModules}
             activeModule={activeModule}
             activeSection={activeSection}
-            completedQuizzes={completedQuizzes}
-            totalQuizzes={totalQuizzes}
-            onModuleSelect={handleNavigate}
-            onSectionSelect={(sectionIndex) => setActiveSection(sectionIndex)}
+            onChange={(moduleIndex, sectionIndex) => {
+              setActiveModule(moduleIndex);
+              setActiveSection(sectionIndex);
+              setCurrentQuizIndex(0);
+            }}
           />
 
           {/* メインコンテンツ */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              {/* モバイルナビゲーション */}
-              <MobileNavigation
-                modules={learningModules}
-                activeModule={activeModule}
-                activeSection={activeSection}
-                onChange={handleNavigate}
-              />
+            <div className="bg-white rounded-lg shadow-sm">
+              <div className="p-4 lg:p-6">
+                {/* セクションヘッダー */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6">
+                  <div className="flex items-center mb-4 lg:mb-0">
+                    <BookOpen className="w-5 h-5 text-purple-500 mr-2" />
+                    <h2 className="text-xl lg:text-2xl font-bold text-gray-900">{currentSection.title}</h2>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
+                      {currentModule.title}
+                    </span>
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+                      {sectionQuizProgress}/{currentSection.quizzes.length} 問完了
+                    </span>
+                  </div>
+                </div>
 
-              {/* 学習コンテンツ */}
-              <div className="prose max-w-none mb-8">
-                <h2 className="text-2xl font-bold text-purple-900 mb-4">
-                  {currentSection.title}
-                </h2>
-                <div className="whitespace-pre-wrap text-gray-700">
-                  {currentSection.content}
+                {/* 学習コンテンツ */}
+                <div className="mb-8">
+                  <div className="prose prose-sm lg:prose max-w-none">
+                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm lg:text-base">
+                      {currentSection.content}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 問題エリア */}
+                <div className="border-t pt-6">
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 lg:p-6 mb-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-900 flex items-center text-lg mb-2 lg:mb-0">
+                        <span className="text-2xl mr-2">🎯</span>
+                        理解度チェック
+                      </h3>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-600">問題</span>
+                        <span className="px-2 py-1 bg-white rounded-lg text-sm font-medium">
+                          {currentQuizIndex + 1} / {currentSection.quizzes.length}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 問題インジケーター */}
+                    <QuizIndicator
+                      totalQuizzes={currentSection.quizzes.length}
+                      currentQuizIndex={currentQuizIndex}
+                      completedQuizzes={completedQuizzes}
+                      quizAnswers={quizAnswers}
+                      activeModule={activeModule}
+                      activeSection={activeSection}
+                      onQuizSelect={setCurrentQuizIndex}
+                    />
+
+                    <QuizComponent
+                      quiz={currentQuiz}
+                      selectedAnswer={quizAnswers[quizKey]}
+                      showResult={showQuizResults[quizKey]}
+                      onAnswerSelect={handleQuizAnswer}
+                    />
+
+                    {/* 問題ナビゲーション */}
+                    <QuizNavigation
+                      currentQuizIndex={currentQuizIndex}
+                      totalQuizzes={currentSection.quizzes.length}
+                      onPrevious={previousQuiz}
+                      onNext={nextQuiz}
+                    />
+                  </div>
+
+                  {/* セクションナビゲーション */}
+                  <SectionNavigation
+                    onPrevious={previousSection}
+                    onNext={nextSection}
+                    canGoPrevious={canGoPrevious}
+                    canGoNext={canGoNext}
+                    isCompleted={currentSection.quizzes.every((_, index) =>
+                      completedQuizzes.has(`${activeModule}-${activeSection}-${index}`))}
+                  />
                 </div>
               </div>
-
-              {/* クイズインジケーター */}
-              <QuizIndicator
-                currentQuizIndex={currentQuizIndex}
-                totalQuizzes={currentSection.quizzes.length}
-                completedQuizzes={completedQuizzes}
-                quizAnswers={quizAnswers}
-                activeModule={activeModule}
-                activeSection={activeSection}
-                onQuizSelect={(index) => setCurrentQuizIndex(index)}
-              />
-
-              {/* クイズコンポーネント */}
-              <QuizComponent
-                quiz={currentQuiz}
-                selectedAnswer={quizAnswers[quizKey]}
-                showResult={showQuizResults[quizKey]}
-                onAnswerSelect={handleQuizAnswer}
-              />
-
-              {/* クイズナビゲーション */}
-              <QuizNavigation
-                currentQuizIndex={currentQuizIndex}
-                totalQuizzes={currentSection.quizzes.length}
-                onPrevious={previousQuiz}
-                onNext={nextQuiz}
-              />
-
-              {/* セクションナビゲーション */}
-              <SectionNavigation
-                onPrevious={previousSection}
-                onNext={nextSection}
-                canGoPrevious={canGoPrevious}
-                canGoNext={canGoNext}
-                isCompleted={currentSection.quizzes.every((_, index) => completedQuizzes.has(`${activeModule}-${activeSection}-${index}`))}
-              />
             </div>
           </div>
         </div>
