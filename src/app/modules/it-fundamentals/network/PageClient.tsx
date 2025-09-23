@@ -1252,46 +1252,6 @@ export default function NetworkLearningPage() {
             </div>
           </div>
         </div>
-
-        {/* 次のセクション */}
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">次のセクション</h3>
-          <p className="text-gray-600 mb-6">
-            ネットワークの学習を終えたら、次の関連分野の学習に進みましょう。
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              href="/modules/it-fundamentals/security"
-              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-            >
-              <div className="flex items-center">
-                <span className="text-lg mr-3">🔒</span>
-                <span className="text-gray-700 font-medium">セキュリティ</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
-            </Link>
-            <Link
-              href="/modules/it-fundamentals/database"
-              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-            >
-              <div className="flex items-center">
-                <span className="text-lg mr-3">💾</span>
-                <span className="text-gray-700 font-medium">データベース</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
-            </Link>
-            <Link
-              href="/modules/it-fundamentals"
-              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-            >
-              <div className="flex items-center">
-                <span className="text-lg mr-3">📚</span>
-                <span className="text-gray-700 font-medium">IT基礎一覧に戻る</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
-            </Link>
-          </div>
-        </div>
       </div>
     </div>
   );
