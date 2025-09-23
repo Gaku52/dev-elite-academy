@@ -289,6 +289,45 @@ export default function ITFundamentalsPage() {
             </div>
           </div>
         </div>
+
+        <div className="mt-8 card-modern p-6">
+          <h2 className="text-xl font-semibold mb-4">次のセクション</h2>
+          <p className="text-[#6F6F6F] mb-6">
+            基本情報技術者試験の学習を終えたら、さらに専門的な分野の学習に進みましょう。
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/modules/programming-basics"
+              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+            >
+              <div className="flex items-center">
+                <Code className="w-5 h-5 text-blue-500 mr-3" />
+                <span className="text-gray-700 font-medium">プログラミング基礎</span>
+              </div>
+              <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors transform rotate-180" />
+            </Link>
+            <Link
+              href="/modules/aws"
+              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+            >
+              <div className="flex items-center">
+                <span className="text-lg mr-3">☁️</span>
+                <span className="text-gray-700 font-medium">AWS クラウド</span>
+              </div>
+              <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors transform rotate-180" />
+            </Link>
+            <Link
+              href="/modules/ai-ml"
+              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+            >
+              <div className="flex items-center">
+                <span className="text-lg mr-3">🤖</span>
+                <span className="text-gray-700 font-medium">AI・機械学習</span>
+              </div>
+              <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors transform rotate-180" />
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
