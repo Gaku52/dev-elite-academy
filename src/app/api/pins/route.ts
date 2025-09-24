@@ -15,25 +15,21 @@ export async function GET(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
 
-    // プロフィールテーブルからuser_idを取得
-    const { data: profile, error: profileError } = await (supabaseAdmin as any)
-      .from('profiles')
-      .select('id')
-      .eq('email', userEmail)
-      .single();
-
-    if (profileError || !profile) {
-      throw new APIError(404, 'User not found', 'USER_NOT_FOUND');
-    }
-
-    // ピン固定された学習パスを取得
+    // ピン固定された学習パスを取得（メールアドレスをuser_idとして使用）
     const { data, error } = await (supabaseAdmin as any)
       .from('pinned_learning_paths')
       .select('*')
-      .eq('user_id', profile.id)
+      .eq('user_email', userEmail)
       .order('pinned_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching pinned paths:', error);
+      // テーブルが存在しない場合は空配列を返す
+      if (error.code === '42P01') {
+        return successResponse([]);
+      }
+      throw error;
+    }
 
     return successResponse(data || []);
   } catch (error) {
@@ -50,40 +46,33 @@ export async function POST(request: NextRequest) {
     validateRequired(body, ['userEmail', 'learningPathName']);
     const supabaseAdmin = getSupabaseAdmin();
 
-    // プロフィールテーブルからuser_idを取得
-    const { data: profile, error: profileError } = await (supabaseAdmin as any)
-      .from('profiles')
-      .select('id')
-      .eq('email', userEmail)
-      .single();
-
-    if (profileError || !profile) {
-      throw new APIError(404, 'User not found', 'USER_NOT_FOUND');
-    }
-
     // 既にピン固定されているかチェック
     const { data: existingPin } = await (supabaseAdmin as any)
       .from('pinned_learning_paths')
       .select('*')
-      .eq('user_id', profile.id)
+      .eq('user_email', userEmail)
       .eq('learning_path_name', learningPathName)
       .single();
 
     if (existingPin) {
-      throw new APIError(400, 'Learning path is already pinned', 'ALREADY_PINNED');
+      // 既にピン固定されている場合は、それを返す（エラーにしない）
+      return successResponse(existingPin);
     }
 
     // ピン固定を追加
     const { data, error } = await (supabaseAdmin as any)
       .from('pinned_learning_paths')
       .insert({
-        user_id: profile.id,
+        user_email: userEmail,
         learning_path_name: learningPathName
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error pinning path:', error);
+      throw error;
+    }
 
     return successResponse(data);
   } catch (error) {
@@ -104,29 +93,22 @@ export async function DELETE(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
 
-    // プロフィールテーブルからuser_idを取得
-    const { data: profile, error: profileError } = await (supabaseAdmin as any)
-      .from('profiles')
-      .select('id')
-      .eq('email', userEmail)
-      .single();
-
-    if (profileError || !profile) {
-      throw new APIError(404, 'User not found', 'USER_NOT_FOUND');
-    }
-
-    // ピン固定を削除
+    // ピン固定を削除（メールアドレスをuser_emailとして使用）
     const { data, error } = await (supabaseAdmin as any)
       .from('pinned_learning_paths')
       .delete()
-      .eq('user_id', profile.id)
+      .eq('user_email', userEmail)
       .eq('learning_path_name', learningPathName)
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error unpinning path:', error);
+      throw error;
+    }
 
     if (!data || data.length === 0) {
-      throw new APIError(404, 'Pin not found', 'PIN_NOT_FOUND');
+      // ピンが見つからない場合も成功として扱う
+      return successResponse({ message: 'Pin not found or already removed' });
     }
 
     return successResponse({ message: 'Pin removed successfully' });

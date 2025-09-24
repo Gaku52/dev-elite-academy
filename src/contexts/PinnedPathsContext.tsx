@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export interface PinnedPath {
   id: number;
-  user_id: string;
+  user_email: string;
   learning_path_name: string;
   pinned_at: string;
   created_at: string;
