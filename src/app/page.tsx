@@ -3,19 +3,23 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import { 
-  Code, 
-  Target, 
-  TrendingUp, 
-  Shield, 
-  Cloud, 
+import { useState, useEffect } from 'react';
+import {
+  Code,
+  Target,
+  TrendingUp,
+  Shield,
+  Cloud,
   Brain,
   Users,
   Award,
   ChevronRight,
   Github,
   Globe,
-  Database
+  Database,
+  BookOpen,
+  Clock,
+  Pin
 } from 'lucide-react';
 
 const skillCategories = [
@@ -69,6 +73,129 @@ const stats = [
   { number: "100+", label: "学習モジュール", icon: <Brain className="w-5 h-5" /> },
   { number: "∞", label: "キャリア可能性", icon: <Award className="w-5 h-5" /> }
 ];
+
+// PinnedLearning コンポーネント
+function PinnedLearning() {
+  const [pinnedContents, setPinnedContents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPinnedContents = async () => {
+      try {
+        const userEmail = 'user@example.com'; // TODO: 実際のユーザーメール取得
+        const response = await fetch(`/api/pinned-contents?user_email=${encodeURIComponent(userEmail)}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          setPinnedContents(data.pinnedContents || []);
+        }
+      } catch (error) {
+        console.error('Error fetching pinned contents:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPinnedContents();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10">
+        <div className="container-modern">
+          <div className="text-center text-black">読み込み中...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (pinnedContents.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10">
+      <div className="container-modern">
+        <div className="text-center mb-8">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-3xl font-bold text-black flex items-center justify-center mb-4"
+          >
+            <Pin className="w-8 h-8 mr-3 text-[#8E9C78]" />
+            今取り組んでいる学習
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-[#6F6F6F] max-w-2xl mx-auto"
+          >
+            ピン留めした学習項目から、継続して取り組みましょう
+          </motion.p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {pinnedContents.map((item, index) => {
+            const content = item.learning_contents;
+            return (
+              <motion.div
+                key={content.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative group"
+              >
+                <Link
+                  href={`/learn/${content.id}`}
+                  className="card-modern p-6 hover:shadow-lg border-2 border-[#8E9C78]/30 hover:border-[#8E9C78]/50 transition-all duration-300 block hover:-translate-y-1"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <BookOpen className="w-4 h-4 text-[#8E9C78]" />
+                      <span className="text-[#8E9C78] text-sm capitalize">
+                        {content.content_type}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Pin className="w-4 h-4 text-[#8E9C78] fill-current" />
+                      <span className="px-2 py-1 rounded-full text-xs bg-green-50 text-green-800 border border-green-200">
+                        {content.difficulty}
+                      </span>
+                    </div>
+                  </div>
+
+                  <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
+                    {content.title}
+                  </h4>
+
+                  <p className="text-[#6F6F6F] text-sm mb-4 line-clamp-2">
+                    {content.description}
+                  </p>
+
+                  <div className="flex items-center justify-between text-xs text-[#6F6F6F]">
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-3 h-3" />
+                      <span>{content.estimated_time}分</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {(content.tags || []).slice(0, 2).map((tag) => (
+                        <span key={tag} className="px-2 py-1 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   return (
@@ -168,6 +295,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Pinned Learning Section */}
+      <PinnedLearning />
 
       {/* Skills Categories Section */}
       <section className="py-16 sm:py-24 md:py-32 bg-gray-50">
