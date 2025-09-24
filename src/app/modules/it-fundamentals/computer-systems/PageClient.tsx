@@ -1621,7 +1621,7 @@ export default function ComputerSystemsPage() {
                 </div>
 
                 {/* セクションナビゲーション */}
-                <div className="flex flex-col lg:flex-row justify-between gap-4 mt-8">
+                <div className="flex flex-col lg:flex-row justify-between gap-4 mt-8 mb-20 lg:mb-8">
                   <button
                     onClick={previousSection}
                     disabled={activeModule === 0 && activeSection === 0}
