@@ -12,8 +12,8 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/Header';
 import UserProgressTracker from '@/components/UserProgressTracker';
-import CategoryContentCount from '@/components/CategoryContentCount';
-import { getLearningPathUrl } from '@/lib/learning-paths';
+import PinnedLearningPaths from '@/components/PinnedLearningPaths';
+import LearningPathCard from '@/components/LearningPathCard';
 
 // サーバーサイドでのデータ取得
 async function getDashboardData() {
@@ -72,6 +72,9 @@ export default async function Dashboard() {
         {/* User Progress Tracker */}
         <UserProgressTracker totalContents={learningContents.length} />
 
+        {/* Pinned Learning Paths */}
+        <PinnedLearningPaths categories={categories} />
+
         {/* Learning Path Section */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
@@ -87,70 +90,12 @@ export default async function Dashboard() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {categories.map((category) => {
-              const pathUrl = getLearningPathUrl(category.name);
-              
-              if (pathUrl) {
-                return (
-                  <Link
-                    key={category.id}
-                    href={pathUrl}
-                    className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 block"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <span className="text-3xl">
-                        {category.icon}
-                      </span>
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: category.color || '#8E9C78' }}
-                      ></div>
-                    </div>
-                    <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
-                      {category.name}
-                    </h4>
-                    <p className="text-[#6F6F6F] text-sm">
-                      {category.description}
-                    </p>
-                    <div className="mt-4">
-                      <CategoryContentCount
-                        categoryName={category.name}
-                        fallbackCount={learningContents.filter(content => content.category_id === category.id).length}
-                      />
-                    </div>
-                  </Link>
-                );
-              }
-              
-              return (
-                <div
-                  key={category.id}
-                  className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <span className="text-3xl">
-                      {category.icon}
-                    </span>
-                    <div 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: category.color || '#8E9C78' }}
-                    ></div>
-                  </div>
-                  <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
-                    {category.name}
-                  </h4>
-                  <p className="text-[#6F6F6F] text-sm">
-                    {category.description}
-                  </p>
-                  <div className="mt-4">
-                    <CategoryContentCount
-                      categoryName={category.name}
-                      fallbackCount={learningContents.filter(content => content.category_id === category.id).length}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+            {categories.map((category) => (
+              <LearningPathCard
+                key={category.id}
+                category={category}
+              />
+            ))}
           </div>
         </div>
 
