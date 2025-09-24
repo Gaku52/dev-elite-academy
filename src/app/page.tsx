@@ -20,6 +20,7 @@ import {
   Database,
   Pin
 } from 'lucide-react';
+import { usePinnedPaths } from '@/hooks/usePinnedPaths';
 
 const skillCategories = [
   {
@@ -82,26 +83,16 @@ interface Category {
   color?: string;
 }
 
-// ピン固定パスの型定義
-interface PinnedPath {
-  id: number;
-  user_email: string;
-  learning_path_name: string;
-  pinned_at: string;
-  created_at: string;
-}
 
 // PinnedLearning コンポーネント
 function PinnedLearning() {
-  const [pinnedPaths, setPinnedPaths] = useState<PinnedPath[]>([]);
+  const { pinnedPaths, loading } = usePinnedPaths();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPinnedData = async () => {
+    const fetchCategories = async () => {
       try {
-        const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
-
         // カテゴリデータを取得
         const { createClient } = await import('@supabase/supabase-js');
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -117,25 +108,17 @@ function PinnedLearning() {
 
           setCategories(categoriesData || []);
         }
-
-        // ピン固定された学習パスを取得
-        const pinsResponse = await fetch(`/api/pins?email=${encodeURIComponent(userEmail)}`);
-
-        if (pinsResponse.ok) {
-          const pinsData = await pinsResponse.json();
-          setPinnedPaths(pinsData.data || []);
-        }
       } catch (error) {
-        console.error('Error fetching pinned data:', error);
+        console.error('Error fetching categories:', error);
       } finally {
-        setLoading(false);
+        setCategoriesLoading(false);
       }
     };
 
-    fetchPinnedData();
+    fetchCategories();
   }, []);
 
-  if (loading) {
+  if (loading || categoriesLoading) {
     return (
       <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10">
         <div className="container-modern">

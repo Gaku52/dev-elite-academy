@@ -57,8 +57,8 @@ export function PinnedPathsProvider({ children }: { children: ReactNode }) {
         throw new Error(data.error);
       }
 
-      console.log('📌 Fetched pinned paths:', data.data);
-      setPinnedPaths(data.data || []);
+      console.log('📌 Fetched pinned paths:', data);
+      setPinnedPaths(data || []);
     } catch (err) {
       console.error('Error fetching pinned paths:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -104,12 +104,12 @@ export function PinnedPathsProvider({ children }: { children: ReactNode }) {
         throw new Error(data.error);
       }
 
-      console.log('✅ Path pinned successfully:', data.data);
+      console.log('✅ Path pinned successfully:', data);
 
       // ローカルステートを更新
-      setPinnedPaths(prev => [...prev, data.data]);
+      setPinnedPaths(prev => [...prev, data]);
 
-      return data.data;
+      return data;
     } catch (err) {
       console.error('Error pinning path:', err);
       throw err;
