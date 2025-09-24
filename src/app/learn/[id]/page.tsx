@@ -282,7 +282,7 @@ export default function LearnPage({ params }: LearnPageProps) {
         </div>
       </div>
 
-      <div className="container-modern py-8">
+      <div className="container-modern py-8 pb-32 md:pb-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* メインコンテンツエリア */}
           <div className="lg:col-span-2">
@@ -384,7 +384,7 @@ export default function LearnPage({ params }: LearnPageProps) {
             </div>
 
             {/* アクションボタン */}
-            <div className="mt-8 mb-32 md:mb-8 flex justify-between">
+            <div className="mt-8 mb-48 md:mb-8 flex justify-between">
               <button className="btn-secondary px-6 py-3">
                 前のコンテンツ
               </button>
