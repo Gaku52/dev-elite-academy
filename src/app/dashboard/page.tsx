@@ -6,7 +6,8 @@ import {
   Star,
   ChevronRight,
   BarChart3,
-  Calendar
+  Calendar,
+  Pin
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
@@ -47,9 +48,102 @@ async function getDashboardData() {
   }
 }
 
-// Server Component（高速表示）
-export default async function Dashboard() {
-  const { categories, learningContents } = await getDashboardData();
+'use client';
+
+import { useState, useEffect } from 'react';
+
+// PinButton コンポーネント
+function PinButton({ contentId, initialPinned = false }: { contentId: number; initialPinned?: boolean }) {
+  const [isPinned, setIsPinned] = useState(initialPinned);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const togglePin = async () => {
+    setIsLoading(true);
+    try {
+      const userEmail = 'user@example.com'; // TODO: 実際のユーザーメール取得
+      const method = isPinned ? 'DELETE' : 'POST';
+
+      const response = await fetch('/api/pinned-contents', {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail,
+          contentId,
+        }),
+      });
+
+      if (response.ok) {
+        setIsPinned(!isPinned);
+      }
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={togglePin}
+      disabled={isLoading}
+      className={`p-2 rounded-full transition-all duration-200 ${
+        isPinned
+          ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+          : 'bg-gray-700/20 text-gray-400 hover:bg-gray-600/30 hover:text-gray-300'
+      }`}
+      title={isPinned ? 'ピン留めを解除' : 'ピン留めする'}
+    >
+      <Pin className={`w-4 h-4 ${isPinned ? 'fill-current' : ''}`} />
+    </button>
+  );
+}
+
+// Dashboard コンポーネント（Client Component に変更）
+export default function Dashboard() {
+  const [categories, setCategories] = useState([]);
+  const [learningContents, setLearningContents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !supabaseAnonKey) {
+          console.error('Supabase credentials not found');
+          return;
+        }
+
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+        const [categoriesResult, contentsResult] = await Promise.all([
+          supabase.from('categories').select('*').eq('is_active', true).order('sort_order'),
+          supabase.from('learning_contents').select('*').eq('is_published', true).order('created_at', { ascending: false })
+        ]);
+
+        setCategories(categoriesResult.data || []);
+        setLearningContents(contentsResult.data || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -178,9 +272,12 @@ export default async function Dashboard() {
                         {content.content_type}
                       </span>
                     </div>
-                    <span className="px-2 py-1 rounded-full text-xs border bg-green-50 text-green-800 border-green-200">
-                      {content.difficulty}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <PinButton contentId={content.id} />
+                      <span className="px-2 py-1 rounded-full text-xs border bg-green-50 text-green-800 border-green-200">
+                        {content.difficulty}
+                      </span>
+                    </div>
                   </div>
                   
                   <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
