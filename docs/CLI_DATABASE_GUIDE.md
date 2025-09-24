@@ -21,7 +21,7 @@ npm install --save-dev dotenv-cli pg
 SUPABASE_HOST=aws-0-ap-southeast-1.pooler.supabase.com
 SUPABASE_PORT=6543
 SUPABASE_DATABASE=postgres
-SUPABASE_USER=postgres.ttsdtjzcgxufudepclzg
+SUPABASE_USER=postgres.example-project-xyz
 SUPABASE_PASSWORD=your-actual-password
 ```
 

@@ -36,9 +36,9 @@
 `.env.local`:
 ```bash
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsI..."
-SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsI..."
+NEXT_PUBLIC_SUPABASE_URL="https://example-project-xyz.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="sb-example-anon-key-1234567890abcdef"
+SUPABASE_SERVICE_KEY="sb-example-service-key-abcdef1234567890"
 
 # GitHub OAuth (Supabaseで管理するため不要だが、参考用)
 # GITHUB_CLIENT_ID="your_github_client_id"

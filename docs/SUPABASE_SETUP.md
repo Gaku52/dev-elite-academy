@@ -20,8 +20,8 @@
 3. `.env.local`ファイルを更新：
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_URL=https://example-project-xyz.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb-example-anon-key-1234567890abcdef
 ```
 
 ## 3. 認証設定
