@@ -193,7 +193,7 @@ graph TD
 ホスト: aws-0-[REGION].pooler.supabase.com
 ポート: 6543
 データベース: postgres
-ユーザー: postgres.ttsdtjzcgxufudepclzg
+ユーザー: postgres.example-project-xyz
 パスワード: [あなたのパスワード]
 SSL: 必須（sslmode=require）
 ```

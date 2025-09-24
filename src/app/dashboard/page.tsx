@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Clock,
   PlayCircle,
@@ -9,47 +11,78 @@ import {
   Calendar
 } from 'lucide-react';
 import Link from 'next/link';
-import { createClient } from '@supabase/supabase-js';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import UserProgressTracker from '@/components/UserProgressTracker';
 import PinnedLearningPaths from '@/components/PinnedLearningPaths';
 import LearningPathCard from '@/components/LearningPathCard';
 
-// サーバーサイドでのデータ取得
-async function getDashboardData() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return { categories: [], learningContents: [] };
-  }
-
-  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-
-  try {
-    const [categoriesResult, contentsResult] = await Promise.all([
-      supabaseAdmin.from('categories').select('*').eq('is_active', true).order('sort_order'),
-      supabaseAdmin.from('learning_contents').select('*').eq('is_published', true).order('created_at', { ascending: false })
-    ]);
-
-    return {
-      categories: categoriesResult.data || [],
-      learningContents: contentsResult.data || []
-    };
-  } catch (err) {
-    console.error('Error fetching dashboard data:', err);
-    return { categories: [], learningContents: [] };
-  }
+// 型定義
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  color?: string;
 }
 
-// Server Component（高速表示）
-export default async function Dashboard() {
-  const { categories, learningContents } = await getDashboardData();
+interface LearningContent {
+  id: number;
+  title: string;
+  description: string;
+  content_type: string;
+  difficulty: string;
+  estimated_time: number;
+  tags: string[];
+  category_id: number;
+}
+
+
+
+// Dashboard コンポーネント（Client Component に変更）
+export default function Dashboard() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [learningContents, setLearningContents] = useState<LearningContent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !supabaseAnonKey) {
+          console.error('Supabase credentials not found');
+          return;
+        }
+
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+        const [categoriesResult, contentsResult] = await Promise.all([
+          supabase.from('categories').select('*').eq('is_active', true).order('sort_order'),
+          supabase.from('learning_contents').select('*').eq('is_published', true).order('created_at', { ascending: false })
+        ]);
+
+        setCategories(categoriesResult.data || []);
+        setLearningContents(contentsResult.data || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

@@ -11,10 +11,7 @@ interface Category {
   name: string;
   description: string;
   icon: string;
-  color: string;
-  sort_order: number;
-  is_active: boolean;
-  created_at: string;
+  color?: string;
 }
 
 interface PinnedLearningPathsProps {
