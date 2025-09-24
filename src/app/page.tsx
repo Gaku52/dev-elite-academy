@@ -86,35 +86,59 @@ interface LearningContent {
   category_id: number;
 }
 
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  color?: string;
+}
+
 interface PinnedContentItem {
   content_id: number;
   pinned_at: string;
   learning_contents: LearningContent;
 }
 
+interface PinnedCategoryItem {
+  category_id: number;
+  pinned_at: string;
+  categories: Category;
+}
+
 // PinnedLearning コンポーネント
 function PinnedLearning() {
   const [pinnedContents, setPinnedContents] = useState<PinnedContentItem[]>([]);
+  const [pinnedCategories, setPinnedCategories] = useState<PinnedCategoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPinnedContents = async () => {
+    const fetchPinnedData = async () => {
       try {
         const userEmail = 'user@example.com'; // TODO: 実際のユーザーメール取得
-        const response = await fetch(`/api/pinned-contents?user_email=${encodeURIComponent(userEmail)}`);
 
-        if (response.ok) {
-          const data = await response.json();
-          setPinnedContents(data.pinnedContents || []);
+        const [contentsResponse, categoriesResponse] = await Promise.all([
+          fetch(`/api/pinned-contents?user_email=${encodeURIComponent(userEmail)}`),
+          fetch(`/api/pinned-categories?user_email=${encodeURIComponent(userEmail)}`)
+        ]);
+
+        if (contentsResponse.ok) {
+          const contentsData = await contentsResponse.json();
+          setPinnedContents(contentsData.pinnedContents || []);
+        }
+
+        if (categoriesResponse.ok) {
+          const categoriesData = await categoriesResponse.json();
+          setPinnedCategories(categoriesData.pinnedCategories || []);
         }
       } catch (error) {
-        console.error('Error fetching pinned contents:', error);
+        console.error('Error fetching pinned data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPinnedContents();
+    fetchPinnedData();
   }, []);
 
   if (loading) {
@@ -127,7 +151,7 @@ function PinnedLearning() {
     );
   }
 
-  if (pinnedContents.length === 0) {
+  if (pinnedContents.length === 0 && pinnedCategories.length === 0) {
     return null;
   }
 
@@ -155,14 +179,59 @@ function PinnedLearning() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pinnedContents.map((item, index) => {
-            const content = item.learning_contents;
+          {/* ピン留めしたカテゴリを表示 */}
+          {pinnedCategories.map((item, index) => {
+            const category = item.categories;
             return (
               <motion.div
-                key={content.id}
+                key={`category-${category.id}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative group"
+              >
+                <div className="card-modern p-6 hover:shadow-lg border-2 border-[#8E9C78]/30 hover:border-[#8E9C78]/50 transition-all duration-300 hover:-translate-y-1">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-3xl" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
+                      {category.icon}
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <Pin className="w-4 h-4 text-[#8E9C78] fill-current" />
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: category.color || '#8E9C78' }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
+                    {category.name}
+                  </h4>
+
+                  <p className="text-[#6F6F6F] text-sm mb-4">
+                    {category.description}
+                  </p>
+
+                  <div className="flex items-center justify-between text-xs text-[#6F6F6F]">
+                    <span className="px-2 py-1 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full">
+                      学習パス
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+
+          {/* ピン留めしたコンテンツを表示 */}
+          {pinnedContents.map((item, index) => {
+            const content = item.learning_contents;
+            const startIndex = pinnedCategories.length;
+            return (
+              <motion.div
+                key={`content-${content.id}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: (startIndex + index) * 0.1 }}
                 className="relative group"
               >
                 <Link
