@@ -38,25 +38,29 @@ interface LearningContent {
   category_id: number;
 }
 
-// PinButton コンポーネント
-function PinButton({ contentId, initialPinned = false }: { contentId: number; initialPinned?: boolean }) {
+
+// CategoryPinButton コンポーネント（カテゴリ用）
+function CategoryPinButton({ categoryId, initialPinned = false }: { categoryId: number; initialPinned?: boolean }) {
   const [isPinned, setIsPinned] = useState(initialPinned);
   const [isLoading, setIsLoading] = useState(false);
 
-  const togglePin = async () => {
+  const togglePin = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Linkのナビゲーションを防ぐ
+    e.stopPropagation(); // イベントの伝播を防ぐ
+
     setIsLoading(true);
     try {
       const userEmail = 'user@example.com'; // TODO: 実際のユーザーメール取得
       const method = isPinned ? 'DELETE' : 'POST';
 
-      const response = await fetch('/api/pinned-contents', {
+      const response = await fetch('/api/pinned-categories', {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userEmail,
-          contentId,
+          categoryId,
         }),
       });
 
@@ -64,7 +68,7 @@ function PinButton({ contentId, initialPinned = false }: { contentId: number; in
         setIsPinned(!isPinned);
       }
     } catch (error) {
-      console.error('Error toggling pin:', error);
+      console.error('Error toggling category pin:', error);
     } finally {
       setIsLoading(false);
     }
@@ -74,14 +78,14 @@ function PinButton({ contentId, initialPinned = false }: { contentId: number; in
     <button
       onClick={togglePin}
       disabled={isLoading}
-      className={`p-2 rounded-full transition-all duration-200 ${
+      className={`p-1.5 rounded-full transition-all duration-200 ${
         isPinned
-          ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-          : 'bg-gray-700/20 text-gray-400 hover:bg-gray-600/30 hover:text-gray-300'
+          ? 'bg-[#8E9C78]/20 text-[#8E9C78] hover:bg-[#8E9C78]/30'
+          : 'bg-gray-200/50 text-gray-400 hover:bg-gray-300/50 hover:text-gray-600'
       }`}
       title={isPinned ? 'ピン留めを解除' : 'ピン留めする'}
     >
-      <Pin className={`w-4 h-4 ${isPinned ? 'fill-current' : ''}`} />
+      <Pin className={`w-3 h-3 ${isPinned ? 'fill-current' : ''}`} />
     </button>
   );
 }
@@ -181,10 +185,13 @@ export default function Dashboard() {
                       <span className="text-3xl">
                         {category.icon}
                       </span>
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: category.color || '#8E9C78' }}
-                      ></div>
+                      <div className="flex items-center space-x-2">
+                        <CategoryPinButton categoryId={category.id} />
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: category.color || '#8E9C78' }}
+                        ></div>
+                      </div>
                     </div>
                     <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
                       {category.name}
@@ -211,10 +218,13 @@ export default function Dashboard() {
                     <span className="text-3xl">
                       {category.icon}
                     </span>
-                    <div 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: category.color || '#8E9C78' }}
-                    ></div>
+                    <div className="flex items-center space-x-2">
+                      <CategoryPinButton categoryId={category.id} />
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: category.color || '#8E9C78' }}
+                      ></div>
+                    </div>
                   </div>
                   <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
                     {category.name}
@@ -258,12 +268,9 @@ export default function Dashboard() {
                         {content.content_type}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <PinButton contentId={content.id} />
-                      <span className="px-2 py-1 rounded-full text-xs border bg-green-50 text-green-800 border-green-200">
-                        {content.difficulty}
-                      </span>
-                    </div>
+                    <span className="px-2 py-1 rounded-full text-xs border bg-green-50 text-green-800 border-green-200">
+                      {content.difficulty}
+                    </span>
                   </div>
                   
                   <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
