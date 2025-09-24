@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FileText, ExternalLink, FileCode } from 'lucide-react';
+import { FileText, ExternalLink, FileCode, Eye } from 'lucide-react';
+import Link from 'next/link';
 import Header from '@/components/Header';
 
 interface Specification {
@@ -111,14 +112,21 @@ export default function SpecificationsPage() {
                 </h3>
                 
                 <div className="flex flex-col gap-3 mt-6">
+                  <Link
+                    href={`/specifications/${spec.name.replace('.html', '')}`}
+                    className="btn-modern flex items-center justify-center gap-2 text-sm py-3"
+                  >
+                    <Eye size={16} />
+                    <span>仕様書を表示</span>
+                  </Link>
                   <a
                     href={spec.downloadUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-modern flex items-center justify-center gap-2 text-sm py-3"
+                    className="btn-secondary flex items-center justify-center gap-2 text-sm py-3"
                   >
                     <FileCode size={16} />
-                    <span>HTMLで表示</span>
+                    <span>RAWで表示</span>
                   </a>
                   <a
                     href={spec.htmlUrl}
