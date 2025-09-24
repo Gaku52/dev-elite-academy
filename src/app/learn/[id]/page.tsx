@@ -282,7 +282,7 @@ export default function LearnPage({ params }: LearnPageProps) {
         </div>
       </div>
 
-      <div className="container-modern py-8">
+      <div className="container-modern py-8 pb-32 md:pb-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* メインコンテンツエリア */}
           <div className="lg:col-span-2">
@@ -384,7 +384,7 @@ export default function LearnPage({ params }: LearnPageProps) {
             </div>
 
             {/* アクションボタン */}
-            <div className="mt-8 flex justify-between">
+            <div className="mt-8 mb-48 md:mb-8 flex justify-between">
               <button className="btn-secondary px-6 py-3">
                 前のコンテンツ
               </button>
@@ -425,6 +425,26 @@ export default function LearnPage({ params }: LearnPageProps) {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* モバイル用固定進捗表示 */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-slate-900/95 to-purple-900/95 backdrop-blur-sm border-t border-purple-800/30 p-4 md:hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-white text-sm font-medium">
+              問題 {completedCount}/{learningSections.length}
+            </div>
+            <div className="text-purple-300 text-sm">
+              セクション完了 {completedCount}/{learningSections.length}
+            </div>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-2">
+            <div
+              className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
           </div>
         </div>
       </div>
