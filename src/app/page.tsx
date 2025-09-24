@@ -74,9 +74,27 @@ const stats = [
   { number: "∞", label: "キャリア可能性", icon: <Award className="w-5 h-5" /> }
 ];
 
+// 型定義
+interface LearningContent {
+  id: number;
+  title: string;
+  description: string;
+  content_type: string;
+  difficulty: string;
+  estimated_time: number;
+  tags: string[];
+  category_id: number;
+}
+
+interface PinnedContentItem {
+  content_id: number;
+  pinned_at: string;
+  learning_contents: LearningContent;
+}
+
 // PinnedLearning コンポーネント
 function PinnedLearning() {
-  const [pinnedContents, setPinnedContents] = useState([]);
+  const [pinnedContents, setPinnedContents] = useState<PinnedContentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

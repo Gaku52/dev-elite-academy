@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Clock,
   PlayCircle,
@@ -10,47 +12,31 @@ import {
   Pin
 } from 'lucide-react';
 import Link from 'next/link';
-import { createClient } from '@supabase/supabase-js';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import UserProgressTracker from '@/components/UserProgressTracker';
 import CategoryContentCount from '@/components/CategoryContentCount';
 import { getLearningPathUrl } from '@/lib/learning-paths';
 
-// サーバーサイドでのデータ取得
-async function getDashboardData() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return { categories: [], learningContents: [] };
-  }
-
-  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-
-  try {
-    const [categoriesResult, contentsResult] = await Promise.all([
-      supabaseAdmin.from('categories').select('*').eq('is_active', true).order('sort_order'),
-      supabaseAdmin.from('learning_contents').select('*').eq('is_published', true).order('created_at', { ascending: false })
-    ]);
-
-    return {
-      categories: categoriesResult.data || [],
-      learningContents: contentsResult.data || []
-    };
-  } catch (err) {
-    console.error('Error fetching dashboard data:', err);
-    return { categories: [], learningContents: [] };
-  }
+// 型定義
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  color?: string;
 }
 
-'use client';
-
-import { useState, useEffect } from 'react';
+interface LearningContent {
+  id: number;
+  title: string;
+  description: string;
+  content_type: string;
+  difficulty: string;
+  estimated_time: number;
+  tags: string[];
+  category_id: number;
+}
 
 // PinButton コンポーネント
 function PinButton({ contentId, initialPinned = false }: { contentId: number; initialPinned?: boolean }) {
@@ -102,8 +88,8 @@ function PinButton({ contentId, initialPinned = false }: { contentId: number; in
 
 // Dashboard コンポーネント（Client Component に変更）
 export default function Dashboard() {
-  const [categories, setCategories] = useState([]);
-  const [learningContents, setLearningContents] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [learningContents, setLearningContents] = useState<LearningContent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
