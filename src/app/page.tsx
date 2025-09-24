@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { useState, useEffect } from 'react';
+import { getLearningPathUrl } from '@/lib/learning-paths';
 import {
   Code,
   Target,
@@ -182,6 +183,53 @@ function PinnedLearning() {
           {/* ピン留めしたカテゴリを表示 */}
           {pinnedCategories.map((item, index) => {
             const category = item.categories;
+            const pathUrl = getLearningPathUrl(category.name);
+
+            if (pathUrl) {
+              return (
+                <motion.div
+                  key={`category-${category.id}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="relative group"
+                >
+                  <Link
+                    href={pathUrl}
+                    className="card-modern p-6 hover:shadow-lg border-2 border-[#8E9C78]/30 hover:border-[#8E9C78]/50 transition-all duration-300 block hover:-translate-y-1"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <span className="text-3xl" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
+                        {category.icon}
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        <Pin className="w-4 h-4 text-[#8E9C78] fill-current" />
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: category.color || '#8E9C78' }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
+                      {category.name}
+                    </h4>
+
+                    <p className="text-[#6F6F6F] text-sm mb-4">
+                      {category.description}
+                    </p>
+
+                    <div className="flex items-center justify-between text-xs text-[#6F6F6F]">
+                      <span className="px-2 py-1 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full">
+                        学習パス
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            }
+
+            // パスが見つからない場合はクリック不可のカード
             return (
               <motion.div
                 key={`category-${category.id}`}
