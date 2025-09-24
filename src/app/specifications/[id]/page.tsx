@@ -114,13 +114,13 @@ export default function SpecificationViewer({ params }: SpecificationViewerProps
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => router.push('/specifications')}
-                className="flex items-center space-x-2 text-[#6F6F6F] hover:text-black transition-colors"
+                className="flex items-center space-x-2 text-black hover:text-gray-600 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>仕様書一覧に戻る</span>
               </button>
               {specInfo && (
-                <div className="flex items-center space-x-2 text-[#6F6F6F]">
+                <div className="flex items-center space-x-2 text-black">
                   <span>｜</span>
                   <FileText className="w-4 h-4" />
                   <span>{specInfo.displayName}</span>
