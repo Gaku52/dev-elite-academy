@@ -92,7 +92,7 @@ const fundamentalTopics = [
     description: 'システム戦略と経営戦略',
     category: 'ストラテジ系',
     icon: TrendingUp,
-    topics: ['システム戦略', '経営戦略マネジメント', '技術戦略マネジメント'],
+    topics: ['システム戦略', '経営戦略マネジメント', '技術戦略マネジメント', 'ビジネスインダストリ'],
     color: 'bg-purple-500',
     progress: 0,
     href: '/modules/it-fundamentals/strategy'

@@ -27,6 +27,9 @@ interface ModuleInfo {
   icon: React.ComponentType<{ className?: string }>;
   color: string;
   href: string;
+  description: string;
+  category: string;
+  topics: string[];
 }
 
 const modules: ModuleInfo[] = [
@@ -35,56 +38,80 @@ const modules: ModuleInfo[] = [
     name: 'コンピュータシステム',
     icon: Calculator,
     color: 'bg-blue-500',
-    href: '/modules/it-fundamentals/computer-systems'
+    href: '/modules/it-fundamentals/computer-systems',
+    description: 'ハードウェア、ソフトウェア、システム構成の基礎知識',
+    category: 'テクノロジ系',
+    topics: ['CPU・メモリ・入出力装置', 'オペレーティングシステム', 'システムの構成と方式']
   },
   {
     key: 'algorithms-programming',
     name: 'アルゴリズムとプログラミング',
     icon: Code,
     color: 'bg-blue-500',
-    href: '/modules/it-fundamentals/algorithms-programming'
+    href: '/modules/it-fundamentals/algorithms-programming',
+    description: 'プログラミング言語、データ構造、アルゴリズムの基本',
+    category: 'テクノロジ系',
+    topics: ['基本アルゴリズム', 'データ構造', 'プログラミング言語の基礎']
   },
   {
     key: 'database',
     name: 'データベース',
     icon: Database,
     color: 'bg-blue-500',
-    href: '/modules/it-fundamentals/database'
+    href: '/modules/it-fundamentals/database',
+    description: 'データベースの基本概念とSQL',
+    category: 'テクノロジ系',
+    topics: ['関係データベース', 'SQL基礎', '正規化']
   },
   {
     key: 'network',
     name: 'ネットワーク',
     icon: Network,
     color: 'bg-blue-500',
-    href: '/modules/it-fundamentals/network'
+    href: '/modules/it-fundamentals/network',
+    description: 'ネットワーク技術とプロトコルの基礎',
+    category: 'テクノロジ系',
+    topics: ['OSI参照モデル', 'TCP/IP', 'LAN・WAN', 'インターネット技術']
   },
   {
     key: 'security',
     name: 'セキュリティ',
     icon: Shield,
     color: 'bg-blue-500',
-    href: '/modules/it-fundamentals/security'
+    href: '/modules/it-fundamentals/security',
+    description: '情報セキュリティの基本概念と対策',
+    category: 'テクノロジ系',
+    topics: ['暗号技術', '認証技術', 'セキュリティ対策', 'リスクマネジメント']
   },
   {
     key: 'system-development',
     name: 'システム開発',
     icon: Users,
     color: 'bg-green-500',
-    href: '/modules/it-fundamentals/system-development'
+    href: '/modules/it-fundamentals/system-development',
+    description: 'システム開発手法とプロジェクトマネジメント',
+    category: 'マネジメント系',
+    topics: ['開発手法', 'テスト技法', 'プロジェクト管理', 'サービスマネジメント']
   },
   {
     key: 'management-legal',
     name: '経営・法務',
     icon: FileText,
     color: 'bg-purple-500',
-    href: '/modules/it-fundamentals/management-legal'
+    href: '/modules/it-fundamentals/management-legal',
+    description: '企業活動と法務の基礎知識',
+    category: 'ストラテジ系',
+    topics: ['経営戦略', '企業会計', '法務・標準化', 'OR・IE']
   },
   {
     key: 'strategy',
     name: 'ストラテジ',
     icon: TrendingUp,
     color: 'bg-purple-500',
-    href: '/modules/it-fundamentals/strategy'
+    href: '/modules/it-fundamentals/strategy',
+    description: 'システム戦略と経営戦略',
+    category: 'ストラテジ系',
+    topics: ['システム戦略', '経営戦略マネジメント', '技術戦略マネジメント', 'ビジネスインダストリ']
   }
 ];
 
@@ -448,9 +475,9 @@ export default function LearningStatsPage() {
           </div>
 
           {/* モジュール別統計 */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="mb-8">
             <h2 className="text-xl font-semibold mb-6">モジュール別進捗</h2>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {modules.map((module) => {
                 const moduleStats = stats?.moduleStats?.[module.key];
                 const total = moduleStats?.total || 0;
@@ -458,32 +485,50 @@ export default function LearningStatsPage() {
 
                 // total=0の場合は未実装として特別処理
                 let progress: number;
-                let displayText: string;
                 let progressBarWidth: number;
 
                 if (total === 0) {
                   progress = 0;
-                  displayText = `${completed} / ${total} (未実装)`;
                   progressBarWidth = 0;
                 } else {
                   progress = Math.round((completed / total) * 100);
-                  displayText = `${completed} / ${total} (${progress}%)`;
                   progressBarWidth = Math.min(progress, 100); // 100%を超えないように制限
                 }
 
                 const Icon = module.icon;
 
                 return (
-                  <div key={module.key} className="flex items-center">
-                    <div className={`w-10 h-10 ${module.color} rounded-lg flex items-center justify-center mr-4`}>
-                      <Icon className="w-5 h-5 text-white" />
+                  <div key={module.key} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <div className="flex items-start mb-4">
+                      <div className={`inline-flex items-center justify-center w-12 h-12 ${module.color} rounded-xl mr-4`}>
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-black mb-1">
+                          {module.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-1">
+                          {module.description}
+                        </p>
+                        <div className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-full inline-block">
+                          {module.category}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-gray-900">{module.name}</span>
-                        <span className="text-sm text-gray-600">
-                          {displayText}
-                        </span>
+
+                    <div className="space-y-2 mb-4">
+                      {module.topics.map((topic, index) => (
+                        <div key={index} className="flex items-center text-sm">
+                          <span className="w-2 h-2 bg-gray-300 rounded-full mr-2"></span>
+                          <span className="text-gray-600">{topic}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">進捗</span>
+                        <span className="text-gray-600">{progress}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
@@ -492,11 +537,11 @@ export default function LearningStatsPage() {
                         />
                       </div>
                     </div>
-                    <Link
-                      href={module.href}
-                      className="ml-4 px-3 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                    >
-                      学習
+
+                    <Link href={module.href} className="mt-4 w-full block">
+                      <button className="w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-sm font-medium">
+                        学習を開始 ({module.category})
+                      </button>
                     </Link>
                   </div>
                 );
