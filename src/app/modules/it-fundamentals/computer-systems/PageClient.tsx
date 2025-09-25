@@ -1552,7 +1552,9 @@ export default function ComputerSystemsPage() {
     acc + module.sections.reduce((sectionAcc, section) =>
       sectionAcc + section.quizzes.length, 0), 0);
 
-  const quizProgress = Math.floor((completedQuizzes.size / totalQuizzes) * 100);
+  // データベースの進捗データを使用して正確な進捗率を計算
+  const dbCompletedCount = progress.filter(p => p.is_completed).length;
+  const quizProgress = totalQuizzes > 0 ? Math.floor((dbCompletedCount / totalQuizzes) * 100) : 0;
   const sectionQuizProgress = currentSection.quizzes.filter((_, index) =>
     completedQuizzes.has(`${activeModule}-${activeSection}-${index}`)).length;
 
