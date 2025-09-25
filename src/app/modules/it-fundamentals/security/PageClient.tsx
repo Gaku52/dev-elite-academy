@@ -129,8 +129,9 @@ export default function SecurityPage() {
   const totalQuizzes = learningModules.reduce((total, module) =>
     total + module.sections.reduce((sectionTotal, section) =>
       sectionTotal + section.quizzes.length, 0), 0);
-  const completedTotal = completedQuizzes.size;
-  const quizProgress = totalQuizzes > 0 ? Math.floor((completedTotal / totalQuizzes) * 100) : 0;
+  // データベースの進捗データを使用して正確な進捗率を計算
+  const dbCompletedCount = progress.filter(p => p.is_completed).length;
+  const quizProgress = totalQuizzes > 0 ? Math.floor((dbCompletedCount / totalQuizzes) * 100) : 0;
   const sectionQuizProgress = currentSection.quizzes.filter((_, index) =>
     completedQuizzes.has(`${activeModule}-${activeSection}-${index}`)).length;
 
@@ -141,7 +142,7 @@ export default function SecurityPage() {
         title="セキュリティ"
         backLink="/modules/it-fundamentals"
         backLinkText="戻る"
-        completedCount={completedTotal}
+        completedCount={dbCompletedCount}
         totalCount={totalQuizzes}
         progress={quizProgress}
         isMobile={true}
@@ -154,7 +155,7 @@ export default function SecurityPage() {
           description="情報セキュリティの基本概念と対策を体系的に学習"
           backLink="/modules/it-fundamentals"
           backLinkText="IT基礎に戻る"
-          completedCount={completedTotal}
+          completedCount={dbCompletedCount}
           totalCount={totalQuizzes}
           progress={quizProgress}
           isMobile={false}
