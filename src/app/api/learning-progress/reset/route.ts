@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { moduleQuizCounts, getTotalQuestions } from '@/lib/moduleQuizCounts';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
@@ -200,23 +201,20 @@ export async function GET(request: NextRequest) {
       }
 
       const progress = data || [];
-      const totalQuestions = 105 + 89 + 80 + 100 + 100 + 120 + 100 + 96; // 790問
+      const totalQuestions = getTotalQuestions(); // 動的に総問題数を取得
       const completedQuestions = progress.filter(p => p.is_completed).length;
       const correctAnswers = progress.reduce((sum, p) => sum + p.correct_count, 0);
       const totalAnswers = progress.reduce((sum, p) => sum + p.answer_count, 0);
       const correctRate = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
-      // モジュール別統計
-      const moduleStats = {
-        'computer-systems': { total: 105, completed: progress.filter(p => p.module_name === 'computer-systems' && p.is_completed).length },
-        'algorithms-programming': { total: 89, completed: progress.filter(p => p.module_name === 'algorithms-programming' && p.is_completed).length },
-        'database': { total: 80, completed: progress.filter(p => p.module_name === 'database' && p.is_completed).length },
-        'network': { total: 100, completed: progress.filter(p => p.module_name === 'network' && p.is_completed).length },
-        'security': { total: 100, completed: progress.filter(p => p.module_name === 'security' && p.is_completed).length },
-        'system-development': { total: 120, completed: progress.filter(p => p.module_name === 'system-development' && p.is_completed).length },
-        'management-legal': { total: 100, completed: progress.filter(p => p.module_name === 'management-legal' && p.is_completed).length },
-        'strategy': { total: 96, completed: progress.filter(p => p.module_name === 'strategy' && p.is_completed).length }
-      };
+      // モジュール別統計（動的に構築）
+      const moduleStats: Record<string, { total: number; completed: number }> = {};
+      Object.entries(moduleQuizCounts).forEach(([moduleName, total]) => {
+        moduleStats[moduleName] = {
+          total,
+          completed: progress.filter(p => p.module_name === moduleName && p.is_completed).length
+        };
+      });
 
       return NextResponse.json({
         stats: { totalQuestions, completedQuestions, correctRate, moduleStats }
