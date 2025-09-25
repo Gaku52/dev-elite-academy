@@ -8,7 +8,7 @@ export const moduleQuizCounts: Record<string, number> = {
   'security': 100,                // 実装済み - 100クイズ
   'system-development': 120,      // 実装済み - 120クイズ
   'management-legal': 100,        // 実装済み - 100クイズ
-  'strategy': 96                  // 実装済み - 96クイズ
+  'strategy': 106                 // 拡張済み - 106クイズ（ビジネスインダストリ+10問追加）
 };
 
 // 総問題数を計算
