@@ -8,15 +8,14 @@ import {
   Star,
   ChevronRight,
   BarChart3,
-  Calendar,
-  Pin
+  Calendar
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import UserProgressTracker from '@/components/UserProgressTracker';
-import CategoryContentCount from '@/components/CategoryContentCount';
-import { getLearningPathUrl } from '@/lib/learning-paths';
+import PinnedLearningPaths from '@/components/PinnedLearningPaths';
+import LearningPathCard from '@/components/LearningPathCard';
 
 // 型定義
 interface Category {
@@ -39,56 +38,6 @@ interface LearningContent {
 }
 
 
-// CategoryPinButton コンポーネント（カテゴリ用）
-function CategoryPinButton({ categoryId, initialPinned = false }: { categoryId: number; initialPinned?: boolean }) {
-  const [isPinned, setIsPinned] = useState(initialPinned);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const togglePin = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Linkのナビゲーションを防ぐ
-    e.stopPropagation(); // イベントの伝播を防ぐ
-
-    setIsLoading(true);
-    try {
-      const userEmail = 'user@example.com'; // TODO: 実際のユーザーメール取得
-      const method = isPinned ? 'DELETE' : 'POST';
-
-      const response = await fetch('/api/pinned-categories', {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userEmail,
-          categoryId,
-        }),
-      });
-
-      if (response.ok) {
-        setIsPinned(!isPinned);
-      }
-    } catch (error) {
-      console.error('Error toggling category pin:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <button
-      onClick={togglePin}
-      disabled={isLoading}
-      className={`p-1.5 rounded-full transition-all duration-200 ${
-        isPinned
-          ? 'bg-[#8E9C78]/20 text-[#8E9C78] hover:bg-[#8E9C78]/30'
-          : 'bg-gray-200/50 text-gray-400 hover:bg-gray-300/50 hover:text-gray-600'
-      }`}
-      title={isPinned ? 'ピン留めを解除' : 'ピン留めする'}
-    >
-      <Pin className={`w-3 h-3 ${isPinned ? 'fill-current' : ''}`} />
-    </button>
-  );
-}
 
 // Dashboard コンポーネント（Client Component に変更）
 export default function Dashboard() {
@@ -156,6 +105,9 @@ export default function Dashboard() {
         {/* User Progress Tracker */}
         <UserProgressTracker totalContents={learningContents.length} />
 
+        {/* Pinned Learning Paths */}
+        <PinnedLearningPaths categories={categories} />
+
         {/* Learning Path Section */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
@@ -171,76 +123,12 @@ export default function Dashboard() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {categories.map((category) => {
-              const pathUrl = getLearningPathUrl(category.name);
-              
-              if (pathUrl) {
-                return (
-                  <Link
-                    key={category.id}
-                    href={pathUrl}
-                    className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 block"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <span className="text-3xl">
-                        {category.icon}
-                      </span>
-                      <div className="flex items-center space-x-2">
-                        <CategoryPinButton categoryId={category.id} />
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: category.color || '#8E9C78' }}
-                        ></div>
-                      </div>
-                    </div>
-                    <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
-                      {category.name}
-                    </h4>
-                    <p className="text-[#6F6F6F] text-sm">
-                      {category.description}
-                    </p>
-                    <div className="mt-4">
-                      <CategoryContentCount
-                        categoryName={category.name}
-                        fallbackCount={learningContents.filter(content => content.category_id === category.id).length}
-                      />
-                    </div>
-                  </Link>
-                );
-              }
-              
-              return (
-                <div
-                  key={category.id}
-                  className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <span className="text-3xl">
-                      {category.icon}
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <CategoryPinButton categoryId={category.id} />
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: category.color || '#8E9C78' }}
-                      ></div>
-                    </div>
-                  </div>
-                  <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
-                    {category.name}
-                  </h4>
-                  <p className="text-[#6F6F6F] text-sm">
-                    {category.description}
-                  </p>
-                  <div className="mt-4">
-                    <CategoryContentCount
-                      categoryName={category.name}
-                      fallbackCount={learningContents.filter(content => content.category_id === category.id).length}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+            {categories.map((category) => (
+              <LearningPathCard
+                key={category.id}
+                category={category}
+              />
+            ))}
           </div>
         </div>
 

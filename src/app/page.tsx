@@ -18,10 +18,9 @@ import {
   Github,
   Globe,
   Database,
-  BookOpen,
-  Clock,
   Pin
 } from 'lucide-react';
+import { usePinnedPaths } from '@/hooks/usePinnedPaths';
 
 const skillCategories = [
   {
@@ -76,17 +75,6 @@ const stats = [
 ];
 
 // 型定義
-interface LearningContent {
-  id: number;
-  title: string;
-  description: string;
-  content_type: string;
-  difficulty: string;
-  estimated_time: number;
-  tags: string[];
-  category_id: number;
-}
-
 interface Category {
   id: number;
   name: string;
@@ -95,54 +83,42 @@ interface Category {
   color?: string;
 }
 
-interface PinnedContentItem {
-  content_id: number;
-  pinned_at: string;
-  learning_contents: LearningContent;
-}
-
-interface PinnedCategoryItem {
-  category_id: number;
-  pinned_at: string;
-  categories: Category;
-}
 
 // PinnedLearning コンポーネント
 function PinnedLearning() {
-  const [pinnedContents, setPinnedContents] = useState<PinnedContentItem[]>([]);
-  const [pinnedCategories, setPinnedCategories] = useState<PinnedCategoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { pinnedPaths, loading } = usePinnedPaths();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPinnedData = async () => {
+    const fetchCategories = async () => {
       try {
-        const userEmail = 'user@example.com'; // TODO: 実際のユーザーメール取得
+        // カテゴリデータを取得
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-        const [contentsResponse, categoriesResponse] = await Promise.all([
-          fetch(`/api/pinned-contents?user_email=${encodeURIComponent(userEmail)}`),
-          fetch(`/api/pinned-categories?user_email=${encodeURIComponent(userEmail)}`)
-        ]);
+        if (supabaseUrl && supabaseAnonKey) {
+          const supabase = createClient(supabaseUrl, supabaseAnonKey);
+          const { data: categoriesData } = await supabase
+            .from('categories')
+            .select('*')
+            .eq('is_active', true)
+            .order('sort_order');
 
-        if (contentsResponse.ok) {
-          const contentsData = await contentsResponse.json();
-          setPinnedContents(contentsData.pinnedContents || []);
-        }
-
-        if (categoriesResponse.ok) {
-          const categoriesData = await categoriesResponse.json();
-          setPinnedCategories(categoriesData.pinnedCategories || []);
+          setCategories(categoriesData || []);
         }
       } catch (error) {
-        console.error('Error fetching pinned data:', error);
+        console.error('Error fetching categories:', error);
       } finally {
-        setLoading(false);
+        setCategoriesLoading(false);
       }
     };
 
-    fetchPinnedData();
+    fetchCategories();
   }, []);
 
-  if (loading) {
+  if (loading || categoriesLoading) {
     return (
       <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10">
         <div className="container-modern">
@@ -152,9 +128,14 @@ function PinnedLearning() {
     );
   }
 
-  if (pinnedContents.length === 0 && pinnedCategories.length === 0) {
+  if (pinnedPaths.length === 0) {
     return null;
   }
+
+  // ピン固定された学習パスに対応するカテゴリを取得
+  const pinnedCategories = categories.filter(category =>
+    pinnedPaths.some(pin => pin.learning_path_name === category.name)
+  );
 
   return (
     <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10">
@@ -180,9 +161,8 @@ function PinnedLearning() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* ピン留めしたカテゴリを表示 */}
-          {pinnedCategories.map((item, index) => {
-            const category = item.categories;
+          {/* ピン留めした学習パスを表示 */}
+          {pinnedCategories.map((category, index) => {
             const pathUrl = getLearningPathUrl(category.name);
 
             if (pathUrl) {
@@ -266,63 +246,6 @@ function PinnedLearning() {
                     </span>
                   </div>
                 </div>
-              </motion.div>
-            );
-          })}
-
-          {/* ピン留めしたコンテンツを表示 */}
-          {pinnedContents.map((item, index) => {
-            const content = item.learning_contents;
-            const startIndex = pinnedCategories.length;
-            return (
-              <motion.div
-                key={`content-${content.id}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: (startIndex + index) * 0.1 }}
-                className="relative group"
-              >
-                <Link
-                  href={`/learn/${content.id}`}
-                  className="card-modern p-6 hover:shadow-lg border-2 border-[#8E9C78]/30 hover:border-[#8E9C78]/50 transition-all duration-300 block hover:-translate-y-1"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <BookOpen className="w-4 h-4 text-[#8E9C78]" />
-                      <span className="text-[#8E9C78] text-sm capitalize">
-                        {content.content_type}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Pin className="w-4 h-4 text-[#8E9C78] fill-current" />
-                      <span className="px-2 py-1 rounded-full text-xs bg-green-50 text-green-800 border border-green-200">
-                        {content.difficulty}
-                      </span>
-                    </div>
-                  </div>
-
-                  <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
-                    {content.title}
-                  </h4>
-
-                  <p className="text-[#6F6F6F] text-sm mb-4 line-clamp-2">
-                    {content.description}
-                  </p>
-
-                  <div className="flex items-center justify-between text-xs text-[#6F6F6F]">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{content.estimated_time}分</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {(content.tags || []).slice(0, 2).map((tag) => (
-                        <span key={tag} className="px-2 py-1 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </Link>
               </motion.div>
             );
           })}
