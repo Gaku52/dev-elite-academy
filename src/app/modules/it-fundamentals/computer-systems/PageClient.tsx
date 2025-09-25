@@ -1552,7 +1552,7 @@ export default function ComputerSystemsPage() {
     acc + module.sections.reduce((sectionAcc, section) =>
       sectionAcc + section.quizzes.length, 0), 0);
 
-  const quizProgress = (completedQuizzes.size / totalQuizzes) * 100;
+  const quizProgress = Math.floor((completedQuizzes.size / totalQuizzes) * 100);
   const sectionQuizProgress = currentSection.quizzes.filter((_, index) =>
     completedQuizzes.has(`${activeModule}-${activeSection}-${index}`)).length;
 
@@ -1572,7 +1572,7 @@ export default function ComputerSystemsPage() {
           <div className="mt-2">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-gray-600">全体進捗</span>
-              <span className="text-gray-900 font-medium">{Math.round(quizProgress)}%</span>
+              <span className="text-gray-900 font-medium">{quizProgress}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
@@ -1613,7 +1613,7 @@ export default function ComputerSystemsPage() {
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-gray-600">学習進捗</span>
-                <span className="text-gray-900 font-medium">{Math.round(quizProgress)}%</span>
+                <span className="text-gray-900 font-medium">{quizProgress}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
@@ -1701,7 +1701,7 @@ export default function ComputerSystemsPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">正答率</span>
-                    <span className="font-medium">{completedQuizzes.size > 0 ? Math.round(quizProgress) : 0}%</span>
+                    <span className="font-medium">{completedQuizzes.size > 0 ? quizProgress : 0}%</span>
                   </div>
                 </div>
               </div>

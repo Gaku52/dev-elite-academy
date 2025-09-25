@@ -130,7 +130,7 @@ export default function SecurityPage() {
     total + module.sections.reduce((sectionTotal, section) =>
       sectionTotal + section.quizzes.length, 0), 0);
   const completedTotal = completedQuizzes.size;
-  const quizProgress = totalQuizzes > 0 ? (completedTotal / totalQuizzes) * 100 : 0;
+  const quizProgress = totalQuizzes > 0 ? Math.floor((completedTotal / totalQuizzes) * 100) : 0;
   const sectionQuizProgress = currentSection.quizzes.filter((_, index) =>
     completedQuizzes.has(`${activeModule}-${activeSection}-${index}`)).length;
 

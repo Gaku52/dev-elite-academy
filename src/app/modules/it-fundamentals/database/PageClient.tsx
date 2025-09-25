@@ -120,7 +120,7 @@ export default function DatabasePage() {
     acc + module.sections.reduce((sectionAcc, section) =>
       sectionAcc + section.quizzes.length, 0), 0);
 
-  const quizProgress = (completedQuizzes.size / totalQuizzes) * 100;
+  const quizProgress = Math.floor((completedQuizzes.size / totalQuizzes) * 100);
   const sectionQuizProgress = currentSection.quizzes.filter((_, index) =>
     completedQuizzes.has(`${activeModule}-${activeSection}-${index}`)).length;
 
