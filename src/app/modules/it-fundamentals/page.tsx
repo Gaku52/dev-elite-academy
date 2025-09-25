@@ -114,13 +114,18 @@ export default function ITFundamentalsPage() {
 
         if (totalQuizzes > 0) {
           // 個々のページと同じ計算: progress配列から該当モジュールの完了済み項目をカウント
-          const moduleProgress = progress.filter(p => p.module_name === moduleName && p.is_completed);
-          const completedCount = moduleProgress.length;
+          // ユニークなsection_keyのみをカウント（重複を排除）
+          const uniqueSections = new Set(
+            progress
+              .filter(p => p.module_name === moduleName && p.is_completed)
+              .map(p => p.section_key)
+          );
+          const completedCount = uniqueSections.size;
 
-          const exactPercentage = (completedCount / totalQuizzes) * 100;
-          const progressPercentage = Math.round(exactPercentage);
+          // 個別ページと完全に同じ計算方法を使用
+          const progressPercentage = Math.floor((completedCount / totalQuizzes) * 100);
 
-          console.log(`📊 Module ${moduleName}: ${completedCount}/${totalQuizzes} = ${exactPercentage.toFixed(2)}% → ${progressPercentage}%`);
+          console.log(`📊 Module ${moduleName}: ${completedCount}/${totalQuizzes} = ${progressPercentage}%`);
           calculatedProgress[parseInt(topicId)] = progressPercentage;
         } else {
           calculatedProgress[parseInt(topicId)] = 0;
