@@ -9,14 +9,14 @@ import { useLearningProgress } from '@/hooks/useLearningProgress';
 // 各モジュールの総クイズ数（実装済みのモジュールから取得）
 // この数値は各モジュールの実装状況に基づいて更新される
 const moduleQuizCounts: Record<string, number> = {
-  'computer-systems': 105,        // 実装済み - 105クイズ
-  'algorithms-programming': 89,   // 実装済み - 89クイズ
-  'database': 80,                 // 実装済み - 80クイズ（拡張済み）
-  'network': 100,                 // 実装済み - 100クイズ（拡張済み）
-  'security': 100,                // 実装済み - 100クイズ（拡張済み）
-  'system-development': 120,      // 実装済み - 120クイズ（拡張済み）
-  'management-legal': 100,        // 実装済み - 100クイズ（拡張済み）
-  'strategy': 96                  // 実装済み - 96クイズ（拡張済み）
+  'computer-systems': 165,        // 拡張済み - 165クイズ（基礎理論+60問追加）
+  'algorithms-programming': 129,  // 拡張済み - 129クイズ（数学系+40問追加）
+  'database': 80,                 // 実装済み - 80クイズ
+  'network': 118,                 // 拡張済み - 118クイズ（情報・通信理論+18問追加）
+  'security': 100,                // 実装済み - 100クイズ
+  'system-development': 120,      // 実装済み - 120クイズ
+  'management-legal': 100,        // 実装済み - 100クイズ
+  'strategy': 96                  // 実装済み - 96クイズ
 };
 
 const fundamentalTopics = [
