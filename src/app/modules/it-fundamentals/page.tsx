@@ -24,6 +24,7 @@ const fundamentalTopics = [
     id: 1,
     title: 'コンピュータシステム',
     description: 'ハードウェア、ソフトウェア、システム構成の基礎知識',
+    category: 'テクノロジ系',
     icon: Calculator,
     topics: ['CPU・メモリ・入出力装置', 'オペレーティングシステム', 'システムの構成と方式'],
     color: 'bg-blue-500',
@@ -34,9 +35,10 @@ const fundamentalTopics = [
     id: 2,
     title: 'アルゴリズムとプログラミング',
     description: 'プログラミング言語、データ構造、アルゴリズムの基本',
+    category: 'テクノロジ系',
     icon: Code,
     topics: ['基本アルゴリズム', 'データ構造', 'プログラミング言語の基礎'],
-    color: 'bg-purple-500',
+    color: 'bg-blue-500',
     progress: 0,
     href: '/modules/it-fundamentals/algorithms-programming'
   },
@@ -44,9 +46,10 @@ const fundamentalTopics = [
     id: 3,
     title: 'データベース',
     description: 'データベースの基本概念とSQL',
+    category: 'テクノロジ系',
     icon: Database,
     topics: ['関係データベース', 'SQL基礎', '正規化'],
-    color: 'bg-green-500',
+    color: 'bg-blue-500',
     progress: 0,
     href: '/modules/it-fundamentals/database'
   },
@@ -54,9 +57,10 @@ const fundamentalTopics = [
     id: 4,
     title: 'ネットワーク',
     description: 'ネットワーク技術とプロトコルの基礎',
+    category: 'テクノロジ系',
     icon: Network,
     topics: ['OSI参照モデル', 'TCP/IP', 'LAN・WAN', 'インターネット技術'],
-    color: 'bg-orange-500',
+    color: 'bg-blue-500',
     progress: 0,
     href: '/modules/it-fundamentals/network'
   },
@@ -64,9 +68,10 @@ const fundamentalTopics = [
     id: 5,
     title: 'セキュリティ',
     description: '情報セキュリティの基本概念と対策',
+    category: 'テクノロジ系',
     icon: Shield,
     topics: ['暗号技術', '認証技術', 'セキュリティ対策', 'リスクマネジメント'],
-    color: 'bg-red-500',
+    color: 'bg-blue-500',
     progress: 0,
     href: '/modules/it-fundamentals/security'
   },
@@ -74,9 +79,10 @@ const fundamentalTopics = [
     id: 6,
     title: 'システム開発',
     description: 'システム開発手法とプロジェクトマネジメント',
+    category: 'マネジメント系',
     icon: Users,
     topics: ['開発手法', 'テスト技法', 'プロジェクト管理', 'サービスマネジメント'],
-    color: 'bg-indigo-500',
+    color: 'bg-green-500',
     progress: 0,
     href: '/modules/it-fundamentals/system-development'
   },
@@ -84,9 +90,10 @@ const fundamentalTopics = [
     id: 7,
     title: '経営・法務',
     description: '企業活動と法務の基礎知識',
+    category: 'ストラテジ系',
     icon: FileText,
     topics: ['経営戦略', '企業会計', '法務・標準化', 'OR・IE'],
-    color: 'bg-teal-500',
+    color: 'bg-purple-500',
     progress: 0,
     href: '/modules/it-fundamentals/management-legal'
   },
@@ -94,9 +101,10 @@ const fundamentalTopics = [
     id: 8,
     title: 'ストラテジ',
     description: 'システム戦略と経営戦略',
+    category: 'ストラテジ系',
     icon: TrendingUp,
     topics: ['システム戦略', '経営戦略マネジメント', '技術戦略マネジメント'],
-    color: 'bg-pink-500',
+    color: 'bg-purple-500',
     progress: 0,
     href: '/modules/it-fundamentals/strategy'
   }
@@ -165,7 +173,7 @@ export default function ITFundamentalsPage() {
             基本情報技術者試験
           </h1>
           <p className="text-xl text-[#6F6F6F] max-w-3xl mx-auto mb-4">
-            IT基礎知識を体系的に学習
+            IT基礎知識を体系的に学習｜科目A: 60問（90分）｜科目B: 20問（100分）
           </p>
           <Link
             href="/learning-stats"
@@ -180,17 +188,17 @@ export default function ITFundamentalsPage() {
             <h2 className="text-xl font-semibold mb-4">学習の概要</h2>
             <p className="text-[#6F6F6F] mb-4">
               基本情報技術者試験は、ITエンジニアとしての基礎的な知識・技能を評価する国家試験です。
-              以下の分野を体系的に学習していきます。
+              以下の3分野を体系的に学習していきます。
             </p>
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">
-                テクノロジ系
+                🔧 テクノロジ系 (41問/60問)
               </span>
               <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-sm">
-                マネジメント系
+                📊 マネジメント系 (7問/60問)
               </span>
               <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-sm">
-                ストラテジ系
+                🎯 ストラテジ系 (12問/60問)
               </span>
             </div>
           </div>
@@ -210,9 +218,12 @@ export default function ITFundamentalsPage() {
                     <h3 className="text-lg font-semibold text-black mb-1">
                       {topic.title}
                     </h3>
-                    <p className="text-sm text-[#6F6F6F]">
+                    <p className="text-sm text-[#6F6F6F] mb-1">
                       {topic.description}
                     </p>
+                    <div className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-full inline-block">
+                      {topic.category}
+                    </div>
                   </div>
                 </div>
 
@@ -240,7 +251,7 @@ export default function ITFundamentalsPage() {
 
                 <Link href={topic.href || '#'} className="mt-4 w-full block">
                   <button className="w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-sm font-medium">
-                    学習を開始
+                    学習を開始 ({topic.category})
                   </button>
                 </Link>
               </div>
