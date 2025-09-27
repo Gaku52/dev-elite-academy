@@ -309,7 +309,7 @@ export default function LearningStatsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container max-w-6xl mx-auto px-4 py-8">
+      <div className="container max-w-6xl mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <Link
           href="/modules/it-fundamentals"
           className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-8 transition-colors"
@@ -318,20 +318,20 @@ export default function LearningStatsPage() {
           IT基礎に戻る
         </Link>
 
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-4">
-                <TrendingUp className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-3 sm:mr-4">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">詳細学習統計</h1>
-                <p className="text-gray-600">あなたの学習進捗を詳細に分析します</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">詳細学習統計</h1>
+                <p className="text-sm sm:text-base text-gray-600">あなたの学習進捗を詳細に分析します</p>
               </div>
             </div>
             <button
               onClick={() => setShowResetDialog(true)}
-              className="flex items-center px-4 py-2 text-red-600 hover:text-red-800 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+              className="flex items-center justify-center px-3 sm:px-4 py-2 text-sm sm:text-base text-red-600 hover:text-red-800 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               進捗リセット
@@ -339,10 +339,10 @@ export default function LearningStatsPage() {
           </div>
 
           {/* タブナビゲーション */}
-          <div className="flex space-x-1 mb-6">
+          <div className="flex space-x-1 mb-4 sm:mb-6">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors ${
                 activeTab === 'overview'
                   ? 'bg-blue-500 text-white'
                   : 'text-blue-600 hover:bg-blue-50'
@@ -352,7 +352,7 @@ export default function LearningStatsPage() {
             </button>
             <button
               onClick={() => setActiveTab('cycles')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors ${
                 activeTab === 'cycles'
                   ? 'bg-blue-500 text-white'
                   : 'text-blue-600 hover:bg-blue-50'
@@ -369,13 +369,13 @@ export default function LearningStatsPage() {
               {streakData && <LearningStreakCard streakData={streakData} />}
 
           {/* 期間選択とチャートタイプ選択 */}
-          <div className="flex flex-wrap gap-4 my-6">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 my-4 sm:my-6">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">表示期間:</span>
+              <span className="text-xs sm:text-sm text-gray-600">表示期間:</span>
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(Number(e.target.value))}
-                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-2 sm:px-3 py-1 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value={7}>1週間</option>
                 <option value={30}>1ヶ月</option>
@@ -385,11 +385,11 @@ export default function LearningStatsPage() {
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">チャートタイプ:</span>
+              <span className="text-xs sm:text-sm text-gray-600">チャートタイプ:</span>
               <div className="flex gap-1">
                 <button
                   onClick={() => setChartType('line')}
-                  className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                  className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors ${
                     chartType === 'line'
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -399,7 +399,7 @@ export default function LearningStatsPage() {
                 </button>
                 <button
                   onClick={() => setChartType('bar')}
-                  className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                  className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors ${
                     chartType === 'bar'
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -409,7 +409,7 @@ export default function LearningStatsPage() {
                 </button>
                 <button
                   onClick={() => setChartType('area')}
-                  className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                  className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors ${
                     chartType === 'area'
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -432,30 +432,30 @@ export default function LearningStatsPage() {
           </div>
 
           {/* 全体統計 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-600">総問題数</span>
                 <BookOpen className="w-5 h-5 text-gray-400" />
               </div>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-xl sm:text-2xl font-bold text-gray-900">
                 {stats?.totalQuestions || 0}<span className="text-sm text-gray-500 font-normal">問</span>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-600">完了済み</span>
                 <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
                   {stats ? Math.round((stats.completedQuestions / Math.max(stats.totalQuestions, 1)) * 100) : 0}%
                 </span>
               </div>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-xl sm:text-2xl font-bold text-gray-900">
                 {stats?.completedQuestions || 0}<span className="text-sm text-gray-500 font-normal">問</span>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-600">正答率</span>
                 <span className={`text-xs px-2 py-1 rounded-full ${
@@ -468,16 +468,16 @@ export default function LearningStatsPage() {
                   {(stats?.correctRate || 0) >= 80 ? '優秀' : (stats?.correctRate || 0) >= 60 ? '良好' : '要改善'}
                 </span>
               </div>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-xl sm:text-2xl font-bold text-gray-900">
                 {stats?.correctRate || 0}<span className="text-sm text-gray-500 font-normal">%</span>
               </div>
             </div>
           </div>
 
           {/* モジュール別統計 */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-6">モジュール別進捗</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">モジュール別進捗</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {modules.map((module) => {
                 const moduleStats = stats?.moduleStats?.[module.key];
                 const total = moduleStats?.total || 0;
@@ -498,35 +498,35 @@ export default function LearningStatsPage() {
                 const Icon = module.icon;
 
                 return (
-                  <div key={module.key} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                    <div className="flex items-start mb-4">
-                      <div className={`inline-flex items-center justify-center w-12 h-12 ${module.color} rounded-xl mr-4`}>
-                        <Icon className="w-6 h-6 text-white" />
+                  <div key={module.key} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <div className="flex items-start mb-3 sm:mb-4">
+                      <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 ${module.color} rounded-xl mr-3 sm:mr-4 flex-shrink-0`}>
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-black mb-1">
+                        <h3 className="text-base sm:text-lg font-semibold text-black mb-1">
                           {module.name}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-1">
+                        <p className="text-xs sm:text-sm text-gray-600 mb-1 line-clamp-2">
                           {module.description}
                         </p>
-                        <div className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-full inline-block">
+                        <div className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 sm:py-1 rounded-full inline-block">
                           {module.category}
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-2 mb-4">
-                      {module.topics.map((topic, index) => (
-                        <div key={index} className="flex items-center text-sm">
-                          <span className="w-2 h-2 bg-gray-300 rounded-full mr-2"></span>
-                          <span className="text-gray-600">{topic}</span>
+                    <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
+                      {module.topics.slice(0, 3).map((topic, index) => (
+                        <div key={index} className="flex items-center text-xs sm:text-sm">
+                          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 rounded-full mr-2 flex-shrink-0"></span>
+                          <span className="text-gray-600 truncate">{topic}</span>
                         </div>
                       ))}
                     </div>
 
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">進捗</span>
                         <span className="text-gray-600">{progress}%</span>
                       </div>
@@ -539,7 +539,7 @@ export default function LearningStatsPage() {
                     </div>
 
                     <Link href={module.href} className="mt-4 w-full block">
-                      <button className="w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-sm font-medium">
+                      <button className="w-full py-1.5 sm:py-2 px-3 sm:px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-xs sm:text-sm font-medium">
                         学習を開始 ({module.category})
                       </button>
                     </Link>
@@ -550,9 +550,9 @@ export default function LearningStatsPage() {
           </div>
 
           {/* 学習のヒント */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">📊 分析から見える改善点</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">📊 分析から見える改善点</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
               <div>
                 <p className="text-gray-700 mb-2"><strong>学習パターン:</strong></p>
                 <p className="text-gray-600">
