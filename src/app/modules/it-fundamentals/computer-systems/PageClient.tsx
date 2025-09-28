@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Circle, ChevronRight, Calculator, AlertCircle, Trophy } from 'lucide-react';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { moduleQuizCounts } from '@/lib/moduleQuizCounts';
 
 interface Quiz {
   question: string;
@@ -1548,9 +1549,8 @@ export default function ComputerSystemsPage() {
     }
   };
 
-  const totalQuizzes = learningModules.reduce((acc, module) =>
-    acc + module.sections.reduce((sectionAcc, section) =>
-      sectionAcc + section.quizzes.length, 0), 0);
+  // メインページと同じ値を使用
+  const totalQuizzes = moduleQuizCounts['computer-systems'] || 0;
 
   // データベースの進捗データを使用して正確な進捗率を計算
   // 重複を排除してユニークなsection_keyのみをカウント

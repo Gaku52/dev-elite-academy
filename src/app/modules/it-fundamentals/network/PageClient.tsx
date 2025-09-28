@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BookOpen } from 'lucide-react';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { moduleQuizCounts } from '@/lib/moduleQuizCounts';
 import { learningModules } from '@/data/modules/it-fundamentals/network';
 import {
   LearningHeader,
@@ -126,9 +127,8 @@ export default function NetworkPage() {
     setCurrentQuizIndex(0);
   };
 
-  const totalQuizzes = learningModules.reduce((total, module) =>
-    total + module.sections.reduce((sectionTotal, section) =>
-      sectionTotal + section.quizzes.length, 0), 0);
+  // メインページと同じ値を使用
+  const totalQuizzes = moduleQuizCounts['network'] || 0;
   // データベースの進捗データを使用して正確な進捗率を計算
   // 重複を排除してユニークなsection_keyのみをカウント
   const uniqueCompletedSections = new Set(

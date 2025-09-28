@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BookOpen } from 'lucide-react';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { moduleQuizCounts } from '@/lib/moduleQuizCounts';
 import { learningModules } from '@/data/modules/it-fundamentals/database';
 import {
   LearningHeader,
@@ -116,9 +117,8 @@ export default function DatabasePage() {
     }
   };
 
-  const totalQuizzes = learningModules.reduce((acc, module) =>
-    acc + module.sections.reduce((sectionAcc, section) =>
-      sectionAcc + section.quizzes.length, 0), 0);
+  // メインページと同じ値を使用
+  const totalQuizzes = moduleQuizCounts['database'] || 0;
 
   // データベースの進捗データを使用して正確な進捗率を計算
   // 重複を排除してユニークなsection_keyのみをカウント
