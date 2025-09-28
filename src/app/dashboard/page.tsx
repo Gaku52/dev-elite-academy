@@ -88,17 +88,17 @@ export default function Dashboard() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <div className="container-modern py-6 sm:py-8 md:py-12">
+      <div className="max-w-6xl mx-auto px-4 py-4">
         {/* Welcome Section */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-[#8E9C78] rounded-2xl shadow-sm">
-            <Trophy className="w-8 h-8 text-white" />
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 mb-3 bg-[#8E9C78] rounded-xl shadow-sm">
+            <Trophy className="w-6 h-6 text-white" />
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-black mb-2">
             学習ダッシュボード
           </h2>
-          <p className="text-base sm:text-lg md:text-xl text-[#6F6F6F] max-w-3xl mx-auto">
-            高年収エンジニアへの道のり。あなたの学習進捗を追跡し、スキルアップの成果を可視化します。
+          <p className="text-sm text-[#6F6F6F] max-w-2xl mx-auto">
+            高年収エンジニアへの道のり
           </p>
         </div>
 
@@ -109,8 +109,8 @@ export default function Dashboard() {
         <PinnedLearningPaths categories={categories} />
 
         {/* Learning Path Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl sm:text-2xl font-bold text-black flex items-center">
               <BarChart3 className="w-6 h-6 mr-3 text-[#8E9C78]" />
               学習パス
@@ -133,8 +133,8 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Start Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl sm:text-2xl font-bold text-black flex items-center">
               <PlayCircle className="w-6 h-6 mr-3 text-green-500" />
               今すぐ始める
@@ -147,7 +147,7 @@ export default function Dashboard() {
                 <Link
                   key={content.id}
                   href={`/learn/${content.id}`}
-                  className="card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group block hover:-translate-y-1"
+                  className="card-modern p-4 hover:shadow-lg transition-all duration-300 cursor-pointer group block hover:-translate-y-1"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-2">
@@ -186,38 +186,38 @@ export default function Dashboard() {
               ))}
             </div>
           ) : (
-            <div className="card-modern p-8 text-center">
-              <p className="text-[#6F6F6F]">学習コンテンツが見つかりません</p>
+            <div className="card-modern p-6 text-center">
+              <p className="text-sm text-[#6F6F6F]">学習コンテンツが見つかりません</p>
             </div>
           )}
         </div>
 
         {/* Motivation Section */}
-        <div className="mt-12 text-center bg-[#8E9C78]/10 rounded-2xl p-8 border border-[#8E9C78]/20">
-          <div className="flex items-center justify-center mb-4">
-            <Star className="w-8 h-8 text-yellow-500 mr-2" />
-            <Trophy className="w-8 h-8 text-yellow-500 mr-2" />
-            <Star className="w-8 h-8 text-yellow-500" />
+        <div className="mt-6 text-center bg-[#8E9C78]/10 rounded-xl p-6 border border-[#8E9C78]/20">
+          <div className="flex items-center justify-center mb-3">
+            <Star className="w-6 h-6 text-yellow-500 mr-2" />
+            <Trophy className="w-6 h-6 text-yellow-500 mr-2" />
+            <Star className="w-6 h-6 text-yellow-500" />
           </div>
-          <h3 className="text-2xl font-bold text-black mb-4">
+          <h3 className="text-lg font-bold text-black mb-2">
             高年収エンジニアへの挑戦
           </h3>
-          <p className="text-[#6F6F6F] mb-6 max-w-2xl mx-auto">
-            技術力を向上させ、市場価値を高める学習を今すぐ始めましょう。継続的な成長があなたの未来を変えます。
+          <p className="text-sm text-[#6F6F6F] mb-4 max-w-xl mx-auto">
+            技術力を向上させ、市場価値を高める学習を今すぐ始めましょう。
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/learn"
-              className="btn-modern inline-flex items-center px-8 py-3"
+              className="btn-modern inline-flex items-center px-6 py-2"
             >
-              <PlayCircle className="w-5 h-5 mr-2" />
+              <PlayCircle className="w-4 h-4 mr-2" />
               学習を開始する
             </Link>
             <Link
               href="#"
-              className="btn-secondary inline-flex items-center px-8 py-3"
+              className="btn-secondary inline-flex items-center px-6 py-2"
             >
-              <Calendar className="w-5 h-5 mr-2" />
+              <Calendar className="w-4 h-4 mr-2" />
               学習計画を立てる
             </Link>
           </div>
