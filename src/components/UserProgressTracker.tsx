@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Trophy, 
-  Star, 
-  Clock, 
+import {
+  Star,
+  Clock,
   Target,
   Zap,
   BookOpen,
@@ -110,16 +109,16 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-r from-purple-800/20 to-pink-800/20 rounded-xl p-4 mb-6 border border-purple-500/30">
+      <div className="bg-white rounded-lg p-3 mb-4 border border-gray-200 shadow-sm">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-700 rounded w-1/3 mx-auto mb-2"></div>
-          <div className="h-3 bg-gray-700 rounded w-2/3 mx-auto mb-4"></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="h-4 bg-gray-300 rounded w-1/3 mx-auto mb-2"></div>
+          <div className="h-3 bg-gray-300 rounded w-2/3 mx-auto mb-3"></div>
+          <div className="grid grid-cols-4 gap-3">
             {[1,2,3,4].map(i => (
               <div key={i} className="text-center">
-                <div className="w-12 h-12 bg-gray-700 rounded-full mx-auto mb-2"></div>
-                <div className="h-5 bg-gray-700 rounded w-8 mx-auto mb-1"></div>
-                <div className="h-3 bg-gray-700 rounded w-12 mx-auto"></div>
+                <div className="w-10 h-10 bg-gray-300 rounded-lg mx-auto mb-1"></div>
+                <div className="h-4 bg-gray-300 rounded w-6 mx-auto mb-1"></div>
+                <div className="h-3 bg-gray-300 rounded w-10 mx-auto"></div>
               </div>
             ))}
           </div>
@@ -129,67 +128,63 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
   }
 
   return (
-    <div className="bg-gradient-to-r from-purple-800/20 to-pink-800/20 rounded-xl p-4 mb-6 border border-purple-500/30">
-      <div className="text-center mb-4">
-        <div className="flex items-center justify-center mb-2">
-          <Trophy className="w-6 h-6 text-yellow-400 mr-2" />
-          <h3 className="text-lg font-bold text-white">あなたの学習進捗</h3>
-          <Trophy className="w-6 h-6 text-yellow-400 ml-2" />
-        </div>
-        <p className="text-sm text-gray-300">{getMotivationalMessage()}</p>
+    <div className="bg-white rounded-lg p-3 mb-4 border border-gray-200 shadow-sm">
+      <div className="text-center mb-3">
+        <h3 className="text-sm font-semibold text-gray-800 mb-1">あなたの学習進捗</h3>
+        <p className="text-xs text-gray-600">{getMotivationalMessage()}</p>
         {progress.streak > 0 && (
-          <p className="text-orange-400 text-xs flex items-center justify-center mt-1">
+          <p className="text-orange-500 text-xs flex items-center justify-center mt-1">
             <Zap className="w-3 h-3 mr-1" />
-            学習ストリーク: {progress.streak}日
+            ストリーク: {progress.streak}日
           </p>
         )}
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-4 gap-3 mb-3">
         <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 mx-auto mb-1 bg-purple-100 rounded-lg flex items-center justify-center">
+            <BookOpen className="w-5 h-5 text-purple-600" />
           </div>
-          <p className="text-xl font-bold text-white">{progress.completedLessons}</p>
-          <p className="text-purple-300 text-xs">完了レッスン</p>
+          <p className="text-lg font-bold text-black">{progress.completedLessons}</p>
+          <p className="text-gray-600 text-xs">完了レッスン</p>
         </div>
 
         <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-            <Target className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 mx-auto mb-1 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Target className="w-5 h-5 text-blue-600" />
           </div>
-          <p className="text-xl font-bold text-white">{progress.totalLessons}</p>
-          <p className="text-blue-300 text-xs">総レッスン数</p>
+          <p className="text-lg font-bold text-black">{progress.totalLessons}</p>
+          <p className="text-gray-600 text-xs">総レッスン数</p>
         </div>
 
         <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-            <Clock className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 mx-auto mb-1 bg-green-100 rounded-lg flex items-center justify-center">
+            <Clock className="w-5 h-5 text-green-600" />
           </div>
-          <p className="text-xl font-bold text-white">{Math.round(progress.completedHours)}</p>
-          <p className="text-green-300 text-xs">学習時間</p>
+          <p className="text-lg font-bold text-black">{Math.round(progress.completedHours)}</p>
+          <p className="text-gray-600 text-xs">学習時間</p>
         </div>
 
         <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
-            <BarChart3 className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 mx-auto mb-1 bg-orange-100 rounded-lg flex items-center justify-center">
+            <BarChart3 className="w-5 h-5 text-orange-600" />
           </div>
-          <p className="text-xl font-bold text-white">{progressPercentage}%</p>
-          <p className="text-yellow-300 text-xs">完了率</p>
+          <p className="text-lg font-bold text-black">{progressPercentage}%</p>
+          <p className="text-gray-600 text-xs">完了率</p>
         </div>
       </div>
       
       {/* Progress Bar */}
-      <div className="mb-3">
+      <div className="mb-2">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-gray-300">全体の進捗</span>
-          <span className="text-xs text-purple-300">
+          <span className="text-xs text-gray-600">全体の進捗</span>
+          <span className="text-xs text-gray-700">
             {progress.completedLessons} / {progress.totalLessons} 完了
           </span>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500 ease-out"
+            className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-500 ease-out"
             style={{width: `${progressPercentage}%`}}
           ></div>
         </div>
@@ -198,12 +193,11 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
       {/* Achievements */}
       {progress.achievements.length > 0 && (
         <div className="text-center">
-          <h4 className="text-xs font-semibold text-gray-300 mb-2">獲得したバッジ</h4>
           <div className="flex justify-center flex-wrap gap-1">
             {progress.achievements.map((achievement, index) => (
               <span
                 key={index}
-                className="flex items-center px-2 py-1 bg-yellow-600/20 text-yellow-300 rounded-full text-xs border border-yellow-500/30"
+                className="inline-flex items-center px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded text-xs"
               >
                 <Star className="w-3 h-3 mr-1" />
                 {achievement}
