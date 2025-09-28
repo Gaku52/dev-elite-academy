@@ -23,12 +23,12 @@ graph TB
     Browser --> Frontend[🖥️ Frontend Layer]
 
     subgraph Frontend[🖥️ Frontend Layer]
-        NextJS[Next.js 15<br/>App Router & Turbopack]
-        React[React 19<br/>Modern Features]
-        TS[TypeScript<br/>Type Safety]
-        Tailwind[Tailwind CSS 4<br/>Styling]
-        Framer[Framer Motion<br/>Animations]
-        Radix[Radix UI<br/>Components]
+        NextJS[⚡ Next.js 15<br/>App Router & Turbopack]
+        React[⚛️ React 19<br/>Modern Features]
+        TS[🔷 TypeScript<br/>Type Safety]
+        Tailwind[🎨 Tailwind CSS 4<br/>Styling]
+        Framer[🎭 Framer Motion<br/>Animations]
+        Radix[🧩 Radix UI<br/>Components]
 
         NextJS --> React
         React --> TS
@@ -40,9 +40,9 @@ graph TB
     Frontend --> API[🔌 API Layer]
 
     subgraph Backend[🗄️ Backend & Database]
-        Supabase[Supabase<br/>Auth & Database]
-        PostgreSQL[(PostgreSQL<br/>Data Storage)]
-        Prisma[Prisma<br/>Database ORM]
+        Supabase[🟢 Supabase<br/>Auth & Database]
+        PostgreSQL[🐘 PostgreSQL<br/>Data Storage]
+        Prisma[⚡ Prisma<br/>Database ORM]
 
         Supabase --> PostgreSQL
         Prisma --> PostgreSQL
@@ -51,15 +51,25 @@ graph TB
     API --> Backend
 
     subgraph Deploy[🚀 Production]
-        Ogadix[ogadix.com<br/>Production Site]
+        Ogadix[🌐 ogadix.com<br/>Production Site]
     end
 
     Frontend --> Deploy
 
-    style User fill:#e1f5fe
-    style Frontend fill:#f3e5f5
-    style Backend fill:#e8f5e8
-    style Deploy fill:#fff3e0
+    style User fill:#e1f5fe,color:#000
+    style Frontend fill:#f8f9fa,color:#000
+    style Backend fill:#f0f8f0,color:#000
+    style Deploy fill:#fff8e1,color:#000
+    style NextJS fill:#000000,color:#fff
+    style React fill:#61dafb,color:#000
+    style TS fill:#3178c6,color:#fff
+    style Tailwind fill:#06b6d4,color:#fff
+    style Framer fill:#ff0055,color:#fff
+    style Radix fill:#161618,color:#fff
+    style Supabase fill:#3ecf8e,color:#000
+    style PostgreSQL fill:#336791,color:#fff
+    style Prisma fill:#2d3748,color:#fff
+    style Ogadix fill:#ff6b35,color:#fff
 ```
 
 ### 開発・デプロイメントフロー
@@ -70,9 +80,9 @@ graph LR
     Code --> Git[📦 Git Repository]
 
     subgraph Development[🛠️ Development Tools]
-        ESLint[ESLint<br/>Code Linting]
-        Prettier[Prettier<br/>Code Formatting]
-        TypeScript[TypeScript<br/>Type Checking]
+        ESLint[🔍 ESLint<br/>Code Linting]
+        Prettier[✨ Prettier<br/>Code Formatting]
+        TypeScript[🔷 TypeScript<br/>Type Checking]
     end
 
     Code --> Development
@@ -80,16 +90,23 @@ graph LR
     Git --> GitHub[📁 GitHub Repository]
     GitHub --> Actions[⚙️ GitHub Actions<br/>CI/CD Pipeline]
 
-    Actions --> Build[🔨 Build Process<br/>Next.js + Turbopack]
+    Actions --> Build[🔨 Build Process<br/>⚡ Next.js + Turbopack]
     Build --> Test[🧪 Quality Checks<br/>ESLint + TypeScript]
     Test --> Deploy[🚀 Deploy to ogadix.com]
 
     Deploy --> Production[🌐 Production Environment<br/>ogadix.com]
 
-    style Dev fill:#e1f5fe
-    style Development fill:#f3e5f5
-    style Actions fill:#e8f5e8
-    style Production fill:#fff3e0
+    style Dev fill:#e1f5fe,color:#000
+    style Development fill:#f8f9fa,color:#000
+    style Actions fill:#f0f8f0,color:#000
+    style Production fill:#fff8e1,color:#000
+    style ESLint fill:#4b32c3,color:#fff
+    style Prettier fill:#f7b93e,color:#000
+    style TypeScript fill:#3178c6,color:#fff
+    style GitHub fill:#24292e,color:#fff
+    style Build fill:#000000,color:#fff
+    style Test fill:#10b981,color:#fff
+    style Deploy fill:#ff6b35,color:#fff
 ```
 
 ### 技術詳細
