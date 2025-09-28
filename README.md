@@ -15,23 +15,87 @@
 
 ## 🔧 技術スタック
 
-### Frontend
-- **Next.js 15** with App Router & Turbopack
-- **React 19** with modern features
-- **TypeScript** for type safety
-- **Tailwind CSS 4** for styling
-- **Framer Motion** for animations
-- **Radix UI** for accessible components
+### システムアーキテクチャ
 
-### Backend & Database
-- **Supabase** for authentication & database
-- **PostgreSQL** for data storage
-- **Prisma** for database ORM
+```mermaid
+graph TB
+    User[👤 ユーザー] --> Browser[🌐 ブラウザ]
+    Browser --> Frontend[🖥️ Frontend Layer]
 
-### Development & Deployment
-- **GitHub Actions** for CI/CD
-- **ogadix.com** for production deployment
-- **ESLint & Prettier** for code quality
+    subgraph Frontend[🖥️ Frontend Layer]
+        NextJS[Next.js 15<br/>App Router & Turbopack]
+        React[React 19<br/>Modern Features]
+        TS[TypeScript<br/>Type Safety]
+        Tailwind[Tailwind CSS 4<br/>Styling]
+        Framer[Framer Motion<br/>Animations]
+        Radix[Radix UI<br/>Components]
+
+        NextJS --> React
+        React --> TS
+        TS --> Tailwind
+        TS --> Framer
+        TS --> Radix
+    end
+
+    Frontend --> API[🔌 API Layer]
+
+    subgraph Backend[🗄️ Backend & Database]
+        Supabase[Supabase<br/>Auth & Database]
+        PostgreSQL[(PostgreSQL<br/>Data Storage)]
+        Prisma[Prisma<br/>Database ORM]
+
+        Supabase --> PostgreSQL
+        Prisma --> PostgreSQL
+    end
+
+    API --> Backend
+
+    subgraph Deploy[🚀 Production]
+        Ogadix[ogadix.com<br/>Production Site]
+    end
+
+    Frontend --> Deploy
+
+    style User fill:#e1f5fe
+    style Frontend fill:#f3e5f5
+    style Backend fill:#e8f5e8
+    style Deploy fill:#fff3e0
+```
+
+### 開発・デプロイメントフロー
+
+```mermaid
+graph LR
+    Dev[👨‍💻 Developer] --> Code[📝 Code]
+    Code --> Git[📦 Git Repository]
+
+    subgraph Development[🛠️ Development Tools]
+        ESLint[ESLint<br/>Code Linting]
+        Prettier[Prettier<br/>Code Formatting]
+        TypeScript[TypeScript<br/>Type Checking]
+    end
+
+    Code --> Development
+
+    Git --> GitHub[📁 GitHub Repository]
+    GitHub --> Actions[⚙️ GitHub Actions<br/>CI/CD Pipeline]
+
+    Actions --> Build[🔨 Build Process<br/>Next.js + Turbopack]
+    Build --> Test[🧪 Quality Checks<br/>ESLint + TypeScript]
+    Test --> Deploy[🚀 Deploy to ogadix.com]
+
+    Deploy --> Production[🌐 Production Environment<br/>ogadix.com]
+
+    style Dev fill:#e1f5fe
+    style Development fill:#f3e5f5
+    style Actions fill:#e8f5e8
+    style Production fill:#fff3e0
+```
+
+### 技術詳細
+- **Frontend**: Next.js 15 with App Router & Turbopack, React 19, TypeScript, Tailwind CSS 4, Framer Motion, Radix UI
+- **Backend**: Supabase (Authentication & Database), PostgreSQL, Prisma ORM
+- **Development**: GitHub Actions CI/CD, ESLint & Prettier, ogadix.com deployment
 
 ## 📚 学習モジュール
 
