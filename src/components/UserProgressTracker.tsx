@@ -40,8 +40,8 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
           const data = await response.json();
           setProgress({
             completedLessons: data.completed_contents || 0,
-            totalLessons: totalContents,
-            totalHours: data.total_estimated_hours || 0,
+            totalLessons: data.total_contents || 120,
+            totalHours: data.total_estimated_hours || 60,
             completedHours: data.completed_hours || 0,
             streak: data.learning_streak || 0,
             achievements: data.achievements || []
@@ -70,11 +70,11 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
 
       setProgress({
         completedLessons: completedCount,
-        totalLessons: totalContents,
-        totalHours: Math.round(totalContents * 1.5), // 推定
-        completedHours: Math.round(completedCount * 1.5),
-        streak: completedCount > 0 ? 1 : 0, // 簡易計算
-        achievements: completedCount > 0 ? ['初回完了'] : []
+        totalLessons: 120, // 基本情報技術者試験目標
+        totalHours: 60, // 目標学習時間
+        completedHours: Math.round(completedCount * 0.5), // 1セクション30分
+        streak: completedCount > 0 ? 1 : 0,
+        achievements: completedCount > 0 ? ['学習スタート'] : []
       });
       setLoading(false);
     };

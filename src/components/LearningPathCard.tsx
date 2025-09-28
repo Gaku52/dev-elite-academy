@@ -52,7 +52,7 @@ const LearningPathCard: React.FC<LearningPathCardProps> = ({
 
   const cardContent = (
     <div
-      className={`card-modern p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 relative ${
+      className={`card-modern p-4 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 relative h-32 flex flex-col ${
         isPinned || pinned
           ? 'border-2 border-[#8E9C78] bg-gradient-to-br from-[#8E9C78]/5 to-transparent'
           : ''
@@ -62,7 +62,7 @@ const LearningPathCard: React.FC<LearningPathCardProps> = ({
       <button
         onClick={handlePinToggle}
         disabled={isToggling}
-        className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 z-10 ${
+        className={`absolute top-2 right-2 p-1 rounded-full transition-all duration-300 z-10 ${
           pinned
             ? 'bg-[#8E9C78] text-white shadow-md'
             : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-[#8E9C78]'
@@ -70,36 +70,36 @@ const LearningPathCard: React.FC<LearningPathCardProps> = ({
         title={pinned ? 'ピン固定を解除' : 'ピン固定'}
       >
         <Pin
-          className={`w-4 h-4 transition-transform duration-300 ${
+          className={`w-3 h-3 transition-transform duration-300 ${
             pinned ? 'fill-current rotate-12' : ''
           }`}
         />
       </button>
 
-      <div className="flex items-start justify-between mb-4">
-        <span className="text-3xl">
+      <div className="flex items-start justify-between mb-2">
+        <span className="text-2xl">
           {category.icon}
         </span>
         <div
-          className="w-3 h-3 rounded-full"
+          className="w-2 h-2 rounded-full"
           style={{ backgroundColor: category.color || '#8E9C78' }}
         ></div>
       </div>
 
-      <h4 className={`text-lg font-semibold mb-2 group-hover:text-[#8E9C78] transition-colors ${
+      <h4 className={`text-sm font-semibold mb-1 group-hover:text-[#8E9C78] transition-colors ${
         isPinned || pinned ? 'text-[#8E9C78]' : 'text-black'
       }`}>
         {category.name}
         {(isPinned || pinned) && (
-          <Pin className="inline-block w-4 h-4 ml-2 fill-current" />
+          <Pin className="inline-block w-3 h-3 ml-1 fill-current" />
         )}
       </h4>
 
-      <p className="text-[#6F6F6F] text-sm">
+      <p className="text-[#6F6F6F] text-xs flex-1 line-clamp-2">
         {category.description}
       </p>
 
-      <div className="mt-4">
+      <div className="mt-auto pt-2">
         <CategoryContentCount
           categoryName={category.name}
           fallbackCount={0}

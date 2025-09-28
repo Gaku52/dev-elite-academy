@@ -20,16 +20,17 @@ export async function GET(request: Request) {
 
     const supabaseAdmin = getSupabaseAdmin();
 
-    // 基本進捗データの取得
-    const [progressResult, contentsResult, sessionsResult] = await Promise.all([
+    // 基本情報技術者試験の進捗データを取得
+    const [learningProgressResult, modulesResult, sessionsResult] = await Promise.all([
       supabaseAdmin
-        .from('user_progress')
-        .select('*, learning_contents(estimated_time)')
+        .from('user_learning_progress')
+        .select('*')
         .eq('user_id', userId),
       supabaseAdmin
-        .from('learning_contents')
-        .select('estimated_time')
-        .eq('is_published', true),
+        .from('user_learning_progress')
+        .select('module_name')
+        .eq('user_id', userId)
+        .neq('module_name', null),
       supabaseAdmin
         .from('learning_sessions')
         .select('session_date, duration_minutes')
@@ -37,20 +38,20 @@ export async function GET(request: Request) {
         .order('session_date', { ascending: false })
     ]);
 
-    const userProgress = progressResult.data || [];
-    const allContents = contentsResult.data || [];
+    const userProgress = learningProgressResult.data || [];
+    const uniqueModules = [...new Set((modulesResult.data || []).map((m: any) => m.module_name))];
     const sessions = sessionsResult.data || [];
 
-    // 完了したコンテンツの計算
-    const completedContents = userProgress.filter((p: any) => p.status === 'completed').length;
-    const totalContents = allContents.length;
+    // 基本情報技術者試験の進捗計算
+    const completedSections = userProgress.filter((p: any) => p.is_completed === true).length;
+    const totalSections = userProgress.length;
 
-    // 学習時間の計算
-    const completedHours = userProgress
-      .filter((p: any) => p.status === 'completed')
-      .reduce((total: number, p: any) => total + (p.learning_contents?.estimated_time || 0), 0) / 60;
+    // 目標：全8分野の学習セクション（推定120セクション）
+    const targetTotalSections = 120;
 
-    const totalEstimatedHours = allContents.reduce((total: number, c: any) => total + (c.estimated_time || 0), 0) / 60;
+    // 学習時間の計算（1セクション平均30分と仮定）
+    const completedHours = completedSections * 0.5; // 30分 = 0.5時間
+    const totalEstimatedHours = targetTotalSections * 0.5;
 
     // 学習ストリークの計算（簡易版）
     let streak = 0;
@@ -68,22 +69,27 @@ export async function GET(request: Request) {
       }
     }
 
-    // 成果の計算
+    // 基本情報技術者試験向けの成果計算
     const achievements = [];
-    if (completedContents > 0) achievements.push('初回完了');
-    if (completedContents >= 5) achievements.push('学習継続者');
-    if (completedContents >= 10) achievements.push('専門学習者');
+    if (completedSections > 0) achievements.push('学習スタート');
+    if (completedSections >= 10) achievements.push('基礎力習得');
+    if (completedSections >= 30) achievements.push('中級レベル');
+    if (completedSections >= 60) achievements.push('上級レベル');
+    if (uniqueModules.length >= 4) achievements.push('幅広い知識');
+    if (uniqueModules.length >= 8) achievements.push('全分野学習');
     if (streak >= 3) achievements.push('継続の達人');
     if (streak >= 7) achievements.push('週間チャレンジャー');
 
     return NextResponse.json({
-      completed_contents: completedContents,
-      total_contents: totalContents,
+      completed_contents: completedSections,
+      total_contents: Math.max(totalSections, targetTotalSections),
       completed_hours: Math.round(completedHours * 10) / 10,
       total_estimated_hours: Math.round(totalEstimatedHours * 10) / 10,
       learning_streak: streak,
       achievements,
-      progress_percentage: totalContents > 0 ? Math.round((completedContents / totalContents) * 100) : 0
+      progress_percentage: targetTotalSections > 0 ? Math.round((completedSections / targetTotalSections) * 100) : 0,
+      modules_studied: uniqueModules.length,
+      total_modules: 8 // 基本情報技術者試験の8分野
     });
 
   } catch (error) {
