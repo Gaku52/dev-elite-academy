@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import { BookOpen, ArrowLeft, Code, Database, Network, Shield, Calculator, Users, FileText, TrendingUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useLearningProgress } from '@/hooks/useLearningProgress';
-
 
 import { moduleQuizCounts, moduleNameMapping } from '@/lib/moduleQuizCounts';
 
@@ -100,12 +98,50 @@ const fundamentalTopics = [
 ];
 
 
+interface LearningProgressItem {
+  id: string;
+  user_id: string;
+  module_name: string;
+  section_key: string;
+  is_completed: boolean;
+  is_correct: boolean;
+  answer_count: number;
+  correct_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function ITFundamentalsPage() {
   const [progressData, setProgressData] = useState<{[key: number]: number}>({});
-  const { progress } = useLearningProgress();
+  const [allProgress, setAllProgress] = useState<LearningProgressItem[]>([]);
 
   useEffect(() => {
-    if (progress) {
+    // 全モジュールの進捗データを取得
+    const fetchAllProgress = async () => {
+      try {
+        const { data: { user } } = await (await import('@/lib/supabase')).supabase.auth.getUser();
+        if (!user) return;
+
+        const url = new URL('/api/learning-progress', window.location.origin);
+        url.searchParams.set('userId', user.id);
+
+        const response = await fetch(url.toString());
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (data.progress) {
+          setAllProgress(data.progress);
+        }
+      } catch (err) {
+        console.error('Error fetching all progress:', err);
+      }
+    };
+
+    fetchAllProgress();
+  }, []);
+
+  useEffect(() => {
+    if (allProgress && allProgress.length > 0) {
       const calculatedProgress: {[key: number]: number} = {};
 
       // 各モジュールの進捗率を計算（個々のページと完全に同じロジックを使用）
@@ -116,7 +152,7 @@ export default function ITFundamentalsPage() {
           // 個々のページと同じ計算: progress配列から該当モジュールの完了済み項目をカウント
           // ユニークなsection_keyのみをカウント（重複を排除）
           const uniqueSections = new Set(
-            progress
+            allProgress
               .filter(p => p.module_name === moduleName && p.is_completed)
               .map(p => p.section_key)
           );
@@ -135,7 +171,7 @@ export default function ITFundamentalsPage() {
       console.log('📊 Calculated module progress:', calculatedProgress);
       setProgressData(calculatedProgress);
     }
-  }, [progress]);
+  }, [allProgress]);
 
   return (
     <div className="min-h-screen bg-white">
