@@ -504,8 +504,10 @@ export default function LearningStatsPage() {
                         <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-base sm:text-lg font-semibold text-black mb-1">
-                          {module.name}
+                        <h3 className="text-base sm:text-lg font-semibold text-black mb-1 min-h-[3rem] sm:min-h-[3.5rem] flex items-center">
+                          <span className="line-clamp-2 leading-tight">
+                            {module.name}
+                          </span>
                         </h3>
                         <p className="text-xs sm:text-sm text-gray-600 mb-1 line-clamp-2">
                           {module.description}
