@@ -1,8 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
+import { diagnosticEnvironmentCheck } from './diagnostic-logger';
+
+// 診断ログ実行 - エラーを投げない安全なチェック
+const diagnosticResult = diagnosticEnvironmentCheck();
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// 既存の警告表示は保持（エラーを投げない）
 if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'your-supabase-url' || supabaseAnonKey === 'your-supabase-anon-key') {
   console.error('❌ Supabase環境変数が正しく設定されていません！');
   console.error('📝 .env.localファイルに実際のSupabaseの値を設定してください。');
@@ -15,6 +20,23 @@ if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'your-supabase-url' || s
   console.error('現在の設定:');
   console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl || '未設定');
   console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? supabaseAnonKey.substring(0, 20) + '...' : '未設定');
+}
+
+// 追加の安全性チェック（本番環境でのみ実行、エラーは投げない）
+if (process.env.NODE_ENV === 'production') {
+  console.log('🏭 本番環境での追加セキュリティチェック:');
+
+  if (diagnosticResult.hasValidUrl && diagnosticResult.isSecure) {
+    console.log('✅ Supabase URL: HTTPS接続で安全です');
+  } else {
+    console.warn('⚠️ Supabase URL: セキュリティ上の懸念があります');
+  }
+
+  if (diagnosticResult.hasValidKey) {
+    console.log('✅ Supabase Key: 設定されています');
+  } else {
+    console.warn('⚠️ Supabase Key: 設定に問題があります');
+  }
 }
 
 export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
