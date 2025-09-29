@@ -1,5 +1,9 @@
 // 診断専用ログ機能 - エラーを投げずに詳細な情報を収集
 export function diagnosticEnvironmentCheck() {
+  console.log('🚀 === Dev Elite Academy 診断システム開始 ===');
+  console.log('📅 実行日時:', new Date().toLocaleString('ja-JP'));
+
+  try {
   console.log('🔍 診断開始: 環境変数チェック');
   console.log('🕐 実行時刻:', new Date().toISOString());
   console.log('🌍 実行環境:', typeof window !== 'undefined' ? 'クライアント' : 'サーバー');
@@ -50,6 +54,7 @@ export function diagnosticEnvironmentCheck() {
   console.log('📋 NEXT_PUBLIC_ 環境変数一覧:', publicKeys);
 
   console.log('✅ 診断完了 - エラーなし');
+  console.log('🏁 === Dev Elite Academy 診断システム終了 ===');
 
   return {
     supabaseUrl,
@@ -58,4 +63,42 @@ export function diagnosticEnvironmentCheck() {
     hasValidKey: !!supabaseKey && supabaseKey !== 'your-supabase-anon-key',
     isSecure: supabaseUrl?.startsWith('https://') || false
   };
+
+  } catch (error) {
+    console.error('🚨 CRITICAL: 診断システムでエラーが発生しました!');
+    console.error('🔥 エラー詳細:', error);
+    console.error('🔍 エラータイプ:', typeof error);
+    console.error('📍 エラーメッセージ:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('📚 エラースタック:', error instanceof Error ? error.stack : 'No stack available');
+    console.error('⚠️ この情報をClaudeに報告してください');
+
+    // エラーが発生してもアプリケーションを壊さないよう、デフォルト値を返す
+    return {
+      supabaseUrl: 'ERROR_OCCURRED',
+      supabaseKey: 'ERROR_OCCURRED',
+      hasValidUrl: false,
+      hasValidKey: false,
+      isSecure: false
+    };
+  }
+}
+
+// セキュリティ機能の個別診断関数
+export function diagnosticSecurityFeature(featureName: string, operation: () => unknown) {
+  console.log(`🔒 セキュリティ機能テスト開始: ${featureName}`);
+  console.log(`⏰ 開始時刻: ${new Date().toISOString()}`);
+
+  try {
+    const result = operation();
+    console.log(`✅ ${featureName}: 正常に実行されました`);
+    console.log(`📊 実行結果:`, result);
+    return { success: true, result, error: null };
+  } catch (error) {
+    console.error(`🚨 ${featureName}: エラーが発生しました!`);
+    console.error(`🔥 エラー詳細:`, error);
+    console.error(`📍 エラーメッセージ:`, error instanceof Error ? error.message : 'Unknown error');
+    console.error(`📚 エラースタック:`, error instanceof Error ? error.stack : 'No stack available');
+    console.error(`⚠️ この情報をClaudeに報告してください`);
+    return { success: false, result: null, error };
+  }
 }
