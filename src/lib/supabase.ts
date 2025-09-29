@@ -1,8 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import { validateEnvironmentVariables } from './env-validator';
-
-// 環境変数の検証を実行
-validateEnvironmentVariables();
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
