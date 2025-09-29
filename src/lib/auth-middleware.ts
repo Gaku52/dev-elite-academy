@@ -99,13 +99,13 @@ export async function adminAuthMiddleware(request: NextRequest) {
 export function validateInput(data: unknown, rules: Record<string, (value: unknown) => boolean>) {
   return diagnosticSecurityFeature("入力値検証", () => {
     console.log('🔍 入力値検証開始');
-    console.log('📊 検証データ:', Object.keys(data || {}));
+    console.log('📊 検証データ:', Object.keys((data as Record<string, unknown>) || {}));
     console.log('📋 検証ルール:', Object.keys(rules));
 
     const errors: string[] = [];
 
     for (const [field, validator] of Object.entries(rules)) {
-      const value = data?.[field];
+      const value = (data as Record<string, unknown>)?.[field];
       console.log(`📝 検証中: ${field} =`, typeof value, value?.toString?.()?.substring(0, 50) || 'undefined');
 
       try {
