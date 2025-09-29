@@ -34,6 +34,14 @@ const nextConfig: NextConfig = {
             {
               key: 'Referrer-Policy',
               value: 'strict-origin-when-cross-origin'
+            },
+            {
+              key: 'Content-Security-Policy',
+              value: (() => {
+                const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://api.github.com; frame-ancestors 'none';";
+                console.log('🔒 CSP (Content Security Policy) 設定:', csp);
+                return csp;
+              })()
             }
           ]
         }

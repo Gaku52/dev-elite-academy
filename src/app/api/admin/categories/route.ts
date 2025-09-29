@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { adminAuthMiddleware, validateInput } from '../../../../lib/auth-middleware';
+import type { AuthResult, ValidationResult } from '../../../../lib/types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
@@ -15,7 +17,16 @@ const supabase = supabaseUrl && supabaseServiceKey ? createClient(supabaseUrl, s
   }
 }) : null;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // 管理者認証チェック（診断付き）
+  const authResult = await adminAuthMiddleware(request);
+  if (!authResult.success || !(authResult.result as AuthResult)?.authenticated) {
+    return (authResult.result as AuthResult)?.response || NextResponse.json(
+      { error: 'Authentication required' },
+      { status: 401 }
+    );
+  }
+
   if (!supabase) {
     return NextResponse.json(
       { error: 'Supabase configuration missing' },
@@ -47,6 +58,15 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック（診断付き）
+  const authResult = await adminAuthMiddleware(request);
+  if (!authResult.success || !(authResult.result as AuthResult)?.authenticated) {
+    return (authResult.result as AuthResult)?.response || NextResponse.json(
+      { error: 'Authentication required' },
+      { status: 401 }
+    );
+  }
+
   if (!supabase) {
     return NextResponse.json(
       { error: 'Supabase configuration missing' },
@@ -56,14 +76,28 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, description, icon, color, sortOrder, isActive } = body;
 
-    if (!name) {
+    // 入力値検証（診断付き）
+    const validationResult = validateInput(body, {
+      name: (value: unknown) => typeof value === 'string' && value.trim().length > 0 && value.length <= 100,
+      description: (value: unknown) => value === undefined || (typeof value === 'string' && value.length <= 500),
+      icon: (value: unknown) => value === undefined || (typeof value === 'string' && value.length <= 50),
+      color: (value: unknown) => value === undefined || (typeof value === 'string' && /^#[0-9A-Fa-f]{6}$/.test(value)),
+      sortOrder: (value: unknown) => value === undefined || (typeof value === 'number' && value >= 0),
+      isActive: (value: unknown) => value === undefined || typeof value === 'boolean'
+    });
+
+    if (!validationResult.success || !(validationResult.result as ValidationResult)?.isValid) {
       return NextResponse.json(
-        { error: 'Name is required' },
+        {
+          error: 'Validation failed',
+          details: (validationResult.result as ValidationResult)?.errors || ['Unknown validation error']
+        },
         { status: 400 }
       );
     }
+
+    const { name, description, icon, color, sortOrder, isActive } = body;
 
     const { data: category, error } = await supabase
       .from('categories')
