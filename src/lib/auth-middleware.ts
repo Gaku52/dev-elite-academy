@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from './supabase';
 import { diagnosticSecurityFeature } from './diagnostic-logger';
-import type { AuthResult, ValidationResult } from './types';
 
 // 管理者認証ミドルウェア（診断付き）
 export async function adminAuthMiddleware(request: NextRequest) {

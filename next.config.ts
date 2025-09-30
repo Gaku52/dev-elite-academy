@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import { diagnosticSecurityFeature } from "./src/lib/diagnostic-logger";
 
 const nextConfig: NextConfig = {
   // セキュリティ強化: 本番環境でconsole.logを自動除去 (一時的に無効化)
