@@ -1,7 +1,7 @@
 // 各モジュールの総クイズ数（実装済みのモジュールから取得）
 // この数値は各モジュールの実装状況に基づいて更新される
 export const moduleQuizCounts: Record<string, number> = {
-  'computer-systems': 135,        // 拡張済み - 135クイズ（基礎理論+30問追加）
+  'computer-systems': 134,        // 拡張済み - 134クイズ（基礎理論+30問追加）
   'algorithms-programming': 118,  // 拡張済み - 118クイズ（数学系+30問追加）
   'database': 80,                 // 実装済み - 80クイズ
   'network': 120,                 // 拡張済み - 120クイズ（情報・通信理論+20問追加）
