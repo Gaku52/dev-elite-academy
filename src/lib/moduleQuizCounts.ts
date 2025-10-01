@@ -4,8 +4,8 @@ export const moduleQuizCounts: Record<string, number> = {
   'computer-systems': 134,        // 拡張済み - 134クイズ（基礎理論+30問追加）
   'algorithms-programming': 118,  // 拡張済み - 118クイズ（数学系+30問追加）
   'database': 80,                 // 実装済み - 80クイズ
-  'network': 120,                 // 拡張済み - 120クイズ（情報・通信理論+20問追加）
-  'security': 100,                // 実装済み - 100クイズ
+  'network': 119,                 // 実装済み - 119クイズ（実測値）
+  'security': 99,                 // 実装済み - 99クイズ（実測値）
   'system-development': 120,      // 実装済み - 120クイズ
   'management-legal': 100,        // 実装済み - 100クイズ
   'strategy': 106                 // 拡張済み - 106クイズ（ビジネスインダストリ+10問追加）
