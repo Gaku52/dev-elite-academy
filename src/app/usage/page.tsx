@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/Header';
 import GrowthPredictionDisplay from '@/components/GrowthPredictionDisplay';
+import { getUsageStats } from '@/lib/usage-stats';
 import {
   Database,
   Activity,
@@ -23,183 +23,8 @@ const FREE_PLAN_LIMITS = {
   edge_functions: 500000      // 500,000 Edge Function実行/月
 };
 
-// サーバーサイドでのDB使用状況取得（改良版）
-async function getUsageStats() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-
-  try {
-    // 1. 基本テーブルの情報取得
-    const [categoriesResult, contentsResult] = await Promise.all([
-      supabaseAdmin.from('categories').select('*', { count: 'exact' }),
-      supabaseAdmin.from('learning_contents').select('*', { count: 'exact' })
-    ]);
-
-    // 2. 進捗追跡テーブルの情報取得
-    let userProgressCount = 0;
-    let sectionProgressCount = 0;
-    let learningSessionsCount = 0;
-    let userLearningProgressCount = 0;
-    let dailyProgressCount = 0;
-    let dailyLearningProgressCount = 0;
-    let learningStreaksCount = 0;
-    let profilesCount = 0;
-    let authUsersCount = 0;
-
-    // 旧進捗システム
-    try {
-      const [userProgressResult, sectionProgressResult, learningSessionsResult] = await Promise.all([
-        supabaseAdmin.from('user_progress').select('*', { count: 'exact' }),
-        supabaseAdmin.from('section_progress').select('*', { count: 'exact' }),
-        supabaseAdmin.from('learning_sessions').select('*', { count: 'exact' })
-      ]);
-
-      userProgressCount = userProgressResult.count || 0;
-      sectionProgressCount = sectionProgressResult.count || 0;
-      learningSessionsCount = learningSessionsResult.count || 0;
-    } catch (error) {
-      console.log('Original progress tables not found:', error);
-    }
-
-    // 新進捗システム
-    try {
-      const [userLearningResult, dailyProgressResult] = await Promise.all([
-        supabaseAdmin.from('user_learning_progress').select('*', { count: 'exact' }),
-        supabaseAdmin.from('daily_progress').select('*', { count: 'exact' })
-      ]);
-
-      userLearningProgressCount = userLearningResult.count || 0;
-      dailyProgressCount = dailyProgressResult.count || 0;
-    } catch (error) {
-      console.log('New learning progress tables not found:', error);
-    }
-
-    // 分析・エンゲージメントテーブル
-    try {
-      const [dailyLearningResult, streaksResult] = await Promise.all([
-        supabaseAdmin.from('daily_learning_progress').select('*', { count: 'exact' }),
-        supabaseAdmin.from('learning_streaks').select('*', { count: 'exact' })
-      ]);
-
-      dailyLearningProgressCount = dailyLearningResult.count || 0;
-      learningStreaksCount = streaksResult.count || 0;
-    } catch (error) {
-      console.log('Analytics tables not found:', error);
-    }
-
-    // ユーザー関連テーブル
-    try {
-      const profilesResult = await supabaseAdmin.from('profiles').select('*', { count: 'exact' });
-      profilesCount = profilesResult.count || 0;
-    } catch (error) {
-      console.log('Profiles table not found:', error);
-    }
-
-    // 3. 認証ユーザー数取得
-    try {
-      const authResponse = await supabaseAdmin.auth.admin.listUsers({
-        page: 1,
-        perPage: 1
-      });
-      
-      if (authResponse.data && 'users' in authResponse.data) {
-        authUsersCount = authResponse.data.users.length > 0 ? 1 : 0; // サンプルカウント
-      }
-    } catch (error) {
-      console.log('Auth users count unavailable with current API key:', error);
-      // 新しいAPIキーでは認証ユーザー数は取得できないため、推定値を使用
-      authUsersCount = 1; // 最小値として1を設定
-    }
-
-    // 4. データベースサイズの精密推定
-    const totalRecords =
-      (categoriesResult.count || 0) +
-      (contentsResult.count || 0) +
-      userProgressCount +
-      sectionProgressCount +
-      learningSessionsCount +
-      userLearningProgressCount +
-      dailyProgressCount +
-      dailyLearningProgressCount +
-      learningStreaksCount +
-      profilesCount +
-      authUsersCount;
-
-    // より現実的なサイズ推定（テーブル構造とインデックスを考慮）
-    const baseTableSize = {
-      categories: (categoriesResult.count || 0) * 0.5,           // 0.5KB per record
-      learning_contents: (contentsResult.count || 0) * 2.0,      // 2KB per record (larger content)
-      user_progress: userProgressCount * 0.3,                    // 0.3KB per record
-      section_progress: sectionProgressCount * 0.2,              // 0.2KB per record
-      learning_sessions: learningSessionsCount * 0.2,            // 0.2KB per record
-      user_learning_progress: userLearningProgressCount * 0.4,   // 0.4KB per record
-      daily_progress: dailyProgressCount * 0.3,                  // 0.3KB per record
-      daily_learning_progress: dailyLearningProgressCount * 0.35,// 0.35KB per record
-      learning_streaks: learningStreaksCount * 0.25,             // 0.25KB per record
-      profiles: profilesCount * 0.6,                             // 0.6KB per record
-      auth_users: authUsersCount * 0.8                           // 0.8KB per record
-    };
-
-    const estimatedDbSizeMB = Math.max(
-      0.1, 
-      Object.values(baseTableSize).reduce((sum, size) => sum + size, 0) / 1024 // Convert to MB
-    );
-
-    // 5. 月間推定活動量（より正確な計算）
-    // アクティブテーブル数に基づく推定
-    const activeTablesCount = 11; // 実際に使用中のテーブル数
-    const averageRequestsPerTable = totalRecords > 0 ? Math.ceil(totalRecords / activeTablesCount) * 50 : 100;
-    const estimatedMonthlyRequests = Math.min(50000, Math.max(100, averageRequestsPerTable));
-    const estimatedMonthlyBandwidthGB = Math.min(5, Math.max(0.01, estimatedDbSizeMB * 0.15));
-
-    return {
-      // 基本テーブル
-      categories_count: categoriesResult.count || 0,
-      learning_contents_count: contentsResult.count || 0,
-      
-      // 進捗追跡テーブル
-      user_progress_count: userProgressCount,
-      section_progress_count: sectionProgressCount,
-      learning_sessions_count: learningSessionsCount,
-      user_learning_progress_count: userLearningProgressCount,
-      daily_progress_count: dailyProgressCount,
-      daily_learning_progress_count: dailyLearningProgressCount,
-      learning_streaks_count: learningStreaksCount,
-      profiles_count: profilesCount,
-      
-      // 認証
-      auth_users_count: authUsersCount,
-      
-      // 集計値
-      total_records: totalRecords,
-      estimated_db_size_mb: estimatedDbSizeMB,
-      
-      // 推定使用量
-      estimated_monthly_requests: estimatedMonthlyRequests,
-      estimated_monthly_bandwidth_gb: estimatedMonthlyBandwidthGB,
-      
-      // メタデータ
-      last_updated: new Date().toISOString(),
-      detailed_size_breakdown: baseTableSize,
-      active_tables_count: 11,
-      monitored_tables_count: Object.keys(baseTableSize).length
-    };
-  } catch (error) {
-    console.error('Usage stats fetch error:', error);
-    return null;
-  }
-}
+// ISR設定: 1時間ごとに再生成
+export const revalidate = 3600;
 
 // 使用率の計算とステータス判定
 function getUsageStatus(current: number, limit: number) {
@@ -333,29 +158,57 @@ export default async function UsagePage() {
         </div>
 
         {/* 監視状況サマリー */}
-        <div className="card-modern p-6 mb-8 bg-green-50 border-green-200">
+        <div className={`card-modern p-6 mb-8 ${
+          usageStats?.partial_data
+            ? 'bg-yellow-50 border-yellow-200'
+            : 'bg-green-50 border-green-200'
+        }`}>
           <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
-            <CheckCircle className="w-6 h-6 mr-2 text-green-500" />
+            {usageStats?.partial_data ? (
+              <AlertTriangle className="w-6 h-6 mr-2 text-yellow-500" />
+            ) : (
+              <CheckCircle className="w-6 h-6 mr-2 text-green-500" />
+            )}
             データベース監視状況
+            {usageStats?.partial_data && (
+              <span className="ml-3 text-sm text-yellow-700 font-normal">
+                （一部データ取得失敗）
+              </span>
+            )}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
             <div>
-              <p className="text-green-700">監視中テーブル</p>
+              <p className={usageStats?.partial_data ? 'text-yellow-700' : 'text-green-700'}>監視中テーブル</p>
               <p className="text-black font-mono">{usageStats?.monitored_tables_count || 0} / {usageStats?.active_tables_count || 11}</p>
             </div>
             <div>
-              <p className="text-green-700">総レコード数</p>
+              <p className={usageStats?.partial_data ? 'text-yellow-700' : 'text-green-700'}>総レコード数</p>
               <p className="text-black font-mono">{usageStats?.total_records?.toLocaleString() || 0}</p>
             </div>
             <div>
-              <p className="text-green-700">DB使用量</p>
+              <p className={usageStats?.partial_data ? 'text-yellow-700' : 'text-green-700'}>DB使用量</p>
               <p className="text-black font-mono">{usageStats?.estimated_db_size_mb?.toFixed(2) || '0.00'} MB</p>
             </div>
             <div>
-              <p className="text-green-700">最終更新</p>
+              <p className={usageStats?.partial_data ? 'text-yellow-700' : 'text-green-700'}>最終更新</p>
               <p className="text-black font-mono text-xs">{usageStats?.last_updated ? new Date(usageStats.last_updated).toLocaleTimeString('ja-JP') : '取得中'}</p>
             </div>
           </div>
+
+          {/* 失敗したテーブルの警告 */}
+          {usageStats?.failed_tables && usageStats.failed_tables.length > 0 && (
+            <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+              <p className="text-sm text-yellow-800 font-semibold mb-1">
+                ⚠️ 以下のテーブルでデータ取得に失敗しました:
+              </p>
+              <p className="text-xs text-yellow-700 font-mono">
+                {usageStats.failed_tables.join(', ')}
+              </p>
+              <p className="text-xs text-yellow-600 mt-2">
+                統計データは利用可能なテーブルの情報のみで算出されています。
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 無料プラン概要 */}
