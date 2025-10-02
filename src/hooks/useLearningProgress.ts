@@ -31,6 +31,7 @@ export function useLearningProgress(moduleName?: string) {
   const [stats, setStats] = useState<LearningStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentCycle, setCurrentCycle] = useState<number>(1);
   const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
   const [totalSessionTime, setTotalSessionTime] = useState<number>(0);
 
@@ -61,6 +62,9 @@ export function useLearningProgress(moduleName?: string) {
 
       console.log('📊 Fetched progress data:', data.progress);
       setProgress(data.progress || []);
+      if (data.currentCycle) {
+        setCurrentCycle(data.currentCycle);
+      }
     } catch (err) {
       console.error('Error fetching progress:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -295,6 +299,7 @@ export function useLearningProgress(moduleName?: string) {
     stats,
     loading,
     error,
+    currentCycle,
     saveProgress,
     resetProgress,
     getSectionProgress,

@@ -3,6 +3,7 @@ export interface LearningProgressRecord {
   user_id: string;
   module_name: string;
   section_key: string;
+  cycle_number: number;
   is_completed: boolean;
   is_correct: boolean;
   answer_count: number;
@@ -15,6 +16,7 @@ export interface LearningProgressInsert {
   user_id: string;
   module_name: string;
   section_key: string;
+  cycle_number: number;
   is_completed: boolean;
   is_correct: boolean;
   answer_count: number;

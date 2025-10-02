@@ -1454,7 +1454,7 @@ export default function ComputerSystemsPage() {
   const [showQuizResults, setShowQuizResults] = useState<{[key: string]: boolean}>({});
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
 
-  const { progress, saveProgress } = useLearningProgress('computer-systems');
+  const { progress, saveProgress, currentCycle } = useLearningProgress('computer-systems');
 
   useEffect(() => {
     if (progress.length > 0) {
@@ -1607,7 +1607,14 @@ export default function ComputerSystemsPage() {
                 <Calculator className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900">コンピュータシステム</h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-gray-900">コンピュータシステム</h1>
+                  {currentCycle > 1 && (
+                    <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                      第{currentCycle}周目
+                    </span>
+                  )}
+                </div>
                 <p className="text-gray-600">基本情報技術者試験レベルの総合学習</p>
               </div>
               <div className="text-right">

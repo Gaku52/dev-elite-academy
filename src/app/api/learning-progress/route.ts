@@ -16,10 +16,27 @@ export async function GET(request: NextRequest) {
       return handleAPIError(new APIError(400, 'userId is required', 'MISSING_USER_ID'));
     }
 
+    // 最新の周回番号を取得
+    let maxCycleQuery = supabase
+      .from('user_learning_progress')
+      .select('cycle_number')
+      .eq('user_id', userId)
+      .order('cycle_number', { ascending: false })
+      .limit(1);
+
+    if (moduleName) {
+      maxCycleQuery = maxCycleQuery.eq('module_name', moduleName);
+    }
+
+    const { data: maxCycleData } = await maxCycleQuery;
+    const currentCycle = (maxCycleData as { cycle_number: number }[] | null)?.[0]?.cycle_number || 1;
+
+    // 最新周回のデータのみを取得
     let query = supabase
       .from('user_learning_progress')
       .select('*')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('cycle_number', currentCycle);
 
     if (moduleName) {
       query = query.eq('module_name', moduleName);
@@ -29,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    return successResponse({ progress: data || [] });
+    return successResponse({ progress: data || [], currentCycle });
   } catch (error) {
     return handleAPIError(error);
   }
@@ -44,13 +61,25 @@ export async function POST(request: NextRequest) {
 
     validateRequired(body, ['userId', 'moduleName', 'sectionKey']);
 
-    // 既存の進捗を確認
+    // 最新の周回番号を取得
+    const { data: maxCycleData } = await supabase
+      .from('user_learning_progress')
+      .select('cycle_number')
+      .eq('user_id', userId)
+      .eq('module_name', moduleName)
+      .order('cycle_number', { ascending: false })
+      .limit(1);
+
+    const currentCycle = (maxCycleData as { cycle_number: number }[] | null)?.[0]?.cycle_number || 1;
+
+    // 最新周回の既存進捗を確認
     const { data: existingData, error: queryError } = await (supabase as any)
       .from('user_learning_progress')
       .select('*')
       .eq('user_id', userId)
       .eq('module_name', moduleName)
       .eq('section_key', sectionKey)
+      .eq('cycle_number', currentCycle)
       .maybeSingle();
 
     if (queryError) {
@@ -80,6 +109,7 @@ export async function POST(request: NextRequest) {
         .eq('user_id', userId)
         .eq('module_name', moduleName)
         .eq('section_key', sectionKey)
+        .eq('cycle_number', currentCycle)
         .select()
         .single();
 
@@ -91,6 +121,7 @@ export async function POST(request: NextRequest) {
         user_id: userId,
         module_name: moduleName,
         section_key: sectionKey,
+        cycle_number: currentCycle,
         is_completed: isCompleted,
         is_correct: isCorrect,
         answer_count: 1,
@@ -107,7 +138,7 @@ export async function POST(request: NextRequest) {
       result = data;
     }
 
-    return successResponse({ progress: result });
+    return successResponse({ progress: result, currentCycle });
   } catch (error) {
     return handleAPIError(error);
   }
