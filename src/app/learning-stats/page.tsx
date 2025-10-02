@@ -602,18 +602,18 @@ export default function LearningStatsPage() {
         </div>
 
         {/* リセット確認ダイアログ */}
-        {showResetDialog && cycleData && (
+        {showResetDialog && (
           <ResetConfirmationDialog
             isOpen={showResetDialog}
             onClose={() => setShowResetDialog(false)}
             onConfirm={handleResetProgress}
-            currentCycle={cycleData.currentCycle || 1}
-            nextCycle={cycleData.nextCycle || 2}
-            cycleStats={cycleData.cycleStats || []}
-            resetPreview={cycleData.resetPreview || {
-              preservedData: [],
-              resetData: [],
-              benefits: []
+            currentCycle={cycleData?.currentCycle || 1}
+            nextCycle={cycleData?.nextCycle || 2}
+            cycleStats={cycleData?.cycleStats || []}
+            resetPreview={cycleData?.resetPreview || {
+              preservedData: ['過去の周回記録', '日次学習推移グラフ', '学習ストリーク記録', '総回答数・正解数の統計'],
+              resetData: ['現在の完了状況', '新しい周回として再スタート'],
+              benefits: ['周回別の成績比較が可能', '学習の成長過程が可視化', '復習効果の測定が可能']
             }}
             isLoading={resetLoading}
           />
