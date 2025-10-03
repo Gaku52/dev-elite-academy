@@ -189,11 +189,22 @@ export async function GET(request: NextRequest) {
     }
 
     if (action === 'stats') {
-      // 全体統計を取得
+      // まず現在の最大周回数を取得
+      const { data: maxCycleData } = await supabase
+        .from('user_learning_progress')
+        .select('cycle_number')
+        .eq('user_id', userId)
+        .order('cycle_number', { ascending: false })
+        .limit(1);
+
+      const currentCycle = maxCycleData?.[0]?.cycle_number || 1;
+
+      // 現在の周回のみの統計を取得
       const { data, error } = await supabase
         .from('user_learning_progress')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('cycle_number', currentCycle);
 
       if (error) {
         console.error('Database error:', error);
@@ -207,7 +218,7 @@ export async function GET(request: NextRequest) {
       const totalAnswers = progress.reduce((sum, p) => sum + p.answer_count, 0);
       const correctRate = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
-      // モジュール別統計（動的に構築）
+      // モジュール別統計（動的に構築、現在の周回のみ）
       const moduleStats: Record<string, { total: number; completed: number }> = {};
       Object.entries(moduleQuizCounts).forEach(([moduleName, total]) => {
         moduleStats[moduleName] = {
