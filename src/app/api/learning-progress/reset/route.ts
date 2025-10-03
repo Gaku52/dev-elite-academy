@@ -227,8 +227,41 @@ export async function GET(request: NextRequest) {
         };
       });
 
+      // 過去3周回分（または存在する分）の統計を取得
+      const cycleHistory = [];
+      const startCycle = Math.max(1, currentCycle - 2); // 最大3周回分
+
+      for (let cycle = startCycle; cycle <= currentCycle; cycle++) {
+        const { data: cycleData } = await supabase
+          .from('user_learning_progress')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('cycle_number', cycle);
+
+        const cycleProgress = cycleData || [];
+        const cycleCompleted = cycleProgress.filter(p => p.is_completed).length;
+        const cycleCorrect = cycleProgress.reduce((sum, p) => sum + p.correct_count, 0);
+        const cycleTotal = cycleProgress.reduce((sum, p) => sum + p.answer_count, 0);
+        const cycleRate = cycleTotal > 0 ? Math.round((cycleCorrect / cycleTotal) * 100) : 0;
+
+        cycleHistory.push({
+          cycle_number: cycle,
+          totalQuestions,
+          completedQuestions: cycleCompleted,
+          correctRate: cycleRate,
+          completionRate: Math.round((cycleCompleted / totalQuestions) * 100)
+        });
+      }
+
       return NextResponse.json({
-        stats: { totalQuestions, completedQuestions, correctRate, moduleStats }
+        stats: {
+          totalQuestions,
+          completedQuestions,
+          correctRate,
+          moduleStats,
+          currentCycle,
+          cycleHistory
+        }
       });
     }
 

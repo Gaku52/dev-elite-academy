@@ -9,6 +9,14 @@ import LearningHeatmap from '@/components/analytics/LearningHeatmap';
 import ResetConfirmationDialog from '@/components/ResetConfirmationDialog';
 import CycleStatistics from '@/components/CycleStatistics';
 
+interface CycleHistoryItem {
+  cycle_number: number;
+  totalQuestions: number;
+  completedQuestions: number;
+  correctRate: number;
+  completionRate: number;
+}
+
 interface LearningStats {
   totalQuestions: number;
   completedQuestions: number;
@@ -19,6 +27,8 @@ interface LearningStats {
       completed: number;
     };
   };
+  currentCycle: number;
+  cycleHistory: CycleHistoryItem[];
 }
 
 interface ModuleInfo {
@@ -431,46 +441,80 @@ export default function LearningStatsPage() {
             <LearningHeatmap data={dailyProgress} days={365} />
           </div>
 
-          {/* 全体統計 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">総問題数</span>
-                <BookOpen className="w-5 h-5 text-gray-400" />
-              </div>
-              <div className="text-xl sm:text-2xl font-bold text-gray-900">
-                {stats?.totalQuestions || 0}<span className="text-sm text-gray-500 font-normal">問</span>
-              </div>
-            </div>
+          {/* 周回別統計 */}
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">周回別進捗</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              {stats?.cycleHistory?.map((cycle) => (
+                <div
+                  key={cycle.cycle_number}
+                  className={`bg-white rounded-lg shadow-sm border-2 p-4 sm:p-6 ${
+                    cycle.cycle_number === stats.currentCycle
+                      ? 'border-blue-500 ring-2 ring-blue-200'
+                      : 'border-gray-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                      第{cycle.cycle_number}周目
+                    </h3>
+                    {cycle.cycle_number === stats.currentCycle && (
+                      <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                        現在
+                      </span>
+                    )}
+                  </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">完了済み</span>
-                <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                  {stats ? Math.round((stats.completedQuestions / Math.max(stats.totalQuestions, 1)) * 100) : 0}%
-                </span>
-              </div>
-              <div className="text-xl sm:text-2xl font-bold text-gray-900">
-                {stats?.completedQuestions || 0}<span className="text-sm text-gray-500 font-normal">問</span>
-              </div>
-            </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">総問題数</span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {cycle.totalQuestions}<span className="text-sm text-gray-500 font-normal">問</span>
+                      </span>
+                    </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">正答率</span>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  (stats?.correctRate || 0) >= 80
-                    ? 'bg-green-100 text-green-800'
-                    : (stats?.correctRate || 0) >= 60
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {(stats?.correctRate || 0) >= 80 ? '優秀' : (stats?.correctRate || 0) >= 60 ? '良好' : '要改善'}
-                </span>
-              </div>
-              <div className="text-xl sm:text-2xl font-bold text-gray-900">
-                {stats?.correctRate || 0}<span className="text-sm text-gray-500 font-normal">%</span>
-              </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">完了済み</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-gray-900">
+                          {cycle.completedQuestions}<span className="text-sm text-gray-500 font-normal">問</span>
+                        </span>
+                        <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                          {cycle.completionRate}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">正答率</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-gray-900">
+                          {cycle.correctRate}<span className="text-sm text-gray-500 font-normal">%</span>
+                        </span>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          cycle.correctRate >= 80
+                            ? 'bg-green-100 text-green-800'
+                            : cycle.correctRate >= 60
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {cycle.correctRate >= 80 ? '優秀' : cycle.correctRate >= 60 ? '良好' : '要改善'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 進捗バー */}
+                    <div className="pt-2">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${cycle.completionRate}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
