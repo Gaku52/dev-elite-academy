@@ -20,16 +20,28 @@ export async function GET(request: Request) {
 
     const supabaseAdmin = getSupabaseAdmin();
 
-    // 基本情報技術者試験の進捗データを取得
+    // まず現在の最大周回数を取得
+    const { data: maxCycleData } = await supabaseAdmin
+      .from('user_learning_progress')
+      .select('cycle_number')
+      .eq('user_id', userId)
+      .order('cycle_number', { ascending: false })
+      .limit(1);
+
+    const currentCycle = (maxCycleData as any)?.[0]?.cycle_number || 1;
+
+    // 基本情報技術者試験の進捗データを取得（現在の周回のみ）
     const [learningProgressResult, modulesResult, sessionsResult] = await Promise.all([
       supabaseAdmin
         .from('user_learning_progress')
         .select('*')
-        .eq('user_id', userId),
+        .eq('user_id', userId)
+        .eq('cycle_number', currentCycle),
       supabaseAdmin
         .from('user_learning_progress')
         .select('module_name')
         .eq('user_id', userId)
+        .eq('cycle_number', currentCycle)
         .neq('module_name', null),
       supabaseAdmin
         .from('learning_sessions')
