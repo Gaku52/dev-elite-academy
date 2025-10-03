@@ -73,7 +73,7 @@ async function startNewCycle(userId: string, moduleName?: string) {
       throw maxCycleError;
     }
 
-    const currentMaxCycle = maxCycleData?.[0]?.cycle_number || 0;
+    const currentMaxCycle = maxCycleData?.[0]?.cycle_number || 1; // デフォルトは1周目
     const nextCycle = currentMaxCycle + 1;
 
     // 現在の周回の進捗データを取得
