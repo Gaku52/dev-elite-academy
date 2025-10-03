@@ -227,11 +227,24 @@ export async function GET(request: NextRequest) {
         };
       });
 
-      // 過去3周回分（または存在する分）の統計を取得
-      const cycleHistory = [];
-      const startCycle = Math.max(1, currentCycle - 2); // 最大3周回分
+      // 実際に存在する周回を取得
+      const { data: allCycles } = await supabase
+        .from('user_learning_progress')
+        .select('cycle_number')
+        .eq('user_id', userId)
+        .order('cycle_number', { ascending: true });
 
-      for (let cycle = startCycle; cycle <= currentCycle; cycle++) {
+      // ユニークな周回番号を取得（実際にデータが存在する周回のみ）
+      const existingCycles = [...new Set((allCycles || []).map(c => c.cycle_number))].sort((a, b) => a - b);
+
+      // 実際の最大周回番号（存在するデータの中で最大）
+      const actualCurrentCycle = existingCycles.length > 0 ? existingCycles[existingCycles.length - 1] : currentCycle;
+
+      // 最新3周回分（または存在する分）を取得
+      const cyclesToShow = existingCycles.slice(-3);
+
+      const cycleHistory = [];
+      for (const cycle of cyclesToShow) {
         const { data: cycleData } = await supabase
           .from('user_learning_progress')
           .select('*')
@@ -259,7 +272,7 @@ export async function GET(request: NextRequest) {
           completedQuestions,
           correctRate,
           moduleStats,
-          currentCycle,
+          currentCycle: actualCurrentCycle,
           cycleHistory
         }
       });
