@@ -228,14 +228,23 @@ export async function GET(request: NextRequest) {
       });
 
       // 実際に存在する周回を取得
-      const { data: allCycles } = await supabase
+      const { data: allCycles, error: allCyclesError } = await supabase
         .from('user_learning_progress')
         .select('cycle_number')
         .eq('user_id', userId)
         .order('cycle_number', { ascending: true });
 
+      console.log('[CYCLE DEBUG] All cycles query result:', {
+        userId,
+        allCycles,
+        allCyclesError,
+        count: allCycles?.length || 0
+      });
+
       // ユニークな周回番号を取得（実際にデータが存在する周回のみ）
       const existingCycles = [...new Set((allCycles || []).map(c => c.cycle_number))].sort((a, b) => a - b);
+
+      console.log('[CYCLE DEBUG] Existing cycles:', existingCycles);
 
       // 実際の最大周回番号（存在するデータの中で最大）
       const actualCurrentCycle = existingCycles.length > 0 ? existingCycles[existingCycles.length - 1] : currentCycle;
@@ -243,13 +252,21 @@ export async function GET(request: NextRequest) {
       // すべての周回を取得（制限なし）
       const cyclesToShow = existingCycles;
 
+      console.log('[CYCLE DEBUG] Cycles to show:', cyclesToShow);
+
       const cycleHistory = [];
       for (const cycle of cyclesToShow) {
-        const { data: cycleData } = await supabase
+        const { data: cycleData, error: cycleDataError } = await supabase
           .from('user_learning_progress')
           .select('*')
           .eq('user_id', userId)
           .eq('cycle_number', cycle);
+
+        console.log(`[CYCLE DEBUG] Cycle ${cycle} data:`, {
+          cycleDataCount: cycleData?.length || 0,
+          cycleDataError,
+          sampleData: cycleData?.[0]
+        });
 
         const cycleProgress = cycleData || [];
         const cycleCompleted = cycleProgress.filter(p => p.is_completed).length;
@@ -257,14 +274,20 @@ export async function GET(request: NextRequest) {
         const cycleTotal = cycleProgress.reduce((sum, p) => sum + p.answer_count, 0);
         const cycleRate = cycleTotal > 0 ? Math.round((cycleCorrect / cycleTotal) * 100) : 0;
 
-        cycleHistory.push({
+        const historyItem = {
           cycle_number: cycle,
           totalQuestions,
           completedQuestions: cycleCompleted,
           correctRate: cycleRate,
           completionRate: Math.round((cycleCompleted / totalQuestions) * 100)
-        });
+        };
+
+        console.log(`[CYCLE DEBUG] Cycle ${cycle} history item:`, historyItem);
+
+        cycleHistory.push(historyItem);
       }
+
+      console.log('[CYCLE DEBUG] Final cycle history:', cycleHistory);
 
       return NextResponse.json({
         stats: {
