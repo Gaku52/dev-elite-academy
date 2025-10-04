@@ -72,6 +72,8 @@ export async function POST(request: NextRequest) {
 
     const currentCycle = (maxCycleData as { cycle_number: number }[] | null)?.[0]?.cycle_number || 1;
 
+    console.log('[SAVE PROGRESS] Current cycle:', currentCycle, 'for user:', userId, 'module:', moduleName);
+
     // 最新周回の既存進捗を確認
     const { data: existingData, error: queryError } = await (supabase as any)
       .from('user_learning_progress')
@@ -115,8 +117,10 @@ export async function POST(request: NextRequest) {
 
       if (error) throw error;
       result = data;
+      console.log('[SAVE PROGRESS] Updated existing record for cycle', currentCycle);
     } else {
       // 新規レコードを作成
+      console.log('[SAVE PROGRESS] Creating new record for cycle', currentCycle);
       const insertData: LearningProgressInsert = {
         user_id: userId,
         module_name: moduleName,
