@@ -196,6 +196,10 @@ export default function LearningStatsPage() {
         throw new Error(data.error);
       }
 
+      console.log('[FRONTEND DEBUG] Fetched stats data:', data);
+      console.log('[FRONTEND DEBUG] Cycle history:', data.stats?.cycleHistory);
+      console.log('[FRONTEND DEBUG] Current cycle:', data.stats?.currentCycle);
+
       setStats(data.stats);
 
       // 日次進捗データの取得
@@ -445,6 +449,11 @@ export default function LearningStatsPage() {
           <div className="mb-6 sm:mb-8">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">周回別進捗</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              {(() => {
+                console.log('[RENDER DEBUG] Rendering cycle history, count:', stats?.cycleHistory?.length);
+                console.log('[RENDER DEBUG] Cycle history data:', stats?.cycleHistory);
+                return null;
+              })()}
               {stats?.cycleHistory?.map((cycle) => (
                 <div
                   key={cycle.cycle_number}
