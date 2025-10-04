@@ -76,6 +76,13 @@ async function startNewCycle(userId: string, moduleName?: string) {
     const currentMaxCycle = maxCycleData?.[0]?.cycle_number || 1; // デフォルトは1周目
     const nextCycle = currentMaxCycle + 1;
 
+    console.log('[RESET] Starting new cycle:', {
+      userId,
+      moduleName,
+      currentMaxCycle,
+      nextCycle
+    });
+
     // 現在の周回の進捗データを取得
     let currentProgressQuery = supabase
       .from('user_learning_progress')
@@ -93,7 +100,10 @@ async function startNewCycle(userId: string, moduleName?: string) {
       throw currentProgressError;
     }
 
+    console.log('[RESET] Current progress records:', currentProgress?.length || 0);
+
     if (!currentProgress || currentProgress.length === 0) {
+      console.log('[RESET] ERROR: No progress data found to reset');
       return NextResponse.json({ error: 'No progress data found to reset' }, { status: 404 });
     }
 
@@ -109,6 +119,8 @@ async function startNewCycle(userId: string, moduleName?: string) {
       correct_count: 0
     }));
 
+    console.log('[RESET] Prepared new cycle data:', newCycleData.length, 'records');
+
     // 新しい周回データを挿入
     const { data: insertedData, error: insertError } = await supabase
       .from('user_learning_progress')
@@ -116,8 +128,11 @@ async function startNewCycle(userId: string, moduleName?: string) {
       .select();
 
     if (insertError) {
+      console.log('[RESET] ERROR: Insert failed:', insertError);
       throw insertError;
     }
+
+    console.log('[RESET] Successfully inserted:', insertedData?.length || 0, 'records for cycle', nextCycle);
 
     return NextResponse.json({
       success: true,
@@ -274,12 +289,17 @@ export async function GET(request: NextRequest) {
         const cycleTotal = cycleProgress.reduce((sum, p) => sum + p.answer_count, 0);
         const cycleRate = cycleTotal > 0 ? Math.round((cycleCorrect / cycleTotal) * 100) : 0;
 
+        // この周回で実際に存在する問題数を使用
+        const cycleTotalQuestions = cycleProgress.length;
+
         const historyItem = {
           cycle_number: cycle,
-          totalQuestions,
+          totalQuestions: cycleTotalQuestions > 0 ? cycleTotalQuestions : totalQuestions,
           completedQuestions: cycleCompleted,
           correctRate: cycleRate,
-          completionRate: Math.round((cycleCompleted / totalQuestions) * 100)
+          completionRate: cycleTotalQuestions > 0
+            ? Math.round((cycleCompleted / cycleTotalQuestions) * 100)
+            : 0
         };
 
         console.log(`[CYCLE DEBUG] Cycle ${cycle} history item:`, historyItem);
