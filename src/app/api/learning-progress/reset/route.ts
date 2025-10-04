@@ -240,8 +240,8 @@ export async function GET(request: NextRequest) {
       // 実際の最大周回番号（存在するデータの中で最大）
       const actualCurrentCycle = existingCycles.length > 0 ? existingCycles[existingCycles.length - 1] : currentCycle;
 
-      // 最新3周回分（または存在する分）を取得
-      const cyclesToShow = existingCycles.slice(-3);
+      // すべての周回を取得（制限なし）
+      const cyclesToShow = existingCycles;
 
       const cycleHistory = [];
       for (const cycle of cyclesToShow) {

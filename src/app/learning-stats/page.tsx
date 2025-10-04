@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, TrendingUp, RotateCcw, Database, Calculator, Code, Network, Shield, Users, FileText } from 'lucide-react';
+import { ArrowLeft, TrendingUp, RotateCcw, Database, Calculator, Code, Network, Shield, Users, FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import DailyProgressChart from '@/components/analytics/DailyProgressChart';
 import LearningStreakCard from '@/components/analytics/LearningStreakCard';
