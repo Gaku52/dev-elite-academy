@@ -229,11 +229,11 @@ export async function GET(request: NextRequest) {
       const progress = data || [];
       const totalQuestions = getTotalQuestions(); // 動的に総問題数を取得
 
-      // it-fundamentalsページと同じロジック: is_completedフラグを使用
+      // answer_count > 0 のレコードを「完了」として判定
       // ユニークなsection_keyのみをカウント（重複を排除）
       const uniqueCompletedSections = new Set(
         progress
-          .filter(p => p.is_completed)
+          .filter(p => (p.answer_count || 0) > 0)
           .map(p => p.section_key)
       );
       const completedQuestions = uniqueCompletedSections.size;
@@ -242,13 +242,13 @@ export async function GET(request: NextRequest) {
       const totalAnswers = progress.reduce((sum, p) => sum + p.answer_count, 0);
       const correctRate = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
-      // モジュール別統計（it-fundamentalsページと完全に同じロジック）
+      // モジュール別統計（answer_count > 0 で判定）
       const moduleStats: Record<string, { total: number; completed: number }> = {};
       Object.entries(moduleQuizCounts).forEach(([moduleName, total]) => {
         // ユニークなsection_keyのみをカウント（重複を排除）
         const uniqueSections = new Set(
           progress
-            .filter(p => p.module_name === moduleName && p.is_completed)
+            .filter(p => p.module_name === moduleName && (p.answer_count || 0) > 0)
             .map(p => p.section_key)
         );
         moduleStats[moduleName] = {
@@ -300,11 +300,11 @@ export async function GET(request: NextRequest) {
 
         const cycleProgress = cycleData || [];
 
-        // it-fundamentalsページと同じロジック: is_completedフラグを使用
+        // answer_count > 0 のレコードを「完了」として判定
         // ユニークなsection_keyのみをカウント（重複を排除）
         const uniqueCycleSections = new Set(
           cycleProgress
-            .filter(p => p.is_completed)
+            .filter(p => (p.answer_count || 0) > 0)
             .map(p => p.section_key)
         );
         const cycleCompleted = uniqueCycleSections.size;
