@@ -289,12 +289,12 @@ export async function GET(request: NextRequest) {
         const cycleTotal = cycleProgress.reduce((sum, p) => sum + p.answer_count, 0);
         const cycleRate = cycleTotal > 0 ? Math.round((cycleCorrect / cycleTotal) * 100) : 0;
 
-        // この周回で実際に存在する問題数を使用
-        const cycleTotalQuestions = cycleProgress.length;
+        // 総問題数を使用（実際に存在するレコード数ではなく、全体の問題数）
+        const cycleTotalQuestions = totalQuestions;
 
         const historyItem = {
           cycle_number: cycle,
-          totalQuestions: cycleTotalQuestions > 0 ? cycleTotalQuestions : totalQuestions,
+          totalQuestions: cycleTotalQuestions,
           completedQuestions: cycleCompleted,
           correctRate: cycleRate,
           completionRate: cycleTotalQuestions > 0
