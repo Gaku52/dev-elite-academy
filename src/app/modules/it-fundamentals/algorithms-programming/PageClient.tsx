@@ -77,7 +77,7 @@ export default function AlgorithmsProgrammingPage() {
     }
 
     try {
-      await saveProgress(quizKey, isCorrect, isCorrect);
+      await saveProgress(quizKey, true, isCorrect);
       console.log('✅ Algorithms-programming progress saved:', { section: quizKey, correct: isCorrect });
     } catch (error) {
       console.error('❌ Failed to save algorithms-programming progress:', error);

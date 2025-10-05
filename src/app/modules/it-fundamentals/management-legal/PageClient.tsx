@@ -75,7 +75,7 @@ export default function ManagementLegalPage() {
     }
 
     try {
-      await saveProgress(quizKey, isCorrect, isCorrect);
+      await saveProgress(quizKey, true, isCorrect);
       console.log('✅ Management-legal progress saved:', { section: quizKey, correct: isCorrect });
     } catch (error) {
       console.error('❌ Failed to save management-legal progress:', error);

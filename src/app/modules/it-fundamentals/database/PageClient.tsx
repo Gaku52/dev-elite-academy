@@ -76,7 +76,7 @@ export default function DatabasePage() {
     }
 
     try {
-      await saveProgress(quizKey, isCorrect, isCorrect);
+      await saveProgress(quizKey, true, isCorrect);
       console.log('✅ Database progress saved:', { section: quizKey, correct: isCorrect });
     } catch (error) {
       console.error('❌ Failed to save database progress:', error);

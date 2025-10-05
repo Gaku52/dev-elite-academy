@@ -77,7 +77,7 @@ export default function SystemDevelopmentPage() {
     }
 
     try {
-      await saveProgress(quizKey, isCorrect, isCorrect);
+      await saveProgress(quizKey, true, isCorrect);
       console.log('✅ System-development progress saved:', { section: quizKey, correct: isCorrect });
     } catch (error) {
       console.error('❌ Failed to save system-development progress:', error);

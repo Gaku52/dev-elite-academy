@@ -1508,7 +1508,7 @@ export default function ComputerSystemsPage() {
     }
 
     try {
-      await saveProgress(quizKey, isCorrect, isCorrect);
+      await saveProgress(quizKey, true, isCorrect);
       console.log('✅ Computer-systems progress saved:', { section: quizKey, correct: isCorrect });
     } catch (error) {
       console.error('❌ Failed to save computer-systems progress:', error);
