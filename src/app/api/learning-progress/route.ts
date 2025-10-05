@@ -61,18 +61,17 @@ export async function POST(request: NextRequest) {
 
     validateRequired(body, ['userId', 'moduleName', 'sectionKey']);
 
-    // 最新の周回番号を取得
+    // ユーザー全体の最新周回番号を取得（モジュール単位ではなく）
     const { data: maxCycleData } = await supabase
       .from('user_learning_progress')
       .select('cycle_number')
       .eq('user_id', userId)
-      .eq('module_name', moduleName)
       .order('cycle_number', { ascending: false })
       .limit(1);
 
     const currentCycle = (maxCycleData as { cycle_number: number }[] | null)?.[0]?.cycle_number || 1;
 
-    console.log('[SAVE PROGRESS] Current cycle:', currentCycle, 'for user:', userId, 'module:', moduleName, 'section:', sectionKey);
+    console.log('[SAVE PROGRESS] User-wide current cycle:', currentCycle, 'for user:', userId, 'module:', moduleName, 'section:', sectionKey);
 
     // 最新周回の既存進捗を確認
     const { data: existingData, error: queryError } = await (supabase as any)
