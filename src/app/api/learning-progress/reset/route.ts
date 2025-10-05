@@ -230,11 +230,11 @@ export async function GET(request: NextRequest) {
       const totalQuestions = getTotalQuestions(); // 動的に総問題数を取得
 
       // answer_count > 0 のレコードを「完了」として判定
-      // ユニークなsection_keyのみをカウント（重複を排除）
+      // ユニークなmodule::section_keyのみをカウント（重複を排除）
       const uniqueCompletedSections = new Set(
         progress
           .filter(p => (p.answer_count || 0) > 0)
-          .map(p => p.section_key)
+          .map(p => `${p.module_name}::${p.section_key}`)
       );
       const completedQuestions = uniqueCompletedSections.size;
 
@@ -245,11 +245,11 @@ export async function GET(request: NextRequest) {
       // モジュール別統計（answer_count > 0 で判定）
       const moduleStats: Record<string, { total: number; completed: number }> = {};
       Object.entries(moduleQuizCounts).forEach(([moduleName, total]) => {
-        // ユニークなsection_keyのみをカウント（重複を排除）
+        // ユニークなmodule::section_keyのみをカウント（重複を排除）
         const uniqueSections = new Set(
           progress
             .filter(p => p.module_name === moduleName && (p.answer_count || 0) > 0)
-            .map(p => p.section_key)
+            .map(p => `${p.module_name}::${p.section_key}`)
         );
         moduleStats[moduleName] = {
           total,
@@ -301,11 +301,11 @@ export async function GET(request: NextRequest) {
         const cycleProgress = cycleData || [];
 
         // answer_count > 0 のレコードを「完了」として判定
-        // ユニークなsection_keyのみをカウント（重複を排除）
+        // ユニークなmodule::section_keyのみをカウント（重複を排除）
         const uniqueCycleSections = new Set(
           cycleProgress
             .filter(p => (p.answer_count || 0) > 0)
-            .map(p => p.section_key)
+            .map(p => `${p.module_name}::${p.section_key}`)
         );
         const cycleCompleted = uniqueCycleSections.size;
 
