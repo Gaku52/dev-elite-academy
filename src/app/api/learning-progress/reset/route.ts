@@ -228,19 +228,32 @@ export async function GET(request: NextRequest) {
 
       const progress = data || [];
       const totalQuestions = getTotalQuestions(); // 動的に総問題数を取得
-      // answer_count > 0 のレコードを「完了」としてカウント（is_completedフラグに依存しない）
-      const completedQuestions = progress.filter(p => (p.answer_count || 0) > 0).length;
+
+      // it-fundamentalsページと同じロジック: is_completedフラグを使用
+      // ユニークなsection_keyのみをカウント（重複を排除）
+      const uniqueCompletedSections = new Set(
+        progress
+          .filter(p => p.is_completed)
+          .map(p => p.section_key)
+      );
+      const completedQuestions = uniqueCompletedSections.size;
+
       const correctAnswers = progress.reduce((sum, p) => sum + p.correct_count, 0);
       const totalAnswers = progress.reduce((sum, p) => sum + p.answer_count, 0);
       const correctRate = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
-      // モジュール別統計（動的に構築、現在の周回のみ）
+      // モジュール別統計（it-fundamentalsページと完全に同じロジック）
       const moduleStats: Record<string, { total: number; completed: number }> = {};
       Object.entries(moduleQuizCounts).forEach(([moduleName, total]) => {
+        // ユニークなsection_keyのみをカウント（重複を排除）
+        const uniqueSections = new Set(
+          progress
+            .filter(p => p.module_name === moduleName && p.is_completed)
+            .map(p => p.section_key)
+        );
         moduleStats[moduleName] = {
           total,
-          // answer_count > 0 のレコードを「完了」としてカウント
-          completed: progress.filter(p => p.module_name === moduleName && (p.answer_count || 0) > 0).length
+          completed: uniqueSections.size
         };
       });
 
@@ -286,8 +299,16 @@ export async function GET(request: NextRequest) {
         });
 
         const cycleProgress = cycleData || [];
-        // answer_count > 0 のレコードを「完了」としてカウント（is_completedフラグに依存しない）
-        const cycleCompleted = cycleProgress.filter(p => (p.answer_count || 0) > 0).length;
+
+        // it-fundamentalsページと同じロジック: is_completedフラグを使用
+        // ユニークなsection_keyのみをカウント（重複を排除）
+        const uniqueCycleSections = new Set(
+          cycleProgress
+            .filter(p => p.is_completed)
+            .map(p => p.section_key)
+        );
+        const cycleCompleted = uniqueCycleSections.size;
+
         const cycleCorrect = cycleProgress.reduce((sum, p) => sum + p.correct_count, 0);
         const cycleTotal = cycleProgress.reduce((sum, p) => sum + p.answer_count, 0);
         const cycleRate = cycleTotal > 0 ? Math.round((cycleCorrect / cycleTotal) * 100) : 0;
