@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     const currentCycle = (maxCycleData as { cycle_number: number }[] | null)?.[0]?.cycle_number || 1;
 
-    console.log('[SAVE PROGRESS] Current cycle:', currentCycle, 'for user:', userId, 'module:', moduleName);
+    console.log('[SAVE PROGRESS] Current cycle:', currentCycle, 'for user:', userId, 'module:', moduleName, 'section:', sectionKey);
 
     // 最新周回の既存進捗を確認
     const { data: existingData, error: queryError } = await (supabase as any)
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
       if (error) throw error;
       result = data;
-      console.log('[SAVE PROGRESS] Updated existing record for cycle', currentCycle);
+      console.log('[SAVE PROGRESS] ✅ Updated existing record for cycle', currentCycle, '- answer_count:', data.answer_count, 'correct_count:', data.correct_count);
     } else {
       // 新規レコードを作成
       console.log('[SAVE PROGRESS] Creating new record for cycle', currentCycle);
@@ -140,8 +140,10 @@ export async function POST(request: NextRequest) {
 
       if (error) throw error;
       result = data;
+      console.log('[SAVE PROGRESS] ✅ Created new record for cycle', currentCycle, '- answer_count:', data.answer_count, 'correct_count:', data.correct_count);
     }
 
+    console.log('[SAVE PROGRESS] 🎉 Success! Returning result for cycle', currentCycle);
     return successResponse({ progress: result, currentCycle });
   } catch (error) {
     return handleAPIError(error);
