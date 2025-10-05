@@ -23,12 +23,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'userId required' }, { status: 400 });
   }
 
-  // すべての周回のデータを取得
+  // すべての周回のデータを取得（limitを大きくする）
   const { data: allData, error } = await supabase
     .from('user_learning_progress')
     .select('cycle_number, module_name, section_key, is_completed, is_correct, answer_count, correct_count')
     .eq('user_id', userId)
-    .order('cycle_number', { ascending: true });
+    .order('cycle_number', { ascending: true })
+    .limit(5000); // 複数周回に対応
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
