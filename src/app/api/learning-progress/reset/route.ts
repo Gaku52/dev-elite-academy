@@ -309,6 +309,18 @@ export async function GET(request: NextRequest) {
 
       console.log('[CYCLE DEBUG] Final cycle history:', cycleHistory);
 
+      // デバッグ: 2周目の生データを確認
+      if (actualCurrentCycle >= 2) {
+        const { data: cycle2Debug } = await supabase
+          .from('user_learning_progress')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('cycle_number', 2)
+          .limit(5);
+
+        console.log('[CYCLE 2 DEBUG] Sample data:', cycle2Debug);
+      }
+
       return NextResponse.json({
         stats: {
           totalQuestions,
