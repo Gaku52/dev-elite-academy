@@ -7,6 +7,10 @@ import Header from '@/components/Header';
 import QuestionViewer from '@/components/subject-b/QuestionViewer';
 import type { SubjectBQuestion, UserAnswer } from '@/types/subject-b';
 import { sampleAlgorithmQuestion } from '@/data/subject-b/sample-algorithm-question';
+import { binarySearchQuestion } from '@/data/subject-b/binary-search-question';
+import { stackQuestion } from '@/data/subject-b/stack-question';
+import { recursionQuestion } from '@/data/subject-b/recursion-question';
+import { queueQuestion } from '@/data/subject-b/queue-question';
 
 interface SubjectBQuestionPageProps {
   params: Promise<{ id: string }>;
@@ -28,13 +32,17 @@ export default function SubjectBQuestionPage({ params }: SubjectBQuestionPagePro
     if (!questionId) return;
 
     // TODO: 将来的にはAPIから問題を取得
-    // 現在はサンプル問題を表示
-    if (questionId === sampleAlgorithmQuestion.id) {
-      setQuestion(sampleAlgorithmQuestion);
-    } else {
-      // 他の問題IDの場合は404
-      setQuestion(null);
-    }
+    // 現在は静的データから取得
+    const allQuestions = [
+      sampleAlgorithmQuestion,
+      binarySearchQuestion,
+      stackQuestion,
+      recursionQuestion,
+      queueQuestion
+    ];
+
+    const foundQuestion = allQuestions.find(q => q.id === questionId);
+    setQuestion(foundQuestion || null);
     setLoading(false);
   }, [questionId]);
 

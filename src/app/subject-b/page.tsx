@@ -4,10 +4,20 @@ import { ArrowRight, Clock, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { sampleAlgorithmQuestion } from '@/data/subject-b/sample-algorithm-question';
+import { binarySearchQuestion } from '@/data/subject-b/binary-search-question';
+import { stackQuestion } from '@/data/subject-b/stack-question';
+import { recursionQuestion } from '@/data/subject-b/recursion-question';
+import { queueQuestion } from '@/data/subject-b/queue-question';
 
 export default function SubjectBPage() {
   // TODO: 将来的には全問題をAPIから取得
-  const questions = [sampleAlgorithmQuestion];
+  const questions = [
+    sampleAlgorithmQuestion,
+    binarySearchQuestion,
+    stackQuestion,
+    recursionQuestion,
+    queueQuestion
+  ];
 
   return (
     <div className="min-h-screen bg-white">
