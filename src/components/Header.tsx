@@ -104,15 +104,22 @@ export default function Header() {
               <BarChart3 className="w-4 h-4 mr-2" />
               学習ダッシュボード
             </Link>
-            <Link 
-              href="/specifications" 
+            <Link
+              href="/specifications"
               className="flex items-center text-[#6F6F6F] hover:text-[#8E9C78] transition-colors font-medium"
             >
               <FileText className="w-4 h-4 mr-2" />
               仕様書・設計書
             </Link>
-            <Link 
-              href="/usage" 
+            <Link
+              href="/subject-b"
+              className="flex items-center text-[#6F6F6F] hover:text-[#8E9C78] transition-colors font-medium"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              科目B問題
+            </Link>
+            <Link
+              href="/usage"
               className="flex items-center text-[#6F6F6F] hover:text-[#8E9C78] transition-colors font-medium"
             >
               <Settings className="w-4 h-4 mr-2" />
@@ -253,15 +260,22 @@ export default function Header() {
             <BarChart3 className="w-5 h-5 mr-3" />
             学習ダッシュボード
           </Link>
-          <Link 
-            href="/specifications" 
+          <Link
+            href="/specifications"
             className="flex items-center text-[#6F6F6F] hover:text-[#8E9C78] transition-colors py-3 px-4 rounded-xl hover:bg-gray-50"
           >
             <FileText className="w-5 h-5 mr-3" />
             仕様書・設計書
           </Link>
-          <Link 
-            href="/usage" 
+          <Link
+            href="/subject-b"
+            className="flex items-center text-[#6F6F6F] hover:text-[#8E9C78] transition-colors py-3 px-4 rounded-xl hover:bg-gray-50"
+          >
+            <BookOpen className="w-5 h-5 mr-3" />
+            科目B問題
+          </Link>
+          <Link
+            href="/usage"
             className="flex items-center text-[#6F6F6F] hover:text-[#8E9C78] transition-colors py-3 px-4 rounded-xl hover:bg-gray-50"
           >
             <Settings className="w-5 h-5 mr-3" />
