@@ -11,17 +11,17 @@ export async function GET(
     const filename = `${id}.html`;
 
     const htmlContent = await fetchGitHubDocumentContent(
-      'project-docs/specifications',
+      'project-docs/subject-b',
       filename
     );
 
     return createSanitizedHtmlResponse(htmlContent);
   } catch (error) {
-    console.error('Error fetching specification content:', error);
+    console.error('Error fetching question content:', error);
 
     return NextResponse.json(
       {
-        error: 'Failed to fetch specification content',
+        error: 'Failed to fetch question content',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
