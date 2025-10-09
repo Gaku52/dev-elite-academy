@@ -321,7 +321,27 @@ export default function ITFundamentalsPage() {
         </div>
 
         <div className="mt-8 card-modern p-6">
-          <h2 className="text-xl font-semibold mb-4">次のセクション</h2>
+          <h2 className="text-xl font-semibold mb-4">科目B対策</h2>
+          <p className="text-[#6F6F6F] mb-6">
+            科目Aの学習と並行して、科目B（アルゴリズムとプログラミング）の過去問題にも挑戦しましょう。
+          </p>
+          <Link
+            href="/subject-b"
+            className="flex items-center justify-between p-4 bg-[#8E9C78]/10 hover:bg-[#8E9C78]/20 rounded-lg transition-colors group"
+          >
+            <div className="flex items-center">
+              <BookOpen className="w-5 h-5 text-[#8E9C78] mr-3" />
+              <div>
+                <span className="text-gray-900 font-semibold block">科目B 過去問題</span>
+                <span className="text-sm text-[#6F6F6F]">アルゴリズムとプログラミングの理解を深める</span>
+              </div>
+            </div>
+            <ArrowLeft className="w-4 h-4 text-[#8E9C78] group-hover:text-[#7a8a6a] transition-colors transform rotate-180" />
+          </Link>
+        </div>
+
+        <div className="mt-8 card-modern p-6">
+          <h2 className="text-xl font-semibold mb-4">次のステップ</h2>
           <p className="text-[#6F6F6F] mb-6">
             基本情報技術者試験の学習を終えたら、さらに専門的な分野の学習に進みましょう。
           </p>
