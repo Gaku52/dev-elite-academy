@@ -97,6 +97,6 @@ jobs:
       run: |
         echo "🎉 Dev Elite Academy CI/CD Pipeline Successful!"
         echo "✅ Build: Passed"
-        echo "✅ Tests: Passed" 
+        echo "✅ Tests: Passed"
         echo "✅ Security: Passed"
         echo "🚀 Ready for deployment!"
