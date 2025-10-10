@@ -1,8 +1,7 @@
 'use client';
 
-import { ArrowRight, Clock, BookOpen } from 'lucide-react';
+import { ArrowRight, Clock, BookOpen, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import Header from '@/components/Header';
 import { sampleAlgorithmQuestion } from '@/data/subject-b/sample-algorithm-question';
 import { binarySearchQuestion } from '@/data/subject-b/binary-search-question';
 import { stackQuestion } from '@/data/subject-b/stack-question';
@@ -21,10 +20,20 @@ export default function SubjectBPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
-      <section className="py-20">
+      <section className="py-12">
         <div className="container-modern">
+          <Link
+            href="/modules/it-fundamentals"
+            className="inline-flex items-center text-[#8E9C78] hover:text-[#7a8a6a] mb-8 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            基本情報技術者試験に戻る
+          </Link>
+
           <div className="mb-16 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-[#8E9C78] rounded-2xl shadow-sm">
+              <BookOpen className="w-8 h-8 text-white" />
+            </div>
             <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
               科目B 過去問題
             </h1>
