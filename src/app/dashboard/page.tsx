@@ -6,7 +6,8 @@ import {
   BookOpen,
   ChevronRight,
   BarChart3,
-  Calendar
+  Calendar,
+  FileText
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -102,6 +103,60 @@ export default function Dashboard() {
 
         {/* Pinned Learning Paths */}
         <PinnedLearningPaths categories={categories} />
+
+        {/* Learning Resources Section */}
+        <div className="mb-6">
+          <h3 className="text-base font-bold text-black flex items-center mb-3">
+            <FileText className="w-4 h-4 mr-2 text-[#4A90E2]" />
+            学習資料
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link
+              href="/fe-exam"
+              className="card-modern p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+            >
+              <div className="flex items-start gap-3">
+                <div className="p-3 bg-[#4A90E2]/10 rounded-xl group-hover:bg-[#4A90E2]/20 transition-colors">
+                  <FileText className="w-6 h-6 text-[#4A90E2]" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-black mb-1 group-hover:text-[#4A90E2] transition-colors">
+                    基本情報技術者試験 学習資料
+                  </h4>
+                  <p className="text-xs text-[#6F6F6F] mb-2">
+                    GitHubから最新の学習資料をMarkdown形式で閲覧
+                  </p>
+                  <div className="flex items-center text-xs text-[#4A90E2]">
+                    <span>資料を見る</span>
+                    <ChevronRight className="w-3 h-3 ml-1" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+            <Link
+              href="/modules/it-fundamentals"
+              className="card-modern p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+            >
+              <div className="flex items-start gap-3">
+                <div className="p-3 bg-[#8E9C78]/10 rounded-xl group-hover:bg-[#8E9C78]/20 transition-colors">
+                  <BookOpen className="w-6 h-6 text-[#8E9C78]" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-black mb-1 group-hover:text-[#8E9C78] transition-colors">
+                    基本情報技術者試験
+                  </h4>
+                  <p className="text-xs text-[#6F6F6F] mb-2">
+                    IT基礎知識を体系的に学習 | 科目A・科目B対策
+                  </p>
+                  <div className="flex items-center text-xs text-[#8E9C78]">
+                    <span>学習を始める</span>
+                    <ChevronRight className="w-3 h-3 ml-1" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
 
         {/* Learning Path Section */}
         <div className="mb-4">

@@ -341,6 +341,26 @@ export default function ITFundamentalsPage() {
         </div>
 
         <div className="mt-8 card-modern p-6">
+          <h2 className="text-xl font-semibold mb-4">学習資料</h2>
+          <p className="text-[#6F6F6F] mb-6">
+            GitHubリポジトリから最新の学習資料をMarkdown形式で閲覧できます。体系的にまとめられた資料で効率的に学習しましょう。
+          </p>
+          <Link
+            href="/fe-exam"
+            className="flex items-center justify-between p-4 bg-[#4A90E2]/10 hover:bg-[#4A90E2]/20 rounded-lg transition-colors group"
+          >
+            <div className="flex items-center">
+              <FileText className="w-5 h-5 text-[#4A90E2] mr-3" />
+              <div>
+                <span className="text-gray-900 font-semibold block">基本情報技術者試験 学習資料</span>
+                <span className="text-sm text-[#6F6F6F]">GitHub連携で常に最新の資料を提供</span>
+              </div>
+            </div>
+            <ArrowLeft className="w-4 h-4 text-[#4A90E2] group-hover:text-[#3a7ac2] transition-colors transform rotate-180" />
+          </Link>
+        </div>
+
+        <div className="mt-8 card-modern p-6">
           <h2 className="text-xl font-semibold mb-4">次のステップ</h2>
           <p className="text-[#6F6F6F] mb-6">
             基本情報技術者試験の学習を終えたら、さらに専門的な分野の学習に進みましょう。
