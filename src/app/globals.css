@@ -175,3 +175,127 @@ button, a, input, textarea, select {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Markdown prose styles (GitHub-like) */
+.prose {
+  color: var(--foreground);
+  max-width: 65ch;
+  line-height: 1.75;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  color: var(--foreground);
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose h1 { font-size: 2.25em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+.prose h2 { font-size: 1.75em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+.prose h3 { font-size: 1.5em; }
+.prose h4 { font-size: 1.25em; }
+.prose h5 { font-size: 1em; }
+.prose h6 { font-size: 0.875em; color: var(--muted); }
+
+.prose p {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.prose a {
+  color: #0969da;
+  text-decoration: none;
+}
+
+.prose a:hover {
+  text-decoration: underline;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose code {
+  background-color: rgba(175, 184, 193, 0.2);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-family: var(--font-mono);
+}
+
+.prose pre {
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.875em;
+}
+
+.prose ul, .prose ol {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--border);
+  padding-left: 1em;
+  color: var(--muted);
+  margin: 1em 0;
+  font-style: italic;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.prose th, .prose td {
+  border: 1px solid var(--border);
+  padding: 0.5em 1em;
+  text-align: left;
+}
+
+.prose th {
+  background-color: #f6f8fa;
+  font-weight: 600;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+
+.prose-slate {
+  /* Additional slate color scheme if needed */
+}
+
+.max-w-none {
+  max-width: none;
+}
