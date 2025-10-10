@@ -179,8 +179,14 @@ button, a, input, textarea, select {
 /* Markdown prose styles (GitHub-like) */
 .prose {
   color: var(--foreground);
-  max-width: 65ch;
+  max-width: 100%;
   line-height: 1.75;
+}
+
+@media (min-width: 768px) {
+  .prose {
+    max-width: 85ch;
+  }
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
