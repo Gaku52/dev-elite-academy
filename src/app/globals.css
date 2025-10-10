@@ -192,21 +192,61 @@ button, a, input, textarea, select {
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
   color: var(--foreground);
   font-weight: 600;
-  line-height: 1.25;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
+  line-height: 1.3;
+  margin-top: 1.75em;
+  margin-bottom: 0.75em;
 }
 
-.prose h1 { font-size: 2.25em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
-.prose h2 { font-size: 1.75em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
-.prose h3 { font-size: 1.5em; }
-.prose h4 { font-size: 1.25em; }
+.prose h1 {
+  font-size: 1.875em;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.3em;
+}
+
+@media (min-width: 640px) {
+  .prose h1 { font-size: 2.25em; }
+}
+
+.prose h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3em;
+  margin-top: 1.5em;
+}
+
+@media (min-width: 640px) {
+  .prose h2 { font-size: 1.75em; }
+}
+
+.prose h3 {
+  font-size: 1.25em;
+  margin-top: 1.25em;
+}
+
+@media (min-width: 640px) {
+  .prose h3 { font-size: 1.5em; }
+}
+
+.prose h4 { font-size: 1.125em; }
+@media (min-width: 640px) {
+  .prose h4 { font-size: 1.25em; }
+}
+
 .prose h5 { font-size: 1em; }
 .prose h6 { font-size: 0.875em; color: var(--muted); }
 
 .prose p {
   margin-top: 1em;
   margin-bottom: 1em;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+@media (min-width: 640px) {
+  .prose p {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
 }
 
 .prose a {
@@ -231,34 +271,72 @@ button, a, input, textarea, select {
   background-color: rgba(175, 184, 193, 0.2);
   padding: 0.2em 0.4em;
   border-radius: 6px;
-  font-size: 0.85em;
+  font-size: 0.8125em;
   font-family: var(--font-mono);
+  word-wrap: break-word;
+}
+
+@media (min-width: 640px) {
+  .prose code {
+    font-size: 0.85em;
+  }
 }
 
 .prose pre {
   background-color: #f6f8fa;
-  border-radius: 6px;
-  padding: 16px;
+  border-radius: 8px;
+  padding: 12px;
   overflow-x: auto;
   margin: 1em 0;
+  border: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 640px) {
+  .prose pre {
+    padding: 16px;
+  }
 }
 
 .prose pre code {
   background-color: transparent;
   padding: 0;
   border-radius: 0;
-  font-size: 0.875em;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+  .prose pre code {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
 }
 
 .prose ul, .prose ol {
   margin-top: 1em;
   margin-bottom: 1em;
-  padding-left: 2em;
+  padding-left: 1.5em;
+}
+
+@media (min-width: 640px) {
+  .prose ul, .prose ol {
+    padding-left: 2em;
+  }
 }
 
 .prose li {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+@media (min-width: 640px) {
+  .prose li {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
 }
 
 .prose blockquote {
@@ -273,17 +351,71 @@ button, a, input, textarea, select {
   width: 100%;
   border-collapse: collapse;
   margin: 1em 0;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+  .prose table {
+    display: table;
+  }
 }
 
 .prose th, .prose td {
   border: 1px solid var(--border);
-  padding: 0.5em 1em;
+  padding: 0.625em 0.75em;
   text-align: left;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  vertical-align: top;
+}
+
+@media (min-width: 640px) {
+  .prose th, .prose td {
+    font-size: 0.875rem;
+    padding: 0.75em 1em;
+  }
+}
+
+@media (min-width: 768px) {
+  .prose th, .prose td {
+    font-size: 0.9375rem;
+    padding: 0.875em 1.25em;
+  }
+}
+
+@media (min-width: 1024px) {
+  .prose th, .prose td {
+    font-size: 1rem;
+    padding: 1em 1.5em;
+  }
 }
 
 .prose th {
   background-color: #f6f8fa;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.prose td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+@media (min-width: 768px) {
+  .prose td {
+    max-width: 300px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .prose td {
+    max-width: none;
+    white-space: normal;
+  }
 }
 
 .prose img {
