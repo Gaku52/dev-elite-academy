@@ -18,6 +18,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import DarkModeToggle from './DarkModeToggle';
 
 export default function Header() {
   const { user, signOut, loading } = useAuth();
@@ -122,6 +123,9 @@ export default function Header() {
 
           {/* モバイルメニューとユーザーメニュー */}
           <div className="flex items-center gap-4">
+            {/* ダークモードトグル */}
+            <DarkModeToggle />
+
             {/* モバイルメニューボタン */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

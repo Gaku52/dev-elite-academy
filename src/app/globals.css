@@ -14,6 +14,18 @@
   --radius: 20px;
 }
 
+.dark {
+  /* Dark mode colors */
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --primary: #a8b899;
+  --secondary: #94a3b8;
+  --muted: #94a3b8;
+  --accent: #a8b899;
+  --card: #1e293b;
+  --border: #334155;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -292,6 +304,10 @@ button, a, input, textarea, select {
   -webkit-overflow-scrolling: touch;
 }
 
+.dark .prose pre {
+  background-color: #1e293b;
+}
+
 @media (min-width: 640px) {
   .prose pre {
     padding: 16px;
@@ -396,6 +412,10 @@ button, a, input, textarea, select {
   background-color: #f6f8fa;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.dark .prose th {
+  background-color: #1e293b;
 }
 
 .prose td {
