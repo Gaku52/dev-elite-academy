@@ -18,7 +18,7 @@ export default function QuizIndicator({
   onQuizSelect
 }: QuizIndicatorProps) {
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="flex flex-wrap gap-2 mb-6 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
       {Array.from({ length: totalQuizzes }, (_, index) => {
         const isCompleted = completedQuizzes.has(`${activeModule}-${activeSection}-${index}`);
         const isCurrent = index === currentQuizIndex;

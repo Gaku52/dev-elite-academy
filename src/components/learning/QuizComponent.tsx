@@ -16,7 +16,7 @@ export default function QuizComponent({
 }: QuizComponentProps) {
   return (
     <div className="space-y-6">
-      <p className="text-gray-700 dark:text-dark-secondary mb-6 text-sm lg:text-base font-medium">
+      <p className="text-gray-900 dark:text-gray-100 mb-6 text-sm lg:text-base font-medium">
         {quiz.question}
       </p>
 
