@@ -20,14 +20,14 @@ export default function SectionNavigation({
       <button
         onClick={onPrevious}
         disabled={!canGoPrevious}
-        className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
+        className="px-6 py-3 border border-gray-300 dark:border-dark-border text-gray-700 dark:text-dark-primary rounded-lg hover:bg-gray-50 dark:hover:bg-dark-card disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
       >
         ← 前のセクション
       </button>
 
       {/* 達成度表示 */}
       {isCompleted && (
-        <div className="flex items-center justify-center px-4 py-2 bg-green-100 text-green-700 rounded-lg">
+        <div className="flex items-center justify-center px-4 py-2 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-lg">
           <Trophy className="w-5 h-5 mr-2" />
           <span className="font-medium">セクション完了！</span>
         </div>
@@ -36,7 +36,7 @@ export default function SectionNavigation({
       <button
         onClick={onNext}
         disabled={!canGoNext}
-        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center text-sm lg:text-base"
+        className="px-6 py-3 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center text-sm lg:text-base"
       >
         次のセクション
         <ChevronRight className="w-4 h-4 ml-1" />

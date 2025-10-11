@@ -78,7 +78,7 @@ export default function GrowthPredictionDisplay() {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
-        <p className="text-gray-600">成長データを読み込み中...</p>
+        <p className="text-gray-600 dark:text-gray-400">成長データを読み込み中...</p>
       </div>
     );
   }
@@ -124,11 +124,11 @@ export default function GrowthPredictionDisplay() {
 
   const getUrgencyColor = (level: string | null) => {
     switch (level) {
-      case 'urgent': return 'text-red-600 bg-red-50 border-red-200';
-      case 'warning': return 'text-orange-600 bg-orange-50 border-orange-200';
-      case 'caution': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'safe': return 'text-green-600 bg-green-50 border-green-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'urgent': return 'text-red-600 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
+      case 'warning': return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800';
+      case 'caution': return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800';
+      case 'safe': return 'text-green-600 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
+      default: return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
     }
   };
 
@@ -147,7 +147,7 @@ export default function GrowthPredictionDisplay() {
     <div className="space-y-6">
       {/* データ収集コントロール */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
           データ蓄積: {growthData?.data_available || 0}日分
         </div>
         <button
@@ -203,8 +203,8 @@ export default function GrowthPredictionDisplay() {
           </div>
 
           {/* 推奨アクション */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+            <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center">
               <TrendingUp className="w-4 h-4 mr-2" />
               推奨アクション
             </h4>
@@ -254,19 +254,19 @@ export default function GrowthPredictionDisplay() {
 
           {/* 最近の履歴 */}
           {growthData.daily_stats.length > 1 && (
-            <div className="bg-gray-50 rounded-xl p-4">
-              <h4 className="font-semibold text-gray-900 mb-3">最近の使用量推移</h4>
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">最近の使用量推移</h4>
               <div className="space-y-2">
                 {growthData.daily_stats.slice(0, 7).map((stat, index) => (
                   <div key={stat.date} className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600">
+                    <span className="text-gray-600 dark:text-gray-400">
                       {new Date(stat.date).toLocaleDateString('ja-JP')}
                     </span>
                     <div className="flex items-center space-x-4">
                       <span className="font-mono">
                         {stat.database_size_mb.toFixed(2)} MB
                       </span>
-                      <span className="text-gray-500">
+                      <span className="text-gray-500 dark:text-gray-400">
                         {stat.total_records.toLocaleString()} レコード
                       </span>
                       {index > 0 && stat.growth_rate_mb_per_day && (
@@ -284,10 +284,10 @@ export default function GrowthPredictionDisplay() {
           )}
         </>
       ) : (
-        <div className="text-center py-8 bg-gray-50 rounded-xl">
+        <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-xl">
           <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">予測データを蓄積中</h3>
-          <p className="text-gray-600 mb-4">
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">予測データを蓄積中</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
             正確な予測には数日間のデータが必要です
           </p>
           <button

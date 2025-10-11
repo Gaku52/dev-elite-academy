@@ -38,15 +38,15 @@ export default function SetupPinsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="max-w-md w-full p-8 bg-white shadow-lg rounded-lg">
-        <h1 className="text-2xl font-bold mb-6 text-center">ピン機能セットアップ</h1>
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="max-w-md w-full p-8 bg-card shadow-lg rounded-lg border border-border">
+        <h1 className="text-2xl font-bold mb-6 text-center text-foreground">ピン機能セットアップ</h1>
 
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-700 mb-2">
+        <div className="mb-6 p-4 bg-secondary rounded-lg">
+          <p className="text-sm text-muted-foreground mb-2">
             このページでは、学習パスのピン機能用データベーステーブルをセットアップします。
           </p>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-muted-foreground">
             初回のみ実行してください。
           </p>
         </div>
@@ -55,25 +55,25 @@ export default function SetupPinsPage() {
           <button
             onClick={setupTable}
             disabled={loading}
-            className="w-full bg-[#8E9C78] text-white py-3 rounded-lg font-semibold hover:bg-[#7a8a6a] transition-colors disabled:opacity-50"
+            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
             {loading ? 'セットアップ中...' : 'テーブルをセットアップ'}
           </button>
         )}
 
         {result && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-800">{result}</p>
+          <div className="p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
+            <p className="text-green-800 dark:text-green-400">{result}</p>
           </div>
         )}
 
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800">{error}</p>
+          <div className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-red-800 dark:text-red-400">{error}</p>
             <button
               onClick={setupTable}
               disabled={loading}
-              className="mt-4 w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors"
+              className="mt-4 w-full bg-destructive text-destructive-foreground py-2 rounded-lg hover:bg-destructive/90 transition-colors"
             >
               再試行
             </button>

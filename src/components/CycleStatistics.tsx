@@ -125,9 +125,9 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto"></div>
-        <p className="text-center text-gray-600 mt-4">周回統計を読み込み中...</p>
+        <p className="text-center text-gray-600 dark:text-gray-400 mt-4">周回統計を読み込み中...</p>
       </div>
     );
   }
@@ -136,19 +136,19 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
     const isMigrationError = error.includes('Migration required');
 
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="text-center">
           <div className="mb-4">
             {isMigrationError ? (
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                 <h3 className="text-lg font-semibold text-yellow-800 mb-2">
                   🔧 データベース設定が必要です
                 </h3>
                 <p className="text-yellow-700 mb-4">
                   周回記録システムを使用するには、データベースマイグレーションの実行が必要です。
                 </p>
-                <div className="bg-yellow-100 rounded p-3 mb-4">
-                  <h4 className="font-semibold text-yellow-800 mb-2">実行手順:</h4>
+                <div className="bg-yellow-100 dark:bg-yellow-900/30 rounded p-3 mb-4">
+                  <h4 className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">実行手順:</h4>
                   <ol className="text-left text-yellow-700 text-sm space-y-1">
                     <li>1. Supabase Dashboard にログイン</li>
                     <li>2. SQL Editor を開く</li>
@@ -176,11 +176,11 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
 
   if (cycleStats.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="text-center">
           <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">周回データがありません</h3>
-          <p className="text-gray-600">学習を開始すると、周回別の統計が表示されます。</p>
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">周回データがありません</h3>
+          <p className="text-gray-600 dark:text-gray-400">学習を開始すると、周回別の統計が表示されます。</p>
         </div>
       </div>
     );
@@ -189,14 +189,14 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
   return (
     <div className="space-y-6">
       {/* 全体サマリー */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="flex items-center mb-4">
           <BarChart3 className="w-6 h-6 text-purple-600 mr-2" />
-          <h2 className="text-xl font-bold text-gray-900">周回別学習統計</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">周回別学習統計</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 rounded-lg p-4">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
             <div className="flex items-center mb-2">
               <RotateCcw className="w-5 h-5 text-blue-600 mr-2" />
               <h3 className="font-semibold text-blue-900">総周回数</h3>
@@ -206,30 +206,30 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
             </p>
           </div>
 
-          <div className="bg-green-50 rounded-lg p-4">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
             <div className="flex items-center mb-2">
               <Award className="w-5 h-5 text-green-600 mr-2" />
-              <h3 className="font-semibold text-green-900">最高正解率</h3>
+              <h3 className="font-semibold text-green-900 dark:text-green-300">最高正解率</h3>
             </div>
             <p className="text-2xl font-bold text-green-600">
               {Math.max(...cycleStats.map(s => s.completion_rate)).toFixed(1)}%
             </p>
           </div>
 
-          <div className="bg-orange-50 rounded-lg p-4">
+          <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
             <div className="flex items-center mb-2">
               <TrendingUp className="w-5 h-5 text-orange-600 mr-2" />
-              <h3 className="font-semibold text-orange-900">総問題数</h3>
+              <h3 className="font-semibold text-orange-900 dark:text-orange-300">総問題数</h3>
             </div>
             <p className="text-2xl font-bold text-orange-600">
               {cycleStats.reduce((sum, s) => sum + s.total_questions, 0).toLocaleString()}問
             </p>
           </div>
 
-          <div className="bg-purple-50 rounded-lg p-4">
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
             <div className="flex items-center mb-2">
               <Clock className="w-5 h-5 text-purple-600 mr-2" />
-              <h3 className="font-semibold text-purple-900">学習モジュール</h3>
+              <h3 className="font-semibold text-purple-900 dark:text-purple-300">学習モジュール</h3>
             </div>
             <p className="text-2xl font-bold text-purple-600">
               {Object.keys(groupedByModule).length}個
@@ -240,8 +240,8 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
 
       {/* モジュール別周回統計 */}
       {Object.entries(groupedByModule).map(([module, stats]) => (
-        <div key={module} className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">
+        <div key={module} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
             {getModuleDisplayName(module)}
           </h3>
 
@@ -260,8 +260,8 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
                 {stats.map((stat) => (
                   <tr
                     key={`${stat.module_name}-${stat.cycle_number}`}
-                    className={`border-b hover:bg-gray-50 cursor-pointer ${
-                      selectedCycle === stat.cycle_number ? 'bg-purple-50' : ''
+                    className={`border-b hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${
+                      selectedCycle === stat.cycle_number ? 'bg-purple-50 dark:bg-purple-900/20' : ''
                     }`}
                     onClick={() => setSelectedCycle(
                       selectedCycle === stat.cycle_number ? null : stat.cycle_number
@@ -269,7 +269,7 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center">
-                        <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm">
+                        <span className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm">
                           第{stat.cycle_number}周目
                         </span>
                       </div>
@@ -303,13 +303,13 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
                         {stat.completion_rate.toFixed(1)}%
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
+                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
                         {formatDate(stat.cycle_start_date)} 〜 {formatDate(stat.cycle_last_update)}
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
+                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
                       {calculateDuration(stat.cycle_start_date, stat.cycle_last_update)}日
                     </td>
                   </tr>
@@ -320,8 +320,8 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
 
           {/* 選択した周回の詳細 */}
           {selectedCycle && stats.find(s => s.cycle_number === selectedCycle) && (
-            <div className="mt-4 p-4 bg-purple-50 rounded-lg">
-              <h4 className="font-semibold text-purple-900 mb-3">
+            <div className="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-3">
                 第{selectedCycle}周目 詳細情報
               </h4>
               {(() => {
@@ -329,20 +329,20 @@ export default function CycleStatistics({ moduleName }: CycleStatisticsProps) {
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <h5 className="text-sm font-medium text-purple-700 mb-1">総回答数</h5>
-                      <p className="text-lg font-bold text-purple-900">
+                      <h5 className="text-sm font-medium text-purple-700 dark:text-purple-400 mb-1">総回答数</h5>
+                      <p className="text-lg font-bold text-purple-900 dark:text-purple-300">
                         {selectedStat.total_attempts.toLocaleString()}回
                       </p>
                     </div>
                     <div>
-                      <h5 className="text-sm font-medium text-purple-700 mb-1">正解数</h5>
-                      <p className="text-lg font-bold text-purple-900">
+                      <h5 className="text-sm font-medium text-purple-700 dark:text-purple-400 mb-1">正解数</h5>
+                      <p className="text-lg font-bold text-purple-900 dark:text-purple-300">
                         {selectedStat.total_correct_answers.toLocaleString()}回
                       </p>
                     </div>
                     <div>
-                      <h5 className="text-sm font-medium text-purple-700 mb-1">全体正解率</h5>
-                      <p className="text-lg font-bold text-purple-900">
+                      <h5 className="text-sm font-medium text-purple-700 dark:text-purple-400 mb-1">全体正解率</h5>
+                      <p className="text-lg font-bold text-purple-900 dark:text-purple-300">
                         {selectedStat.total_attempts > 0
                           ? ((selectedStat.total_correct_answers / selectedStat.total_attempts) * 100).toFixed(1)
                           : 0}%

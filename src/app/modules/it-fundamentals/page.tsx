@@ -174,24 +174,24 @@ export default function ITFundamentalsPage() {
   }, [allProgress]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <div className="container-modern py-12">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-[#8E9C78] hover:text-[#7a8a6a] mb-8 transition-colors"
+          className="inline-flex items-center text-primary hover:text-primary/80 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           ダッシュボードに戻る
         </Link>
-        
+
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-[#4A90E2] rounded-2xl shadow-sm">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-[#4A90E2] dark:bg-[#4A90E2]/90 rounded-2xl shadow-sm">
             <BookOpen className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-black mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             基本情報技術者試験
           </h1>
-          <p className="text-xl text-[#6F6F6F] max-w-3xl mx-auto mb-4">
+          <p className="text-xl text-muted max-w-3xl mx-auto mb-4">
             IT基礎知識を体系的に学習｜科目A: 60問（90分）｜科目B: 20問（100分）
           </p>
           <Link
@@ -205,18 +205,18 @@ export default function ITFundamentalsPage() {
         <div className="mb-8">
           <div className="card-modern p-6">
             <h2 className="text-xl font-semibold mb-4">学習の概要</h2>
-            <p className="text-[#6F6F6F] mb-4">
+            <p className="text-muted mb-4">
               基本情報技術者試験は、ITエンジニアとしての基礎的な知識・技能を評価する国家試験です。
               以下の3分野を体系的に学習していきます。
             </p>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">
+              <span className="px-3 py-1 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-full text-sm">
                 🔧 テクノロジ系 (41問/60問)
               </span>
-              <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-sm">
+              <span className="px-3 py-1 bg-green-50 dark:bg-green-950/50 text-green-600 dark:text-green-400 rounded-full text-sm">
                 📊 マネジメント系 (7問/60問)
               </span>
-              <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-sm">
+              <span className="px-3 py-1 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-full text-sm">
                 🎯 ストラテジ系 (12問/60問)
               </span>
             </div>
@@ -234,13 +234,13 @@ export default function ITFundamentalsPage() {
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-black mb-1">
+                    <h3 className="text-lg font-semibold text-foreground mb-1">
                       {topic.title}
                     </h3>
-                    <p className="text-sm text-[#6F6F6F] mb-1">
+                    <p className="text-sm text-muted mb-1">
                       {topic.description}
                     </p>
-                    <div className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-full inline-block">
+                    <div className="text-xs text-muted bg-card px-2 py-1 rounded-full inline-block">
                       {topic.category}
                     </div>
                   </div>
@@ -249,18 +249,18 @@ export default function ITFundamentalsPage() {
                 <div className="space-y-2 mb-4">
                   {topic.topics.map((item, index) => (
                     <div key={index} className="flex items-center text-sm">
-                      <span className="w-2 h-2 bg-gray-300 rounded-full mr-2"></span>
-                      <span className="text-[#6F6F6F]">{item}</span>
+                      <span className="w-2 h-2 bg-border rounded-full mr-2"></span>
+                      <span className="text-muted">{item}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6F6F6F]">進捗</span>
-                    <span className="text-[#6F6F6F]">{currentProgress}%</span>
+                    <span className="text-muted">進捗</span>
+                    <span className="text-muted">{currentProgress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-border rounded-full h-2">
                     <div
                       className={`${topic.color} h-2 rounded-full transition-all duration-300`}
                       style={{ width: `${currentProgress}%` }}
@@ -269,7 +269,7 @@ export default function ITFundamentalsPage() {
                 </div>
 
                 <Link href={topic.href || '#'} className="mt-4 w-full block">
-                  <button className="w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-sm font-medium">
+                  <button className="w-full py-2 px-4 bg-card hover:bg-card/80 text-foreground rounded-lg transition-colors text-sm font-medium">
                     学習を開始 ({topic.category})
                   </button>
                 </Link>
@@ -285,7 +285,7 @@ export default function ITFundamentalsPage() {
               <span className="text-2xl mr-3">📚</span>
               <div>
                 <h3 className="font-medium mb-1">体系的な学習</h3>
-                <p className="text-sm text-[#6F6F6F]">
+                <p className="text-sm text-muted">
                   各分野を順序立てて学習し、知識を確実に定着させます
                 </p>
               </div>
@@ -294,7 +294,7 @@ export default function ITFundamentalsPage() {
               <span className="text-2xl mr-3">🎯</span>
               <div>
                 <h3 className="font-medium mb-1">実践的な演習</h3>
-                <p className="text-sm text-[#6F6F6F]">
+                <p className="text-sm text-muted">
                   過去問題や演習問題で実力を確認しながら進めます
                 </p>
               </div>
@@ -303,7 +303,7 @@ export default function ITFundamentalsPage() {
               <span className="text-2xl mr-3">📊</span>
               <div>
                 <h3 className="font-medium mb-1">進捗管理</h3>
-                <p className="text-sm text-[#6F6F6F]">
+                <p className="text-sm text-muted">
                   学習の進捗を可視化し、効率的な学習計画を立てられます
                 </p>
               </div>
@@ -312,7 +312,7 @@ export default function ITFundamentalsPage() {
               <span className="text-2xl mr-3">💡</span>
               <div>
                 <h3 className="font-medium mb-1">重要ポイント解説</h3>
-                <p className="text-sm text-[#6F6F6F]">
+                <p className="text-sm text-muted">
                   試験によく出る重要なポイントを詳しく解説します
                 </p>
               </div>
@@ -322,79 +322,79 @@ export default function ITFundamentalsPage() {
 
         <div className="mt-8 card-modern p-6">
           <h2 className="text-xl font-semibold mb-4">科目B対策</h2>
-          <p className="text-[#6F6F6F] mb-6">
+          <p className="text-muted mb-6">
             科目Aの学習と並行して、科目B（アルゴリズムとプログラミング）の過去問題にも挑戦しましょう。
           </p>
           <Link
             href="/subject-b"
-            className="flex items-center justify-between p-4 bg-[#8E9C78]/10 hover:bg-[#8E9C78]/20 rounded-lg transition-colors group"
+            className="flex items-center justify-between p-4 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors group"
           >
             <div className="flex items-center">
-              <BookOpen className="w-5 h-5 text-[#8E9C78] mr-3" />
+              <BookOpen className="w-5 h-5 text-primary mr-3" />
               <div>
-                <span className="text-gray-900 font-semibold block">科目B 過去問題</span>
-                <span className="text-sm text-[#6F6F6F]">アルゴリズムとプログラミングの理解を深める</span>
+                <span className="text-foreground font-semibold block">科目B 過去問題</span>
+                <span className="text-sm text-muted">アルゴリズムとプログラミングの理解を深める</span>
               </div>
             </div>
-            <ArrowLeft className="w-4 h-4 text-[#8E9C78] group-hover:text-[#7a8a6a] transition-colors transform rotate-180" />
+            <ArrowLeft className="w-4 h-4 text-primary group-hover:text-primary/80 transition-colors transform rotate-180" />
           </Link>
         </div>
 
         <div className="mt-8 card-modern p-6">
           <h2 className="text-xl font-semibold mb-4">学習資料</h2>
-          <p className="text-[#6F6F6F] mb-6">
+          <p className="text-muted mb-6">
             GitHubリポジトリから最新の学習資料をMarkdown形式で閲覧できます。体系的にまとめられた資料で効率的に学習しましょう。
           </p>
           <Link
             href="/fe-exam"
-            className="flex items-center justify-between p-4 bg-[#4A90E2]/10 hover:bg-[#4A90E2]/20 rounded-lg transition-colors group"
+            className="flex items-center justify-between p-4 bg-blue-500/10 dark:bg-blue-500/20 hover:bg-blue-500/20 dark:hover:bg-blue-500/30 rounded-lg transition-colors group"
           >
             <div className="flex items-center">
-              <FileText className="w-5 h-5 text-[#4A90E2] mr-3" />
+              <FileText className="w-5 h-5 text-blue-500 dark:text-blue-400 mr-3" />
               <div>
-                <span className="text-gray-900 font-semibold block">基本情報技術者試験 学習資料</span>
-                <span className="text-sm text-[#6F6F6F]">GitHub連携で常に最新の資料を提供</span>
+                <span className="text-foreground font-semibold block">基本情報技術者試験 学習資料</span>
+                <span className="text-sm text-muted">GitHub連携で常に最新の資料を提供</span>
               </div>
             </div>
-            <ArrowLeft className="w-4 h-4 text-[#4A90E2] group-hover:text-[#3a7ac2] transition-colors transform rotate-180" />
+            <ArrowLeft className="w-4 h-4 text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors transform rotate-180" />
           </Link>
         </div>
 
         <div className="mt-8 card-modern p-6">
           <h2 className="text-xl font-semibold mb-4">次のステップ</h2>
-          <p className="text-[#6F6F6F] mb-6">
+          <p className="text-muted mb-6">
             基本情報技術者試験の学習を終えたら、さらに専門的な分野の学習に進みましょう。
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/modules/programming-basics"
-              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+              className="flex items-center justify-between p-4 bg-card hover:bg-card/80 rounded-lg transition-colors group"
             >
               <div className="flex items-center">
-                <Code className="w-5 h-5 text-blue-500 mr-3" />
-                <span className="text-gray-700 font-medium">プログラミング基礎</span>
+                <Code className="w-5 h-5 text-blue-500 dark:text-blue-400 mr-3" />
+                <span className="text-foreground font-medium">プログラミング基礎</span>
               </div>
-              <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors transform rotate-180" />
+              <ArrowLeft className="w-4 h-4 text-muted group-hover:text-foreground transition-colors transform rotate-180" />
             </Link>
             <Link
               href="/modules/aws"
-              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+              className="flex items-center justify-between p-4 bg-card hover:bg-card/80 rounded-lg transition-colors group"
             >
               <div className="flex items-center">
                 <span className="text-lg mr-3">☁️</span>
-                <span className="text-gray-700 font-medium">AWS クラウド</span>
+                <span className="text-foreground font-medium">AWS クラウド</span>
               </div>
-              <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors transform rotate-180" />
+              <ArrowLeft className="w-4 h-4 text-muted group-hover:text-foreground transition-colors transform rotate-180" />
             </Link>
             <Link
               href="/modules/ai-ml"
-              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+              className="flex items-center justify-between p-4 bg-card hover:bg-card/80 rounded-lg transition-colors group"
             >
               <div className="flex items-center">
                 <span className="text-lg mr-3">🤖</span>
-                <span className="text-gray-700 font-medium">AI・機械学習</span>
+                <span className="text-foreground font-medium">AI・機械学習</span>
               </div>
-              <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors transform rotate-180" />
+              <ArrowLeft className="w-4 h-4 text-muted group-hover:text-foreground transition-colors transform rotate-180" />
             </Link>
           </div>
         </div>

@@ -19,8 +19,8 @@ export default function SpecificationViewerPage({ params }: SpecificationViewerP
 
   if (!specId) {
     return (
-      <div className="min-h-screen bg-white flex justify-center items-center">
-        <div className="text-[#6F6F6F]">読み込み中...</div>
+      <div className="min-h-screen bg-background flex justify-center items-center">
+        <div className="text-muted-foreground">読み込み中...</div>
       </div>
     );
   }

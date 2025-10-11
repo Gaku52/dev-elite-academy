@@ -45,23 +45,23 @@ export default function DailyProgressChart({ data, chartType = 'line' }: DailyPr
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-900 mb-2">{label}</p>
+        <div className="bg-white dark:bg-dark-card p-4 border border-gray-200 dark:border-dark-border rounded-lg shadow-lg">
+          <p className="font-semibold text-gray-900 dark:text-dark-primary mb-2">{label}</p>
           <div className="space-y-1 text-sm">
-            <p className="text-gray-600">
-              問題数: <span className="font-medium text-gray-900">{data.totalQuestions}問</span>
+            <p className="text-gray-600 dark:text-dark-secondary">
+              問題数: <span className="font-medium text-gray-900 dark:text-dark-primary">{data.totalQuestions}問</span>
             </p>
-            <p className="text-gray-600">
-              正解数: <span className="font-medium text-green-600">{data.correctQuestions}問</span>
+            <p className="text-gray-600 dark:text-dark-secondary">
+              正解数: <span className="font-medium text-green-600 dark:text-green-400">{data.correctQuestions}問</span>
             </p>
-            <p className="text-gray-600">
-              正答率: <span className="font-medium text-blue-600">{data.correctRate}%</span>
+            <p className="text-gray-600 dark:text-dark-secondary">
+              正答率: <span className="font-medium text-blue-600 dark:text-blue-400">{data.correctRate}%</span>
             </p>
-            <p className="text-gray-600">
-              学習時間: <span className="font-medium text-purple-600">{data.timeSpent}分</span>
+            <p className="text-gray-600 dark:text-dark-secondary">
+              学習時間: <span className="font-medium text-purple-600 dark:text-purple-400">{data.timeSpent}分</span>
             </p>
-            <p className="text-gray-600">
-              完了セクション: <span className="font-medium text-orange-600">{data.sectionsCompleted}</span>
+            <p className="text-gray-600 dark:text-dark-secondary">
+              完了セクション: <span className="font-medium text-orange-600 dark:text-orange-400">{data.sectionsCompleted}</span>
             </p>
           </div>
         </div>
@@ -72,8 +72,8 @@ export default function DailyProgressChart({ data, chartType = 'line' }: DailyPr
 
   if (chartType === 'area') {
     return (
-      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold mb-4">日次学習推移（エリアチャート）</h3>
+      <div className="bg-white dark:bg-dark-card rounded-lg p-6 shadow-sm border border-gray-200 dark:border-dark-border">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-primary">日次学習推移（エリアチャート）</h3>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={chartData}>
             <defs>
@@ -115,8 +115,8 @@ export default function DailyProgressChart({ data, chartType = 'line' }: DailyPr
 
   if (chartType === 'bar') {
     return (
-      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold mb-4">日次学習推移（バーチャート）</h3>
+      <div className="bg-white dark:bg-dark-card rounded-lg p-6 shadow-sm border border-gray-200 dark:border-dark-border">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-primary">日次学習推移（バーチャート）</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -133,8 +133,8 @@ export default function DailyProgressChart({ data, chartType = 'line' }: DailyPr
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold mb-4">日次学習推移</h3>
+    <div className="bg-white dark:bg-dark-card rounded-lg p-6 shadow-sm border border-gray-200 dark:border-dark-border">
+      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-primary">日次学習推移</h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />

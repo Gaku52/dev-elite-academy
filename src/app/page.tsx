@@ -120,9 +120,9 @@ function PinnedLearning() {
 
   if (loading || categoriesLoading) {
     return (
-      <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10">
+      <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10 dark:from-[#a8b899]/20 dark:to-[#a8b899]/15">
         <div className="container-modern">
-          <div className="text-center text-black">読み込み中...</div>
+          <div className="text-center text-foreground">読み込み中...</div>
         </div>
       </section>
     );
@@ -138,23 +138,23 @@ function PinnedLearning() {
   );
 
   return (
-    <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10">
+    <section className="py-12 bg-gradient-to-r from-[#8E9C78]/10 to-[#7a8a6a]/10 dark:from-[#a8b899]/20 dark:to-[#a8b899]/15">
       <div className="container-modern">
         <div className="text-center mb-8">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-3xl font-bold text-black flex items-center justify-center mb-4"
+            className="text-3xl font-bold text-foreground flex items-center justify-center mb-4"
           >
-            <Pin className="w-8 h-8 mr-3 text-[#8E9C78]" />
+            <Pin className="w-8 h-8 mr-3 text-primary" />
             今取り組んでいる学習
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-[#6F6F6F] max-w-2xl mx-auto"
+            className="text-muted max-w-2xl mx-auto"
           >
             ピン留めした学習項目から、継続して取り組みましょう
           </motion.p>
@@ -176,14 +176,14 @@ function PinnedLearning() {
                 >
                   <Link
                     href={pathUrl}
-                    className="card-modern p-6 hover:shadow-lg border-2 border-[#8E9C78]/30 hover:border-[#8E9C78]/50 transition-all duration-300 block hover:-translate-y-1"
+                    className="card-modern p-6 hover:shadow-lg border-2 border-primary/30 hover:border-primary/50 transition-all duration-300 block hover:-translate-y-1"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <span className="text-3xl" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
                         {category.icon}
                       </span>
                       <div className="flex items-center space-x-2">
-                        <Pin className="w-4 h-4 text-[#8E9C78] fill-current" />
+                        <Pin className="w-4 h-4 text-primary fill-current" />
                         <div
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: category.color || '#8E9C78' }}
@@ -191,16 +191,16 @@ function PinnedLearning() {
                       </div>
                     </div>
 
-                    <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
+                    <h4 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
                       {category.name}
                     </h4>
 
-                    <p className="text-[#6F6F6F] text-sm mb-4">
+                    <p className="text-muted text-sm mb-4">
                       {category.description}
                     </p>
 
-                    <div className="flex items-center justify-between text-xs text-[#6F6F6F]">
-                      <span className="px-2 py-1 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full">
+                    <div className="flex items-center justify-between text-xs text-muted">
+                      <span className="px-2 py-1 bg-primary/10 text-primary rounded-full">
                         学習パス
                       </span>
                     </div>
@@ -218,13 +218,13 @@ function PinnedLearning() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="relative group"
               >
-                <div className="card-modern p-6 hover:shadow-lg border-2 border-[#8E9C78]/30 hover:border-[#8E9C78]/50 transition-all duration-300 hover:-translate-y-1">
+                <div className="card-modern p-6 hover:shadow-lg border-2 border-primary/30 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1">
                   <div className="flex items-start justify-between mb-4">
                     <span className="text-3xl" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
                       {category.icon}
                     </span>
                     <div className="flex items-center space-x-2">
-                      <Pin className="w-4 h-4 text-[#8E9C78] fill-current" />
+                      <Pin className="w-4 h-4 text-primary fill-current" />
                       <div
                         className="w-3 h-3 rounded-full"
                         style={{ backgroundColor: category.color || '#8E9C78' }}
@@ -232,16 +232,16 @@ function PinnedLearning() {
                     </div>
                   </div>
 
-                  <h4 className="text-lg font-semibold text-black mb-2 group-hover:text-[#8E9C78] transition-colors">
+                  <h4 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
                     {category.name}
                   </h4>
 
-                  <p className="text-[#6F6F6F] text-sm mb-4">
+                  <p className="text-muted text-sm mb-4">
                     {category.description}
                   </p>
 
-                  <div className="flex items-center justify-between text-xs text-[#6F6F6F]">
-                    <span className="px-2 py-1 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full">
+                  <div className="flex items-center justify-between text-xs text-muted">
+                    <span className="px-2 py-1 bg-primary/10 text-primary rounded-full">
                       学習パス
                     </span>
                   </div>
@@ -257,7 +257,7 @@ function PinnedLearning() {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header />
       
       {/* Hero Section */}
@@ -271,14 +271,14 @@ export default function Home() {
                 transition={{ duration: 0.8 }}
                 className="space-y-6"
               >
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black leading-tight tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-tight tracking-tight">
                   Dev Elite{' '}
                   <span className="text-gradient">
                     Academy
                   </span>
                 </h1>
-                
-                <p className="text-base sm:text-lg md:text-xl text-[#6F6F6F] leading-relaxed max-w-xl">
+
+                <p className="text-base sm:text-lg md:text-xl text-muted leading-relaxed max-w-xl">
                   エンジニア3年目から高年収エンジニアへ。DevOps、AI/ML、セキュリティ、アーキテクチャ設計まで、将来性のある技術スキルを実践的に習得し、年収800万円以上を目指す統合学習プラットフォーム。
                 </p>
               </motion.div>
@@ -335,16 +335,16 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.5 }}
               className="relative"
             >
-              <div className="card-modern p-8 bg-gradient-to-br from-[#8E9C78]/10 to-[#8E9C78]/5">
-                <h3 className="text-2xl font-bold text-black mb-6">統計</h3>
+              <div className="card-modern p-8 bg-gradient-to-br from-[#8E9C78]/10 to-[#8E9C78]/5 dark:from-[#a8b899]/20 dark:to-[#a8b899]/10">
+                <h3 className="text-2xl font-bold text-foreground mb-6">統計</h3>
                 <div className="grid grid-cols-2 gap-6">
                   {stats.map((stat) => (
                     <div key={stat.label} className="text-center space-y-2">
-                      <div className="flex justify-center text-[#8E9C78]">
+                      <div className="flex justify-center text-primary">
                         {stat.icon}
                       </div>
-                      <div className="text-3xl font-bold text-black">{stat.number}</div>
-                      <div className="text-sm text-[#6F6F6F]">{stat.label}</div>
+                      <div className="text-3xl font-bold text-foreground">{stat.number}</div>
+                      <div className="text-sm text-muted">{stat.label}</div>
                     </div>
                   ))}
                 </div>
@@ -358,7 +358,7 @@ export default function Home() {
       <PinnedLearning />
 
       {/* Skills Categories Section */}
-      <section className="py-16 sm:py-24 md:py-32 bg-gray-50">
+      <section className="py-16 sm:py-24 md:py-32 bg-gray-50 dark:bg-card">
         <div className="container-modern">
           <div className="text-center mb-16">
             <motion.div
@@ -367,10 +367,10 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="space-y-4"
             >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
                 高年収エンジニアへの道のり
               </h2>
-              <p className="text-base sm:text-lg md:text-xl text-[#6F6F6F] max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl text-muted max-w-2xl mx-auto">
                 実際の業務で必要とされる技術スキルを体系的に習得し、市場価値の高いエンジニアを目指します。
               </p>
             </motion.div>
@@ -388,13 +388,13 @@ export default function Home() {
                 <div className={`inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-r ${category.color} rounded-2xl text-white`}>
                   {category.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-black mb-4">{category.title}</h3>
-                <p className="text-[#6F6F6F] mb-6 leading-relaxed">{category.description}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-4">{category.title}</h3>
+                <p className="text-muted mb-6 leading-relaxed">{category.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {category.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="px-3 py-1.5 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full text-sm font-medium"
+                      className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium"
                     >
                       {skill}
                     </span>
@@ -407,7 +407,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 md:py-32 bg-[#8E9C78]">
+      <section className="py-16 sm:py-24 md:py-32 bg-primary dark:bg-primary/90">
         <div className="container-modern text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -423,8 +423,8 @@ export default function Home() {
                 実践的なプロジェクトと体系化された学習パスで、確実にスキルアップできます。
               </p>
             </div>
-            
-            <button className="bg-white text-[#8E9C78] px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-gray-50 transition-colors inline-flex items-center space-x-2">
+
+            <button className="bg-white dark:bg-gray-100 text-primary px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-gray-50 dark:hover:bg-gray-200 transition-colors inline-flex items-center space-x-2">
               <span>無料で始める</span>
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -433,25 +433,25 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 bg-black text-white">
+      <footer className="py-16 bg-black dark:bg-background text-white dark:text-foreground border-t dark:border-border">
         <div className="container-modern">
           <div className="flex justify-center space-x-6 mb-8">
             <a
               href="https://github.com/Gaku52/dev-elite-academy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#6F6F6F] hover:text-white transition-colors duration-300"
+              className="text-muted hover:text-foreground transition-colors duration-300"
             >
               <Github className="h-6 w-6" />
             </a>
             <a
               href="#"
-              className="text-[#6F6F6F] hover:text-white transition-colors duration-300"
+              className="text-muted hover:text-foreground transition-colors duration-300"
             >
               <Globe className="h-6 w-6" />
             </a>
           </div>
-          <p className="text-center text-[#6F6F6F]">
+          <p className="text-center text-muted">
             &copy; 2025 Dev Elite Academy. Built with Next.js 15, TypeScript, and Tailwind CSS.
           </p>
         </div>

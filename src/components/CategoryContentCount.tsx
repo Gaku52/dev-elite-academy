@@ -38,17 +38,17 @@ export default function CategoryContentCount({ categoryName, fallbackCount }: Ca
   }, [categoryName]);
 
   if (loading) {
-    return <span className="text-xs text-[#8E9C78] animate-pulse">{fallbackCount} コンテンツ</span>;
+    return <span className="text-xs text-olive-600 dark:text-olive-400 animate-pulse">{fallbackCount} コンテンツ</span>;
   }
 
   if (!contentData) {
-    return <span className="text-xs text-[#8E9C78]">{fallbackCount} コンテンツ</span>;
+    return <span className="text-xs text-olive-600 dark:text-olive-400">{fallbackCount} コンテンツ</span>;
   }
 
   // 基本情報技術者試験の場合は実装済みモジュール数を表示
   if (categoryName === '基本情報技術者試験' && contentData.implementedModules !== undefined) {
     return (
-      <span className="text-xs text-[#8E9C78]">
+      <span className="text-xs text-olive-600 dark:text-olive-400">
         {contentData.implementedModules} コンテンツ
       </span>
     );
@@ -56,7 +56,7 @@ export default function CategoryContentCount({ categoryName, fallbackCount }: Ca
 
   // 他のカテゴリの場合はコンテンツ数を表示
   return (
-    <span className="text-xs text-[#8E9C78]">
+    <span className="text-xs text-olive-600 dark:text-olive-400">
       {contentData.contentCount || fallbackCount} コンテンツ
     </span>
   );

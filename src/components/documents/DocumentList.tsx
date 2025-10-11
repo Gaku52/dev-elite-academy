@@ -43,19 +43,19 @@ export default function DocumentList({ config }: DocumentListProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex justify-center items-center">
-        <div className="text-[#6F6F6F]">読み込み中...</div>
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex justify-center items-center">
+        <div className="text-gray-600 dark:text-gray-400">読み込み中...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-900">
         <Header />
         <div className="container-modern py-16">
-          <div className="card-modern p-6 border-red-200 bg-red-50">
-            <p className="text-red-600">{error}</p>
+          <div className="card-modern p-6 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
           </div>
         </div>
       </div>
@@ -63,15 +63,15 @@ export default function DocumentList({ config }: DocumentListProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       <Header />
       <section className="py-20">
         <div className="container-modern">
           <div className="mb-16 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               {config.pageTitle}
             </h1>
-            <p className="text-xl text-[#6F6F6F] max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               {config.pageDescription}
             </p>
           </div>
@@ -83,15 +83,15 @@ export default function DocumentList({ config }: DocumentListProps) {
                 className="card-modern p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 bg-[#8E9C78]/10 rounded-2xl group-hover:bg-[#8E9C78]/20 transition-colors">
-                    <FileText className="w-6 h-6 text-[#8E9C78]" />
+                  <div className="p-3 bg-primary/10 rounded-2xl group-hover:bg-primary/20 transition-colors">
+                    <FileText className="w-6 h-6 text-primary" />
                   </div>
-                  <span className="text-xs text-[#6F6F6F] bg-gray-100 px-2 py-1 rounded-full">
+                  <span className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">
                     {formatFileSize(doc.size)}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-black mb-4 line-clamp-2">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 line-clamp-2">
                   {doc.displayName}
                 </h3>
 
@@ -123,8 +123,8 @@ export default function DocumentList({ config }: DocumentListProps) {
                   </a>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-2 text-xs text-[#6F6F6F]">
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                     <FileText size={12} />
                     <span>{doc.name}</span>
                   </div>
@@ -138,8 +138,8 @@ export default function DocumentList({ config }: DocumentListProps) {
       {documents.length === 0 && !error && (
         <div className="container-modern">
           <div className="card-modern p-12 text-center">
-            <FileText className="w-16 h-16 text-[#6F6F6F] mx-auto mb-4" />
-            <p className="text-[#6F6F6F] text-lg">{config.emptyMessage}</p>
+            <FileText className="w-16 h-16 text-gray-600 dark:text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400 text-lg">{config.emptyMessage}</p>
           </div>
         </div>
       )}

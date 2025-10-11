@@ -82,16 +82,16 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
       {/* ヘッダー */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-black">{question.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-dark-primary">{question.title}</h1>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-[#6F6F6F]">
+            <div className="flex items-center space-x-2 text-gray-600 dark:text-dark-secondary">
               <Clock className="w-5 h-5" />
               <span>目安時間: {question.timeEstimate}分</span>
             </div>
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              question.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
-              question.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-              'bg-red-100 text-red-700'
+              question.difficulty === 'easy' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
+              question.difficulty === 'medium' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' :
+              'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
             }`}>
               {question.difficulty === 'easy' ? '易' :
                question.difficulty === 'medium' ? '中' : '難'}
@@ -99,25 +99,25 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
           </div>
         </div>
 
-        <p className="text-lg text-[#6F6F6F] mb-4">{question.description}</p>
+        <p className="text-lg text-gray-600 dark:text-dark-secondary mb-4">{question.description}</p>
 
         {submitted && (
           <div className={`p-4 rounded-lg ${
-            score === maxScore ? 'bg-green-50 border-2 border-green-200' :
-            score >= maxScore * 0.6 ? 'bg-yellow-50 border-2 border-yellow-200' :
-            'bg-red-50 border-2 border-red-200'
+            score === maxScore ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800' :
+            score >= maxScore * 0.6 ? 'bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-800' :
+            'bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800'
           }`}>
             <div className="flex items-center space-x-3">
               {score === maxScore ? (
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
               ) : (
-                <AlertCircle className="w-6 h-6 text-yellow-600" />
+                <AlertCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
               )}
               <div>
-                <p className="font-bold text-lg">
+                <p className="font-bold text-lg text-gray-900 dark:text-dark-primary">
                   正解数: {score} / {maxScore}
                 </p>
-                <p className="text-sm text-[#6F6F6F]">
+                <p className="text-sm text-gray-600 dark:text-dark-secondary">
                   得点率: {Math.round((score / maxScore) * 100)}%
                 </p>
               </div>
@@ -134,20 +134,20 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
 
         {/* 擬似コード */}
         {question.pseudoCode && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-bold mb-3 flex items-center">
+          <div className="bg-gray-50 dark:bg-dark-card rounded-lg p-4 mb-6">
+            <h3 className="text-lg font-bold mb-3 flex items-center text-gray-900 dark:text-dark-primary">
               <BookOpen className="w-5 h-5 mr-2" />
               プログラム（擬似言語）
             </h3>
-            <div className="font-mono text-sm bg-white p-4 rounded border border-gray-200 overflow-x-auto">
+            <div className="font-mono text-sm bg-white dark:bg-dark-bg p-4 rounded border border-gray-200 dark:border-dark-border overflow-x-auto">
               {question.pseudoCode.map((block, index) => (
-                <div key={index} className={`${block.highlight ? 'bg-yellow-100' : ''}`}>
+                <div key={index} className={`${block.highlight ? 'bg-yellow-100 dark:bg-yellow-900/30' : ''}`}>
                   {block.lineNumber && (
-                    <span className="text-gray-400 mr-4 select-none">
+                    <span className="text-gray-400 dark:text-gray-500 mr-4 select-none">
                       {block.lineNumber.toString().padStart(2, '0')}
                     </span>
                   )}
-                  <span style={{ whiteSpace: 'pre' }}>{block.code}</span>
+                  <span className="text-gray-900 dark:text-dark-primary" style={{ whiteSpace: 'pre' }}>{block.code}</span>
                 </div>
               ))}
             </div>
@@ -156,8 +156,8 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
 
         {/* 補足情報 */}
         {question.additionalInfo && (
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: question.additionalInfo }} />
+          <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-600 p-4 mb-6">
+            <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: question.additionalInfo }} />
           </div>
         )}
       </div>
@@ -166,26 +166,26 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
       {question.subQuestions.map((subQ) => (
         <div key={subQ.id} className="card-modern p-6 mb-6">
           <div className="flex items-start space-x-3 mb-4">
-            <span className="inline-block bg-[#8E9C78] text-white px-3 py-1 rounded-full font-bold">
+            <span className="inline-block bg-olive-600 dark:bg-olive-700 text-white px-3 py-1 rounded-full font-bold">
               {subQ.questionNumber}
             </span>
             {submitted && (
               results[subQ.id] ? (
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0" />
               ) : (
-                <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                <XCircle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0" />
               )
             )}
           </div>
 
-          <div className="prose max-w-none mb-4" dangerouslySetInnerHTML={{ __html: subQ.text }} />
+          <div className="prose dark:prose-invert max-w-none mb-4" dangerouslySetInnerHTML={{ __html: subQ.text }} />
 
           {/* 空欄補充問題 */}
           {subQ.type === 'fill-in-blank' && subQ.fillInBlanks && (
             <div className="space-y-4">
               {subQ.fillInBlanks.map(blank => (
-                <div key={blank.id} className="border border-gray-200 rounded-lg p-4">
-                  <label className="block font-bold mb-2 text-lg">
+                <div key={blank.id} className="border border-gray-200 dark:border-dark-border rounded-lg p-4">
+                  <label className="block font-bold mb-2 text-lg text-gray-900 dark:text-dark-primary">
                     空欄 {blank.label}
                   </label>
                   <select
@@ -202,7 +202,7 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
                       handleAnswerChange(subQ.id, JSON.stringify(currentAnswers));
                     }}
                     disabled={submitted}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8E9C78] focus:border-transparent disabled:bg-gray-100"
+                    className="w-full p-3 border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-bg text-gray-900 dark:text-dark-primary rounded-lg focus:ring-2 focus:ring-olive-500 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-dark-card"
                   >
                     <option value="">選択してください</option>
                     {blank.options.map(option => (
@@ -224,8 +224,8 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
                   key={choice.id}
                   className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     answers[subQ.id] === choice.id
-                      ? 'border-[#8E9C78] bg-[#8E9C78]/10'
-                      : 'border-gray-200 hover:border-[#8E9C78]/50'
+                      ? 'border-olive-600 dark:border-olive-500 bg-olive-50 dark:bg-olive-900/20'
+                      : 'border-gray-200 dark:border-dark-border hover:border-olive-400 dark:hover:border-olive-600'
                   } ${submitted ? 'cursor-not-allowed' : ''}`}
                 >
                   <input
@@ -237,7 +237,7 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
                     disabled={submitted}
                     className="mr-3"
                   />
-                  <span>{choice.text}</span>
+                  <span className="text-gray-900 dark:text-dark-primary">{choice.text}</span>
                 </label>
               ))}
             </div>
@@ -254,13 +254,13 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
               </button>
 
               {showExplanation[subQ.id] && (
-                <div className="bg-gray-50 border-l-4 border-[#8E9C78] p-4 rounded">
-                  <h4 className="font-bold mb-2 text-lg">解説</h4>
-                  <div className="prose max-w-none mb-4" dangerouslySetInnerHTML={{ __html: subQ.explanation }} />
+                <div className="bg-gray-50 dark:bg-dark-card border-l-4 border-olive-600 dark:border-olive-500 p-4 rounded">
+                  <h4 className="font-bold mb-2 text-lg text-gray-900 dark:text-dark-primary">解説</h4>
+                  <div className="prose dark:prose-invert max-w-none mb-4" dangerouslySetInnerHTML={{ __html: subQ.explanation }} />
                   {subQ.detailedExplanation && (
-                    <div className="mt-4 pt-4 border-t border-gray-300">
-                      <h5 className="font-bold mb-2">詳細解説</h5>
-                      <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: subQ.detailedExplanation }} />
+                    <div className="mt-4 pt-4 border-t border-gray-300 dark:border-dark-border">
+                      <h5 className="font-bold mb-2 text-gray-900 dark:text-dark-primary">詳細解説</h5>
+                      <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: subQ.detailedExplanation }} />
                     </div>
                   )}
                 </div>
@@ -282,21 +282,21 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
 
       {/* 全体の解説 */}
       {submitted && question.overallExplanation && (
-        <div className="card-modern p-6 mb-6 bg-blue-50">
-          <h3 className="text-xl font-bold mb-4">全体の解説</h3>
-          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: question.overallExplanation }} />
+        <div className="card-modern p-6 mb-6 bg-blue-50 dark:bg-blue-900/20">
+          <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-dark-primary">全体の解説</h3>
+          <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: question.overallExplanation }} />
         </div>
       )}
 
       {/* 学習ポイント */}
       {submitted && question.learningPoints && question.learningPoints.length > 0 && (
         <div className="card-modern p-6 mb-6">
-          <h3 className="text-xl font-bold mb-4">この問題で学べること</h3>
+          <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-dark-primary">この問題で学べること</h3>
           <ul className="space-y-2">
             {question.learningPoints.map((point, index) => (
               <li key={index} className="flex items-start space-x-2">
-                <CheckCircle className="w-5 h-5 text-[#8E9C78] flex-shrink-0 mt-0.5" />
-                <span>{point}</span>
+                <CheckCircle className="w-5 h-5 text-olive-600 dark:text-olive-400 flex-shrink-0 mt-0.5" />
+                <span className="text-gray-900 dark:text-dark-primary">{point}</span>
               </li>
             ))}
           </ul>
@@ -306,12 +306,12 @@ export default function QuestionViewer({ question, onComplete }: QuestionViewerP
       {/* キーワード */}
       {question.keywords && question.keywords.length > 0 && (
         <div className="card-modern p-6">
-          <h3 className="text-xl font-bold mb-4">関連キーワード</h3>
+          <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-dark-primary">関連キーワード</h3>
           <div className="flex flex-wrap gap-2">
             {question.keywords.map((keyword, index) => (
               <span
                 key={index}
-                className="px-3 py-1 bg-gray-100 text-[#6F6F6F] rounded-full text-sm"
+                className="px-3 py-1 bg-gray-100 dark:bg-dark-card text-gray-600 dark:text-dark-secondary rounded-full text-sm"
               >
                 {keyword}
               </span>

@@ -150,24 +150,24 @@ export default function CategoriesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background">
         <Header />
         <div className="flex justify-center items-center h-64">
-          <div className="text-[#6F6F6F] text-xl">読み込み中...</div>
+          <div className="text-muted text-xl">読み込み中...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header />
       <section className="py-20">
         <div className="container-modern">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
             <div>
-              <h1 className="text-4xl font-bold text-black mb-2">カテゴリマスタ管理</h1>
-              <p className="text-xl text-[#6F6F6F]">学習カテゴリの作成・編集・管理を行います</p>
+              <h1 className="text-4xl font-bold text-foreground mb-2">カテゴリマスタ管理</h1>
+              <p className="text-xl text-muted">学習カテゴリの作成・編集・管理を行います</p>
             </div>
             <button
               onClick={() => setShowForm(true)}
@@ -180,60 +180,60 @@ export default function CategoriesPage() {
 
           {showForm && (
             <div className="card-modern p-8 mb-12">
-              <h2 className="text-2xl font-bold text-black mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-6">
                 {editingCategory ? 'カテゴリ編集' : '新規カテゴリ'}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">カテゴリ名 *</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">カテゴリ名 *</label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-black focus:outline-none focus:border-[#8E9C78] transition-colors"
+                      className="w-full px-4 py-3 border border-border rounded-2xl text-foreground bg-background focus:outline-none focus:border-primary transition-colors"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">表示順</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">表示順</label>
                     <input
                       type="number"
                       value={formData.sortOrder}
                       onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-black focus:outline-none focus:border-[#8E9C78] transition-colors"
+                      className="w-full px-4 py-3 border border-border rounded-2xl text-foreground bg-background focus:outline-none focus:border-primary transition-colors"
                     />
                   </div>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">説明</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">説明</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-black focus:outline-none focus:border-[#8E9C78] transition-colors"
+                    className="w-full px-4 py-3 border border-border rounded-2xl text-foreground bg-background focus:outline-none focus:border-primary transition-colors"
                     rows={4}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">アイコン</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">アイコン</label>
                     <input
                       type="text"
                       value={formData.icon}
                       onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-black focus:outline-none focus:border-[#8E9C78] transition-colors"
+                      className="w-full px-4 py-3 border border-border rounded-2xl text-foreground bg-background focus:outline-none focus:border-primary transition-colors"
                       placeholder="📚"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">カラー</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">カラー</label>
                     <input
                       type="color"
                       value={formData.color}
                       onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      className="w-full h-12 border border-gray-200 rounded-2xl cursor-pointer"
+                      className="w-full h-12 border border-border rounded-2xl cursor-pointer bg-background"
                     />
                   </div>
                   <div className="flex items-end">
@@ -242,9 +242,9 @@ export default function CategoriesPage() {
                         type="checkbox"
                         checked={formData.isActive}
                         onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                        className="w-5 h-5 text-[#8E9C78] border-gray-300 rounded focus:ring-[#8E9C78]"
+                        className="w-5 h-5 text-primary border-border rounded focus:ring-primary bg-background"
                       />
-                      <span className="text-sm font-medium text-black">有効</span>
+                      <span className="text-sm font-medium text-foreground">有効</span>
                     </label>
                   </div>
                 </div>
@@ -271,54 +271,54 @@ export default function CategoriesPage() {
           <div className="card-modern overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-card dark:bg-card border-b border-border">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-black">順序</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-black">カテゴリ名</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-black">説明</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-black">コンテンツ数</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-black">状態</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-black">操作</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">順序</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">カテゴリ名</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">説明</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">コンテンツ数</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">状態</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">操作</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-border">
                   {categories.map((category, index) => (
-                    <tr key={category.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={category.id} className="hover:bg-card dark:hover:bg-card transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => updateSortOrder(category, 'up')}
                             disabled={index === 0}
-                            className="p-1 hover:bg-[#8E9C78]/10 rounded-lg disabled:opacity-30 text-[#6F6F6F] hover:text-[#8E9C78] transition-all"
+                            className="p-1 hover:bg-primary/10 rounded-lg disabled:opacity-30 text-muted hover:text-primary transition-all"
                           >
                             <ChevronUp size={16} />
                           </button>
                           <button
                             onClick={() => updateSortOrder(category, 'down')}
                             disabled={index === categories.length - 1}
-                            className="p-1 hover:bg-[#8E9C78]/10 rounded-lg disabled:opacity-30 text-[#6F6F6F] hover:text-[#8E9C78] transition-all"
+                            className="p-1 hover:bg-primary/10 rounded-lg disabled:opacity-30 text-muted hover:text-primary transition-all"
                           >
                             <ChevronDown size={16} />
                           </button>
-                          <span className="ml-2 text-black font-medium">{category.sort_order}</span>
+                          <span className="ml-2 text-foreground font-medium">{category.sort_order}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           {category.icon && <span className="text-2xl">{category.icon}</span>}
-                          <span className="font-semibold text-black">{category.name}</span>
+                          <span className="font-semibold text-foreground">{category.name}</span>
                           {category.color && (
                             <div
-                              className="w-4 h-4 rounded-full border border-gray-300"
+                              className="w-4 h-4 rounded-full border border-border"
                               style={{ backgroundColor: category.color }}
                             />
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-[#6F6F6F]">
+                      <td className="px-6 py-4 text-muted">
                         {category.description || '-'}
                       </td>
-                      <td className="px-6 py-4 text-black">
+                      <td className="px-6 py-4 text-foreground">
                         <div className="space-y-1 text-sm">
                           <div>コンテンツ: {category.contents?.[0]?.count || 0}</div>
                           <div>学習計画: {category.study_plans?.[0]?.count || 0}</div>
@@ -326,9 +326,9 @@ export default function CategoriesPage() {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 text-sm rounded-full font-medium ${
-                          category.is_active 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-800'
+                          category.is_active
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                            : 'bg-card dark:bg-card text-muted'
                         }`}>
                           {category.is_active ? '有効' : '無効'}
                         </span>
@@ -337,13 +337,13 @@ export default function CategoriesPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEdit(category)}
-                            className="p-2 hover:bg-[#8E9C78]/10 rounded-xl text-[#8E9C78] hover:text-[#7a8a6a] transition-all"
+                            className="p-2 hover:bg-primary/10 rounded-xl text-primary hover:text-primary/80 transition-all"
                           >
                             <Edit size={18} />
                           </button>
                           <button
                             onClick={() => handleDelete(category.id)}
-                            className="p-2 hover:bg-red-50 rounded-xl text-red-500 hover:text-red-600 transition-all"
+                            className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl text-red-500 hover:text-red-600 transition-all"
                           >
                             <Trash2 size={18} />
                           </button>

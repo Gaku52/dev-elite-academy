@@ -296,10 +296,10 @@ export default function LearningStatsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">統計情報を読み込み中...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">統計情報を読み込み中...</p>
         </div>
       </div>
     );
@@ -307,12 +307,12 @@ export default function LearningStatsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">エラー: {error}</p>
+          <p className="text-destructive mb-4">エラー: {error}</p>
           <button
             onClick={fetchStats}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
             再試行
           </button>
@@ -322,11 +322,11 @@ export default function LearningStatsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="container max-w-6xl mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <Link
           href="/modules/it-fundamentals"
-          className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-8 transition-colors"
+          className="inline-flex items-center text-primary hover:text-primary/80 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           IT基礎に戻る
@@ -335,17 +335,17 @@ export default function LearningStatsPage() {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div className="flex items-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-3 sm:mr-4">
-                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-xl flex items-center justify-center mr-3 sm:mr-4">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">詳細学習統計</h1>
-                <p className="text-sm sm:text-base text-gray-600">あなたの学習進捗を詳細に分析します</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">詳細学習統計</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">あなたの学習進捗を詳細に分析します</p>
               </div>
             </div>
             <button
               onClick={() => setShowResetDialog(true)}
-              className="flex items-center justify-center px-3 sm:px-4 py-2 text-sm sm:text-base text-red-600 hover:text-red-800 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+              className="flex items-center justify-center px-3 sm:px-4 py-2 text-sm sm:text-base text-destructive hover:text-destructive/80 border border-destructive/30 rounded-lg hover:bg-destructive/10 transition-colors"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               進捗リセット
@@ -358,8 +358,8 @@ export default function LearningStatsPage() {
               onClick={() => setActiveTab('overview')}
               className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors ${
                 activeTab === 'overview'
-                  ? 'bg-blue-500 text-white'
-                  : 'text-blue-600 hover:bg-blue-50'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-primary hover:bg-accent'
               }`}
             >
               概要統計
@@ -368,8 +368,8 @@ export default function LearningStatsPage() {
               onClick={() => setActiveTab('cycles')}
               className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors ${
                 activeTab === 'cycles'
-                  ? 'bg-blue-500 text-white'
-                  : 'text-blue-600 hover:bg-blue-50'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-primary hover:bg-accent'
               }`}
             >
               周回別統計
@@ -385,11 +385,11 @@ export default function LearningStatsPage() {
           {/* 期間選択とチャートタイプ選択 */}
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 my-4 sm:my-6">
             <div className="flex items-center gap-2">
-              <span className="text-xs sm:text-sm text-gray-600">表示期間:</span>
+              <span className="text-xs sm:text-sm text-muted-foreground">表示期間:</span>
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(Number(e.target.value))}
-                className="px-2 sm:px-3 py-1 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-2 sm:px-3 py-1 border border-input rounded-lg text-xs sm:text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value={7}>1週間</option>
                 <option value={30}>1ヶ月</option>
@@ -399,14 +399,14 @@ export default function LearningStatsPage() {
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs sm:text-sm text-gray-600">チャートタイプ:</span>
+              <span className="text-xs sm:text-sm text-muted-foreground">チャートタイプ:</span>
               <div className="flex gap-1">
                 <button
                   onClick={() => setChartType('line')}
                   className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors ${
                     chartType === 'line'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                   }`}
                 >
                   折れ線
@@ -415,8 +415,8 @@ export default function LearningStatsPage() {
                   onClick={() => setChartType('bar')}
                   className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors ${
                     chartType === 'bar'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                   }`}
                 >
                   棒グラフ
@@ -425,8 +425,8 @@ export default function LearningStatsPage() {
                   onClick={() => setChartType('area')}
                   className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors ${
                     chartType === 'area'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                   }`}
                 >
                   エリア
@@ -447,7 +447,7 @@ export default function LearningStatsPage() {
 
           {/* 周回別統計 */}
           <div className="mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">周回別進捗</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 text-foreground">周回別進捗</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {(() => {
                 console.log('[RENDER DEBUG] Rendering cycle history, count:', stats?.cycleHistory?.length);
@@ -457,18 +457,18 @@ export default function LearningStatsPage() {
               {stats?.cycleHistory?.map((cycle) => (
                 <div
                   key={cycle.cycle_number}
-                  className={`bg-white rounded-lg shadow-sm border-2 p-4 sm:p-6 ${
+                  className={`bg-card rounded-lg shadow-sm border-2 p-4 sm:p-6 ${
                     cycle.cycle_number === stats.currentCycle
-                      ? 'border-blue-500 ring-2 ring-blue-200'
-                      : 'border-gray-200'
+                      ? 'border-primary ring-2 ring-primary/20'
+                      : 'border-border'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                    <h3 className="text-base sm:text-lg font-bold text-foreground">
                       第{cycle.cycle_number}周目
                     </h3>
                     {cycle.cycle_number === stats.currentCycle && (
-                      <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                      <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
                         現在
                       </span>
                     )}
@@ -476,36 +476,36 @@ export default function LearningStatsPage() {
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">総問題数</span>
-                      <span className="text-lg font-bold text-gray-900">
-                        {cycle.totalQuestions}<span className="text-sm text-gray-500 font-normal">問</span>
+                      <span className="text-sm text-muted-foreground">総問題数</span>
+                      <span className="text-lg font-bold text-foreground">
+                        {cycle.totalQuestions}<span className="text-sm text-muted-foreground font-normal">問</span>
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">完了済み</span>
+                      <span className="text-sm text-muted-foreground">完了済み</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-gray-900">
-                          {cycle.completedQuestions}<span className="text-sm text-gray-500 font-normal">問</span>
+                        <span className="text-lg font-bold text-foreground">
+                          {cycle.completedQuestions}<span className="text-sm text-muted-foreground font-normal">問</span>
                         </span>
-                        <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                        <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full">
                           {cycle.completionRate}%
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">正答率</span>
+                      <span className="text-sm text-muted-foreground">正答率</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-gray-900">
-                          {cycle.correctRate}<span className="text-sm text-gray-500 font-normal">%</span>
+                        <span className="text-lg font-bold text-foreground">
+                          {cycle.correctRate}<span className="text-sm text-muted-foreground font-normal">%</span>
                         </span>
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           cycle.correctRate >= 80
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
                             : cycle.correctRate >= 60
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
+                            ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
                         }`}>
                           {cycle.correctRate >= 80 ? '優秀' : cycle.correctRate >= 60 ? '良好' : '要改善'}
                         </span>
@@ -514,9 +514,9 @@ export default function LearningStatsPage() {
 
                     {/* 進捗バー */}
                     <div className="pt-2">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-secondary rounded-full h-2">
                         <div
-                          className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full transition-all duration-300"
                           style={{ width: `${cycle.completionRate}%` }}
                         />
                       </div>
@@ -529,7 +529,7 @@ export default function LearningStatsPage() {
 
           {/* モジュール別統計 */}
           <div className="mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">モジュール別進捗</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-foreground">モジュール別進捗</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {modules.map((module) => {
                 const moduleStats = stats?.moduleStats?.[module.key];
@@ -551,21 +551,21 @@ export default function LearningStatsPage() {
                 const Icon = module.icon;
 
                 return (
-                  <div key={module.key} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                  <div key={module.key} className="bg-card rounded-lg shadow-sm border border-border p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer">
                     <div className="flex items-start mb-3 sm:mb-4">
                       <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 ${module.color} rounded-xl mr-3 sm:mr-4 flex-shrink-0`}>
                         <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-base sm:text-lg font-semibold text-black mb-1 min-h-[3rem] sm:min-h-[3.5rem] flex items-center">
+                        <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1 min-h-[3rem] sm:min-h-[3.5rem] flex items-center">
                           <span className="line-clamp-2 leading-tight">
                             {module.name}
                           </span>
                         </h3>
-                        <p className="text-xs sm:text-sm text-gray-600 mb-1 line-clamp-2">
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1 line-clamp-2">
                           {module.description}
                         </p>
-                        <div className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 sm:py-1 rounded-full inline-block">
+                        <div className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 sm:py-1 rounded-full inline-block">
                           {module.category}
                         </div>
                       </div>
@@ -574,18 +574,18 @@ export default function LearningStatsPage() {
                     <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
                       {module.topics.slice(0, 3).map((topic, index) => (
                         <div key={index} className="flex items-center text-xs sm:text-sm">
-                          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 rounded-full mr-2 flex-shrink-0"></span>
-                          <span className="text-gray-600 truncate">{topic}</span>
+                          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-muted rounded-full mr-2 flex-shrink-0"></span>
+                          <span className="text-muted-foreground truncate">{topic}</span>
                         </div>
                       ))}
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-gray-600">進捗</span>
-                        <span className="text-gray-600">{progress}%</span>
+                        <span className="text-muted-foreground">進捗</span>
+                        <span className="text-muted-foreground">{progress}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-secondary rounded-full h-2">
                         <div
                           className={`${module.color} h-2 rounded-full transition-all duration-300`}
                           style={{ width: `${progressBarWidth}%` }}
@@ -594,7 +594,7 @@ export default function LearningStatsPage() {
                     </div>
 
                     <Link href={module.href} className="mt-4 w-full block">
-                      <button className="w-full py-1.5 sm:py-2 px-3 sm:px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-xs sm:text-sm font-medium">
+                      <button className="w-full py-1.5 sm:py-2 px-3 sm:px-4 bg-secondary hover:bg-secondary/80 text-foreground rounded-lg transition-colors text-xs sm:text-sm font-medium">
                         学習を開始 ({module.category})
                       </button>
                     </Link>
@@ -605,28 +605,28 @@ export default function LearningStatsPage() {
           </div>
 
           {/* 学習のヒント */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">📊 分析から見える改善点</h3>
+          <div className="bg-gradient-to-r from-blue-50 dark:from-blue-950/30 to-purple-50 dark:to-purple-950/30 rounded-lg p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">📊 分析から見える改善点</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
               <div>
-                <p className="text-gray-700 mb-2"><strong>学習パターン:</strong></p>
-                <p className="text-gray-600">
+                <p className="text-foreground mb-2"><strong>学習パターン:</strong></p>
+                <p className="text-muted-foreground">
                   {dailyProgress.filter(d => d.totalQuestions > 0).length > 0
                     ? '継続的に学習を進めています'
                     : 'まずは定期的な学習習慣を作りましょう'}
                 </p>
               </div>
               <div>
-                <p className="text-gray-700 mb-2"><strong>推奨アクション:</strong></p>
-                <p className="text-gray-600">
+                <p className="text-foreground mb-2"><strong>推奨アクション:</strong></p>
+                <p className="text-muted-foreground">
                   {(stats?.correctRate || 0) < 60
                     ? '基礎から復習することをお勧めします'
                     : '難易度の高い問題に挑戦しましょう'}
                 </p>
               </div>
               <div>
-                <p className="text-gray-700 mb-2"><strong>強化ポイント:</strong></p>
-                <p className="text-gray-600">
+                <p className="text-foreground mb-2"><strong>強化ポイント:</strong></p>
+                <p className="text-muted-foreground">
                   {Object.entries(stats?.moduleStats || {}).reduce((min, [key, value]) => {
                     const progress = value.completed / Math.max(value.total, 1);
                     return progress < min.progress ? { key, progress } : min;
@@ -634,8 +634,8 @@ export default function LearningStatsPage() {
                 </p>
               </div>
               <div>
-                <p className="text-gray-700 mb-2"><strong>次の目標:</strong></p>
-                <p className="text-gray-600">
+                <p className="text-foreground mb-2"><strong>次の目標:</strong></p>
+                <p className="text-muted-foreground">
                   {(streakData?.current_streak || 0) >= 7
                     ? 'この調子で継続しましょう'
                     : '7日連続学習を目指しましょう'}

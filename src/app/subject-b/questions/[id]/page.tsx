@@ -70,10 +70,10 @@ export default function SubjectBQuestionPage({ params }: SubjectBQuestionPagePro
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background">
         <Header />
         <div className="flex justify-center items-center h-64">
-          <div className="text-[#6F6F6F]">読み込み中...</div>
+          <div className="text-muted-foreground">読み込み中...</div>
         </div>
       </div>
     );
@@ -81,12 +81,12 @@ export default function SubjectBQuestionPage({ params }: SubjectBQuestionPagePro
 
   if (!question) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background">
         <Header />
         <div className="container-modern py-16">
-          <div className="card-modern p-6 border-red-200 bg-red-50">
-            <h2 className="text-xl font-bold text-red-700 mb-4">問題が見つかりません</h2>
-            <p className="text-red-600 mb-4">指定された問題は存在しないか、まだ公開されていません。</p>
+          <div className="card-modern p-6 border-destructive/20 bg-destructive/10">
+            <h2 className="text-xl font-bold text-destructive mb-4">問題が見つかりません</h2>
+            <p className="text-destructive/80 mb-4">指定された問題は存在しないか、まだ公開されていません。</p>
             <button
               onClick={() => router.push('/subject-b')}
               className="btn-secondary flex items-center space-x-2"
@@ -101,15 +101,15 @@ export default function SubjectBQuestionPage({ params }: SubjectBQuestionPagePro
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header />
 
       {/* ナビゲーションヘッダー */}
-      <div className="bg-gray-50 border-b border-gray-200 sticky top-0 z-40">
+      <div className="bg-secondary border-b border-border sticky top-0 z-40">
         <div className="container-modern py-4">
           <button
             onClick={() => router.push('/subject-b')}
-            className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors font-medium"
+            className="flex items-center space-x-2 text-foreground hover:text-muted-foreground transition-colors font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>問題一覧に戻る</span>

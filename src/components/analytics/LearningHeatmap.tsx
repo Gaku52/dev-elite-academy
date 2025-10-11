@@ -88,8 +88,8 @@ export default function LearningHeatmap({ data, days = 365 }: LearningHeatmapPro
   const monthLabels = getMonthLabels();
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold mb-4">学習カレンダー</h3>
+    <div className="bg-white dark:bg-dark-card rounded-lg p-6 shadow-sm border border-gray-200 dark:border-dark-border">
+      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-primary">学習カレンダー</h3>
 
       <div className="overflow-x-auto">
         <div className="inline-block">
@@ -98,7 +98,7 @@ export default function LearningHeatmap({ data, days = 365 }: LearningHeatmapPro
             {monthLabels.map((label, index) => (
               <div
                 key={index}
-                className="text-xs text-gray-600"
+                className="text-xs text-gray-600 dark:text-dark-secondary"
                 style={{ marginLeft: index === 0 ? `${label.position * 13}px` : `${(label.position - monthLabels[index - 1].position) * 13 - 24}px` }}
               >
                 {label.month}
@@ -110,7 +110,7 @@ export default function LearningHeatmap({ data, days = 365 }: LearningHeatmapPro
             {/* 曜日ラベル */}
             <div className="flex flex-col justify-between mr-2 py-1">
               {weekDays.map((day, index) => (
-                <div key={index} className="text-xs text-gray-600 h-3 flex items-center">
+                <div key={index} className="text-xs text-gray-600 dark:text-dark-secondary h-3 flex items-center">
                   {index % 2 === 0 && day}
                 </div>
               ))}
@@ -133,13 +133,13 @@ export default function LearningHeatmap({ data, days = 365 }: LearningHeatmapPro
                     return (
                       <div key={dayIndex} className="relative group">
                         <div
-                          className={`w-3 h-3 rounded-sm ${level} border border-gray-300 cursor-pointer transition-all hover:scale-125`}
+                          className={`w-3 h-3 rounded-sm ${level} dark:${level.replace('gray-100', 'dark-card').replace('green-', 'green-')} border border-gray-300 dark:border-dark-border cursor-pointer transition-all hover:scale-125`}
                         />
                         {/* ツールチップ */}
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10">
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-dark-card text-white dark:text-dark-primary text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 border border-gray-700 dark:border-dark-border">
                           <div>{format(date, 'yyyy年M月d日', { locale: ja })}</div>
                           <div>{questions > 0 ? `${questions}問解答` : '学習なし'}</div>
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-0 h-0 border-4 border-transparent border-t-gray-900"></div>
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-0 h-0 border-4 border-transparent border-t-gray-900 dark:border-t-dark-card"></div>
                         </div>
                       </div>
                     );
@@ -150,14 +150,14 @@ export default function LearningHeatmap({ data, days = 365 }: LearningHeatmapPro
           </div>
 
           {/* 凡例 */}
-          <div className="flex items-center gap-2 mt-4 text-xs text-gray-600">
+          <div className="flex items-center gap-2 mt-4 text-xs text-gray-600 dark:text-dark-secondary">
             <span>少ない</span>
             <div className="flex gap-1">
-              <div className="w-3 h-3 bg-gray-100 rounded-sm border border-gray-300"></div>
-              <div className="w-3 h-3 bg-green-200 rounded-sm border border-gray-300"></div>
-              <div className="w-3 h-3 bg-green-400 rounded-sm border border-gray-300"></div>
-              <div className="w-3 h-3 bg-green-600 rounded-sm border border-gray-300"></div>
-              <div className="w-3 h-3 bg-green-800 rounded-sm border border-gray-300"></div>
+              <div className="w-3 h-3 bg-gray-100 dark:bg-dark-card rounded-sm border border-gray-300 dark:border-dark-border"></div>
+              <div className="w-3 h-3 bg-green-200 dark:bg-green-900/50 rounded-sm border border-gray-300 dark:border-dark-border"></div>
+              <div className="w-3 h-3 bg-green-400 dark:bg-green-700 rounded-sm border border-gray-300 dark:border-dark-border"></div>
+              <div className="w-3 h-3 bg-green-600 dark:bg-green-600 rounded-sm border border-gray-300 dark:border-dark-border"></div>
+              <div className="w-3 h-3 bg-green-800 dark:bg-green-500 rounded-sm border border-gray-300 dark:border-dark-border"></div>
             </div>
             <span>多い</span>
           </div>

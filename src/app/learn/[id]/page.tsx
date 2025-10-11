@@ -141,9 +141,9 @@ export default function LearnPage({ params }: LearnPageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="flex items-center space-x-3 text-black">
-          <Loader2 className="w-8 h-8 animate-spin text-[#8E9C78]" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex items-center space-x-3 text-foreground">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
           <span>読み込み中...</span>
         </div>
       </div>
@@ -152,11 +152,11 @@ export default function LearnPage({ params }: LearnPageProps) {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-black mb-4">ログインが必要です</h1>
-          <Link 
+          <h1 className="text-2xl font-bold text-foreground mb-4">ログインが必要です</h1>
+          <Link
             href="/auth"
             className="btn-modern inline-block px-6 py-3"
           >
@@ -264,15 +264,15 @@ export default function LearnPage({ params }: LearnPageProps) {
   const progressPercentage = (completedCount / learningSections.length) * 100;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-b border-border bg-background">
         <div className="container-modern">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <Link
                 href="/dashboard"
-                className="text-[#8E9C78] hover:text-[#7a8a6a] transition-colors flex items-center"
+                className="text-primary hover:text-primary transition-colors flex items-center"
               >
                 <ChevronLeft className="w-5 h-5 mr-1" />
                 ダッシュボードに戻る
@@ -292,10 +292,10 @@ export default function LearnPage({ params }: LearnPageProps) {
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
                     <span className="text-2xl">{content.categories?.icon || '📚'}</span>
-                    <span className="text-[#8E9C78] text-sm">{content.categories?.name}</span>
+                    <span className="text-primary text-sm">{content.categories?.name}</span>
                   </div>
-                  <h1 className="text-2xl font-bold text-black mb-2">{content.title}</h1>
-                  <p className="text-[#6F6F6F]">{content.description}</p>
+                  <h1 className="text-2xl font-bold text-foreground mb-2">{content.title}</h1>
+                  <p className="text-muted">{content.description}</p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   content.difficulty === 'beginner' 
@@ -311,19 +311,19 @@ export default function LearnPage({ params }: LearnPageProps) {
 
               {/* 進捗バー */}
               <div className="mb-4">
-                <div className="flex justify-between text-sm text-[#6F6F6F] mb-2">
+                <div className="flex justify-between text-sm text-muted mb-2">
                   <span>学習進捗</span>
                   <span>{progressPercentage.toFixed(0)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-border rounded-full h-3">
                   <div
-                    className="h-3 rounded-full bg-gradient-to-r from-[#8E9C78] to-[#7a8a6a] transition-all duration-500"
+                    className="h-3 rounded-full bg-gradient-to-r from-primary to-primary/80 dark:from-primary dark:to-primary/70 transition-all duration-500"
                     style={{ width: `${progressPercentage}%` }}
                   ></div>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-6 text-sm text-[#6F6F6F]">
+              <div className="flex items-center space-x-6 text-sm text-muted">
                 <div className="flex items-center">
                   <Clock className="w-4 h-4 mr-1" />
                   <span>推定時間: {totalDuration}分</span>
@@ -345,27 +345,27 @@ export default function LearnPage({ params }: LearnPageProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
-                        section.completed 
+                        section.completed
                           ? 'bg-green-100 text-green-600 border border-green-200'
-                          : 'bg-[#8E9C78]/10 text-[#8E9C78] border border-[#8E9C78]/20'
+                          : 'bg-primary/10 text-primary border border-primary/20'
                       }`}>
                         {section.completed ? <CheckCircle className="w-5 h-5" /> : section.icon}
                       </div>
                       <div>
-                        <h3 className="text-black font-semibold group-hover:text-[#8E9C78] transition-colors">
+                        <h3 className="text-foreground font-semibold group-hover:text-primary transition-colors">
                           セクション {index + 1}: {section.title}
                         </h3>
-                        <p className="text-[#6F6F6F] text-sm">
+                        <p className="text-muted text-sm">
                           推定時間: {section.duration}分
                         </p>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => handleSectionComplete(section.id)}
                       disabled={updatingSection === section.id}
                       className={`px-4 py-2 rounded-2xl transition-colors text-sm font-medium flex items-center ${
                         updatingSection === section.id
-                          ? 'bg-gray-200 cursor-not-allowed text-[#6F6F6F]'
+                          ? 'bg-border cursor-not-allowed text-muted'
                           : 'btn-modern'
                       }`}
                     >
@@ -398,12 +398,12 @@ export default function LearnPage({ params }: LearnPageProps) {
           {/* サイドバー */}
           <div className="lg:col-span-1">
             {/* 学習のヒント */}
-            <div className="card-modern p-6 mb-6 bg-[#8E9C78]/10 border-[#8E9C78]/20">
-              <h3 className="text-black font-semibold mb-4 flex items-center">
+            <div className="card-modern p-6 mb-6 bg-primary/10 border-primary/20">
+              <h3 className="text-foreground font-semibold mb-4 flex items-center">
                 <Award className="w-5 h-5 mr-2 text-yellow-500" />
                 学習のヒント
               </h3>
-              <ul className="space-y-2 text-sm text-[#6F6F6F]">
+              <ul className="space-y-2 text-sm text-muted">
                 <li>• 各セクションを順番に進めましょう</li>
                 <li>• コード演習は実際に手を動かすことが重要</li>
                 <li>• 分からない部分はメモを取りながら学習</li>
@@ -413,12 +413,12 @@ export default function LearnPage({ params }: LearnPageProps) {
 
             {/* 関連スキル */}
             <div className="card-modern p-6">
-              <h3 className="text-black font-semibold mb-4">関連スキル</h3>
+              <h3 className="text-foreground font-semibold mb-4">関連スキル</h3>
               <div className="flex flex-wrap gap-2">
                 {(content.tags || []).map((tag: string) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full text-sm"
+                    className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
                   >
                     {tag}
                   </span>
@@ -430,19 +430,19 @@ export default function LearnPage({ params }: LearnPageProps) {
       </div>
 
       {/* モバイル用固定進捗表示 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-slate-900/95 to-purple-900/95 backdrop-blur-sm border-t border-purple-800/30 p-4 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-slate-900/95 to-purple-900/95 dark:from-slate-950/95 dark:to-purple-950/95 backdrop-blur-sm border-t border-purple-800/30 dark:border-purple-900/30 p-4 md:hidden">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <div className="text-white text-sm font-medium">
               問題 {completedCount}/{learningSections.length}
             </div>
-            <div className="text-purple-300 text-sm">
+            <div className="text-purple-300 dark:text-purple-400 text-sm">
               セクション完了 {completedCount}/{learningSections.length}
             </div>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-gray-700 dark:bg-gray-800 rounded-full h-2">
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+              className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-600 dark:to-pink-600 transition-all duration-500"
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>

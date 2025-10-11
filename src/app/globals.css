@@ -15,15 +15,16 @@
 }
 
 .dark {
-  /* Dark mode colors */
+  /* Dark mode colors - maintaining green theme */
   --background: #0f172a;
   --foreground: #f1f5f9;
   --primary: #a8b899;
-  --secondary: #94a3b8;
+  --secondary: #64748b;
   --muted: #94a3b8;
   --accent: #a8b899;
   --card: #1e293b;
   --border: #334155;
+  --bg-secondary: #1e293b;
 }
 
 @theme inline {
@@ -35,6 +36,13 @@
   --color-accent: var(--accent);
   --color-card: var(--card);
   --color-border: var(--border);
+
+  /* Semantic color aliases for easier use */
+  --color-bg-primary: var(--background);
+  --color-bg-secondary: #f9fafb;
+  --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--muted);
+
   --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
   --font-serif: "Crimson Text", Georgia, serif;
   --font-mono: "Roboto Mono", "Courier New", monospace;
@@ -145,6 +153,7 @@ button, a, input, textarea, select {
   color: var(--foreground);
   border: 1px solid var(--border);
   padding: 10px 20px;
+  border-radius: var(--radius);
 }
 
 @media (min-width: 640px) {

@@ -54,7 +54,7 @@ const LearningPathCard: React.FC<LearningPathCardProps> = ({
     <div
       className={`card-modern p-4 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 relative h-32 flex flex-col ${
         isPinned || pinned
-          ? 'border-2 border-[#8E9C78] bg-gradient-to-br from-[#8E9C78]/5 to-transparent'
+          ? 'border-2 border-primary bg-gradient-to-br from-primary/5 to-transparent'
           : ''
       }`}
     >
@@ -64,8 +64,8 @@ const LearningPathCard: React.FC<LearningPathCardProps> = ({
         disabled={isToggling}
         className={`absolute top-2 right-2 p-1 rounded-full transition-all duration-300 z-10 ${
           pinned
-            ? 'bg-[#8E9C78] text-white shadow-md'
-            : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-[#8E9C78]'
+            ? 'bg-primary text-primary-foreground shadow-md'
+            : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-primary'
         } ${isToggling ? 'opacity-50 cursor-not-allowed' : ''}`}
         title={pinned ? 'ピン固定を解除' : 'ピン固定'}
       >
@@ -86,8 +86,8 @@ const LearningPathCard: React.FC<LearningPathCardProps> = ({
         ></div>
       </div>
 
-      <h4 className={`text-sm font-semibold mb-1 group-hover:text-[#8E9C78] transition-colors ${
-        isPinned || pinned ? 'text-[#8E9C78]' : 'text-black'
+      <h4 className={`text-sm font-semibold mb-1 group-hover:text-primary transition-colors ${
+        isPinned || pinned ? 'text-primary' : 'text-foreground'
       }`}>
         {category.name}
         {(isPinned || pinned) && (
@@ -95,7 +95,7 @@ const LearningPathCard: React.FC<LearningPathCardProps> = ({
         )}
       </h4>
 
-      <p className="text-[#6F6F6F] text-xs flex-1 line-clamp-2">
+      <p className="text-muted-foreground text-xs flex-1 line-clamp-2">
         {category.description}
       </p>
 

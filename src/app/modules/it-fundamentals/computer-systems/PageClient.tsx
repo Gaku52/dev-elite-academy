@@ -1563,26 +1563,26 @@ export default function ComputerSystemsPage() {
     completedQuizzes.has(`${activeModule}-${activeSection}-${index}`)).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* モバイルヘッダー */}
-      <div className="lg:hidden bg-white border-b sticky top-0 z-10">
+      <div className="lg:hidden bg-card border-b border-border sticky top-0 z-10">
         <div className="p-4">
           <Link
             href="/modules/it-fundamentals"
-            className="inline-flex items-center text-blue-600 text-sm mb-2"
+            className="inline-flex items-center text-primary hover:text-primary/80 text-sm mb-2"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
             戻る
           </Link>
-          <h1 className="text-xl font-bold text-gray-900">コンピュータシステム</h1>
+          <h1 className="text-xl font-bold text-foreground">コンピュータシステム</h1>
           <div className="mt-2">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-600">全体進捗</span>
-              <span className="text-gray-900 font-medium">{quizProgress}%</span>
+              <span className="text-muted-foreground">全体進捗</span>
+              <span className="text-foreground font-medium">{quizProgress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-muted rounded-full h-2">
               <div
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                className="bg-primary h-2 rounded-full transition-all duration-300"
                 style={{ width: `${quizProgress}%` }}
               />
             </div>
@@ -1595,42 +1595,42 @@ export default function ComputerSystemsPage() {
         <div className="hidden lg:block mb-6">
           <Link
             href="/modules/it-fundamentals"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors"
+            className="inline-flex items-center text-primary hover:text-primary/80 mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             IT基礎に戻る
           </Link>
 
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="bg-card rounded-lg shadow-sm border border-border p-6 mb-6">
             <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-4">
-                <Calculator className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mr-4">
+                <Calculator className="w-6 h-6 text-primary-foreground" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold text-gray-900">コンピュータシステム</h1>
+                  <h1 className="text-3xl font-bold text-foreground">コンピュータシステム</h1>
                   {currentCycle > 1 && (
-                    <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold">
                       第{currentCycle}周目
                     </span>
                   )}
                 </div>
-                <p className="text-gray-600">基本情報技術者試験レベルの総合学習</p>
+                <p className="text-muted-foreground">基本情報技術者試験レベルの総合学習</p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-blue-600">{completedQuizzes.size}/{totalQuizzes}</div>
-                <div className="text-sm text-gray-600">問題完了</div>
+                <div className="text-2xl font-bold text-primary">{completedQuizzes.size}/{totalQuizzes}</div>
+                <div className="text-sm text-muted-foreground">問題完了</div>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-muted rounded-lg p-4">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-600">学習進捗</span>
-                <span className="text-gray-900 font-medium">{quizProgress}%</span>
+                <span className="text-muted-foreground">学習進捗</span>
+                <span className="text-foreground font-medium">{quizProgress}%</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
+              <div className="w-full bg-muted-foreground/20 rounded-full h-3">
                 <div
-                  className="bg-blue-500 h-3 rounded-full transition-all duration-300"
+                  className="bg-primary h-3 rounded-full transition-all duration-300"
                   style={{ width: `${quizProgress}%` }}
                 />
               </div>
@@ -1641,8 +1641,8 @@ export default function ComputerSystemsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* サイドバー - デスクトップ */}
           <div className="hidden lg:block lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-4 sticky top-4">
-              <h3 className="font-semibold mb-4 text-gray-900">学習モジュール</h3>
+            <div className="bg-card rounded-lg shadow-sm border border-border p-4 sticky top-4">
+              <h3 className="font-semibold mb-4 text-foreground">学習モジュール</h3>
               <nav className="space-y-2">
                 {learningModules.map((module, moduleIndex) => (
                   <div key={module.id}>
@@ -1654,8 +1654,8 @@ export default function ComputerSystemsPage() {
                       }}
                       className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
                         activeModule === moduleIndex
-                          ? 'bg-blue-50 text-blue-600 font-medium'
-                          : 'hover:bg-gray-50 text-gray-700'
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'hover:bg-muted text-foreground'
                       }`}
                     >
                       {module.title}
@@ -1676,13 +1676,13 @@ export default function ComputerSystemsPage() {
                               }}
                               className={`w-full text-left px-3 py-1.5 rounded text-xs flex items-center justify-between ${
                                 activeSection === sectionIndex
-                                  ? 'bg-blue-100 text-blue-700'
-                                  : 'hover:bg-gray-50 text-gray-600'
+                                  ? 'bg-primary/20 text-primary'
+                                  : 'hover:bg-muted text-muted-foreground'
                               }`}
                             >
                               <span className="flex items-center">
                                 {sectionCompletedCount === section.quizzes.length ? (
-                                  <CheckCircle className="w-3 h-3 mr-2 text-green-500" />
+                                  <CheckCircle className="w-3 h-3 mr-2 text-green-500 dark:text-green-400" />
                                 ) : (
                                   <Circle className="w-3 h-3 mr-2" />
                                 )}
@@ -1701,20 +1701,20 @@ export default function ComputerSystemsPage() {
               </nav>
 
               {/* 統計情報 */}
-              <div className="mt-6 pt-6 border-t">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">学習統計</h4>
+              <div className="mt-6 pt-6 border-t border-border">
+                <h4 className="text-sm font-semibold text-foreground mb-3">学習統計</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">総問題数</span>
-                    <span className="font-medium">{totalQuizzes}問</span>
+                    <span className="text-muted-foreground">総問題数</span>
+                    <span className="font-medium text-foreground">{totalQuizzes}問</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">完了済み</span>
-                    <span className="font-medium text-green-600">{completedQuizzes.size}問</span>
+                    <span className="text-muted-foreground">完了済み</span>
+                    <span className="font-medium text-green-600 dark:text-green-400">{completedQuizzes.size}問</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">正答率</span>
-                    <span className="font-medium">{completedQuizzes.size > 0 ? quizProgress : 0}%</span>
+                    <span className="text-muted-foreground">正答率</span>
+                    <span className="font-medium text-foreground">{completedQuizzes.size > 0 ? quizProgress : 0}%</span>
                   </div>
                 </div>
               </div>
@@ -1722,7 +1722,7 @@ export default function ComputerSystemsPage() {
           </div>
 
           {/* モバイルナビゲーション */}
-          <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 mb-4">
+          <div className="lg:hidden bg-card rounded-lg shadow-sm border border-border p-4 mb-4">
             <select
               value={`${activeModule}-${activeSection}`}
               onChange={(e) => {
@@ -1731,7 +1731,7 @@ export default function ComputerSystemsPage() {
                 setActiveSection(sectionIndex);
                 setCurrentQuizIndex(0);
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
             >
               {learningModules.map((module, moduleIndex) => (
                 <optgroup key={module.id} label={module.title}>
@@ -1747,19 +1747,19 @@ export default function ComputerSystemsPage() {
 
           {/* メインコンテンツ */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm">
+            <div className="bg-card rounded-lg shadow-sm border border-border">
               <div className="p-4 lg:p-6">
                 {/* セクションヘッダー */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6">
                   <div className="flex items-center mb-4 lg:mb-0">
-                    <BookOpen className="w-5 h-5 text-blue-500 mr-2" />
-                    <h2 className="text-xl lg:text-2xl font-bold text-gray-900">{currentSection.title}</h2>
+                    <BookOpen className="w-5 h-5 text-primary mr-2" />
+                    <h2 className="text-xl lg:text-2xl font-bold text-foreground">{currentSection.title}</h2>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full">
                       {currentModule.title}
                     </span>
-                    <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+                    <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full">
                       {sectionQuizProgress}/{currentSection.quizzes.length} 問完了
                     </span>
                   </div>
@@ -1767,24 +1767,24 @@ export default function ComputerSystemsPage() {
 
                 {/* 学習コンテンツ */}
                 <div className="mb-8">
-                  <div className="prose prose-sm lg:prose max-w-none">
-                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm lg:text-base">
+                  <div className="prose prose-sm lg:prose dark:prose-invert max-w-none">
+                    <div className="whitespace-pre-wrap text-foreground leading-relaxed text-sm lg:text-base">
                       {currentSection.content}
                     </div>
                   </div>
                 </div>
 
                 {/* 問題エリア */}
-                <div className="border-t pt-6">
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 lg:p-6 mb-6">
+                <div className="border-t border-border pt-6">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-4 lg:p-6 mb-6 border border-border">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
-                      <h3 className="font-semibold text-gray-900 flex items-center text-lg mb-2 lg:mb-0">
+                      <h3 className="font-semibold text-foreground flex items-center text-lg mb-2 lg:mb-0">
                         <span className="text-2xl mr-2">🎯</span>
                         理解度チェック
                       </h3>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">問題</span>
-                        <span className="px-2 py-1 bg-white rounded-lg text-sm font-medium">
+                        <span className="text-sm text-muted-foreground">問題</span>
+                        <span className="px-2 py-1 bg-background rounded-lg text-sm font-medium text-foreground border border-border">
                           {currentQuizIndex + 1} / {currentSection.quizzes.length}
                         </span>
                       </div>
@@ -1803,12 +1803,12 @@ export default function ComputerSystemsPage() {
                             onClick={() => setCurrentQuizIndex(index)}
                             className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
                               isCurrent
-                                ? 'bg-blue-600 text-white shadow-lg scale-110'
+                                ? 'bg-primary text-primary-foreground shadow-lg scale-110'
                                 : isCompleted
-                                ? 'bg-green-500 text-white'
+                                ? 'bg-green-500 dark:bg-green-600 text-white'
                                 : hasAnswer
-                                ? 'bg-yellow-500 text-white'
-                                : 'bg-white text-gray-600 border border-gray-300'
+                                ? 'bg-yellow-500 dark:bg-yellow-600 text-white'
+                                : 'bg-background text-foreground border border-border'
                             }`}
                           >
                             {index + 1}
@@ -1817,7 +1817,7 @@ export default function ComputerSystemsPage() {
                       })}
                     </div>
 
-                    <p className="text-gray-700 mb-6 text-sm lg:text-base font-medium">
+                    <p className="text-foreground mb-6 text-sm lg:text-base font-medium">
                       {currentQuiz.question}
                     </p>
 
@@ -1835,13 +1835,13 @@ export default function ComputerSystemsPage() {
                             className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all text-sm lg:text-base ${
                               showResult
                                 ? isCorrect
-                                  ? 'bg-green-50 border-green-400 text-green-700'
+                                  ? 'bg-green-50 dark:bg-green-950/20 border-green-400 dark:border-green-600 text-green-700 dark:text-green-300'
                                   : isSelected
-                                  ? 'bg-red-50 border-red-400 text-red-700'
-                                  : 'bg-gray-50 border-gray-200 text-gray-500'
+                                  ? 'bg-red-50 dark:bg-red-950/20 border-red-400 dark:border-red-600 text-red-700 dark:text-red-300'
+                                  : 'bg-muted border-border text-muted-foreground'
                                 : isSelected
-                                ? 'bg-blue-50 border-blue-400 text-blue-700'
-                                : 'hover:bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
+                                ? 'bg-primary/10 border-primary text-primary'
+                                : 'hover:bg-muted border-border text-foreground hover:border-primary/50'
                             }`}
                           >
                             <div className="flex items-center justify-between">
@@ -1849,9 +1849,9 @@ export default function ComputerSystemsPage() {
                               {showResult && (
                                 <span className="ml-2">
                                   {isCorrect ? (
-                                    <CheckCircle className="w-5 h-5 text-green-600" />
+                                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                                   ) : isSelected ? (
-                                    <AlertCircle className="w-5 h-5 text-red-600" />
+                                    <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                                   ) : null}
                                 </span>
                               )}
@@ -1864,8 +1864,8 @@ export default function ComputerSystemsPage() {
                     {showQuizResults[quizKey] && (
                       <div className={`mt-6 p-4 rounded-lg ${
                         quizAnswers[quizKey] === currentQuiz.correct
-                          ? 'bg-green-100 text-green-800 border border-green-300'
-                          : 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+                          ? 'bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-300 border border-green-300 dark:border-green-600'
+                          : 'bg-yellow-100 dark:bg-yellow-950/20 text-yellow-800 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-600'
                       }`}>
                         <div className="flex items-start">
                           <span className="text-xl mr-2">
@@ -1886,14 +1886,14 @@ export default function ComputerSystemsPage() {
                       <button
                         onClick={previousQuiz}
                         disabled={currentQuizIndex === 0}
-                        className="px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base"
+                        className="px-4 py-2 text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base"
                       >
                         ← 前の問題
                       </button>
                       <button
                         onClick={nextQuiz}
                         disabled={currentQuizIndex === currentSection.quizzes.length - 1}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base"
+                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base"
                       >
                         次の問題 →
                       </button>
@@ -1906,14 +1906,14 @@ export default function ComputerSystemsPage() {
                   <button
                     onClick={previousSection}
                     disabled={activeModule === 0 && activeSection === 0}
-                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
+                    className="px-6 py-3 border border-border text-foreground rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
                   >
                     ← 前のセクション
                   </button>
 
                   {/* 達成度表示 */}
                   {sectionQuizProgress === currentSection.quizzes.length && (
-                    <div className="flex items-center justify-center px-4 py-2 bg-green-100 text-green-700 rounded-lg">
+                    <div className="flex items-center justify-center px-4 py-2 bg-green-100 dark:bg-green-950/20 text-green-700 dark:text-green-300 rounded-lg border border-green-300 dark:border-green-600">
                       <Trophy className="w-5 h-5 mr-2" />
                       <span className="font-medium">セクション完了！</span>
                     </div>
@@ -1922,7 +1922,7 @@ export default function ComputerSystemsPage() {
                   <button
                     onClick={nextSection}
                     disabled={activeModule === learningModules.length - 1 && activeSection === currentModule.sections.length - 1}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center text-sm lg:text-base"
+                    className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center text-sm lg:text-base"
                   >
                     次のセクション
                     <ChevronRight className="w-4 h-4 ml-1" />
@@ -1932,15 +1932,15 @@ export default function ComputerSystemsPage() {
             </div>
 
             {/* モバイル用固定フッター */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-4">
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4">
               <div className="flex justify-between text-sm">
                 <div>
-                  <span className="text-gray-600">現在の問題: </span>
-                  <span className="font-medium">{currentQuizIndex + 1}/{currentSection.quizzes.length}</span>
+                  <span className="text-muted-foreground">現在の問題: </span>
+                  <span className="font-medium text-foreground">{currentQuizIndex + 1}/{currentSection.quizzes.length}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">セクション完了: </span>
-                  <span className="font-medium text-green-600">{sectionQuizProgress}/{currentSection.quizzes.length}</span>
+                  <span className="text-muted-foreground">セクション完了: </span>
+                  <span className="font-medium text-green-600 dark:text-green-400">{sectionQuizProgress}/{currentSection.quizzes.length}</span>
                 </div>
               </div>
             </div>

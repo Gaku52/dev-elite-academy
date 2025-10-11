@@ -140,7 +140,7 @@ export default function SecurityPage() {
     completedQuizzes.has(`${activeModule}-${activeSection}-${index}`)).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* モバイルヘッダー */}
       <LearningHeader
         title="セキュリティ"
@@ -196,19 +196,19 @@ export default function SecurityPage() {
 
           {/* メインコンテンツ */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm">
+            <div className="bg-card rounded-lg shadow-sm border border-border">
               <div className="p-4 lg:p-6">
                 {/* セクションヘッダー */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6">
                   <div className="flex items-center mb-4 lg:mb-0">
-                    <BookOpen className="w-5 h-5 text-red-500 mr-2" />
-                    <h2 className="text-xl lg:text-2xl font-bold text-gray-900">{currentSection.title}</h2>
+                    <BookOpen className="w-5 h-5 text-red-500 dark:text-red-400 mr-2" />
+                    <h2 className="text-xl lg:text-2xl font-bold text-foreground">{currentSection.title}</h2>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
-                    <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full">
+                    <span className="px-3 py-1 bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-full">
                       {currentModule.title}
                     </span>
-                    <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+                    <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full">
                       {sectionQuizProgress}/{currentSection.quizzes.length} 問完了
                     </span>
                   </div>
@@ -216,24 +216,24 @@ export default function SecurityPage() {
 
                 {/* 学習コンテンツ */}
                 <div className="mb-8">
-                  <div className="prose prose-sm lg:prose max-w-none">
-                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm lg:text-base">
+                  <div className="prose prose-sm lg:prose dark:prose-invert max-w-none">
+                    <div className="whitespace-pre-wrap text-foreground leading-relaxed text-sm lg:text-base">
                       {currentSection.content}
                     </div>
                   </div>
                 </div>
 
                 {/* 問題エリア */}
-                <div className="border-t pt-6">
-                  <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-lg p-4 lg:p-6 mb-6">
+                <div className="border-t border-border pt-6">
+                  <div className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20 rounded-lg p-4 lg:p-6 mb-6 border border-border">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
-                      <h3 className="font-semibold text-gray-900 flex items-center text-lg mb-2 lg:mb-0">
+                      <h3 className="font-semibold text-foreground flex items-center text-lg mb-2 lg:mb-0">
                         <span className="text-2xl mr-2">🔒</span>
                         理解度チェック
                       </h3>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">問題</span>
-                        <span className="px-2 py-1 bg-white rounded-lg text-sm font-medium">
+                        <span className="text-sm text-muted-foreground">問題</span>
+                        <span className="px-2 py-1 bg-background rounded-lg text-sm font-medium text-foreground border border-border">
                           {currentQuizIndex + 1} / {currentSection.quizzes.length}
                         </span>
                       </div>

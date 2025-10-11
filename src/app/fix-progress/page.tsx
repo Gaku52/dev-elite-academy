@@ -76,7 +76,7 @@ export default function FixProgressPage() {
 
       <h1 className="text-3xl font-bold mb-6">進捗データ修正ツール</h1>
 
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+      <div className="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4 mb-6">
         <h2 className="text-lg font-semibold mb-2">このツールについて</h2>
         <p className="text-sm mb-2">
           このツールは、以下の問題を修正します:
@@ -122,7 +122,7 @@ export default function FixProgressPage() {
       )}
 
       {result && (
-        <div className="bg-green-50 border border-green-200 rounded p-6">
+        <div className="bg-green-50 dark:bg-green-900 border border-green-200 rounded p-6">
           <h3 className="font-semibold text-green-800 mb-4 text-lg">✓ 修正完了</h3>
           <div className="space-y-3 mb-4">
             <p className="text-sm">
@@ -143,7 +143,7 @@ export default function FixProgressPage() {
             <h4 className="font-semibold mb-3">周回別統計 (修正後)</h4>
             <div className="space-y-2">
               {Object.entries(result.details.cycleStats).map(([cycle, stats]) => (
-                <div key={cycle} className="bg-white rounded p-3 border border-gray-200">
+                <div key={cycle} className="bg-white dark:bg-gray-800 rounded p-3 border border-gray-200">
                   <p className="font-semibold">第{cycle}周目</p>
                   <p className="text-sm text-gray-600">
                     完了: {stats.completed} / {stats.total} (

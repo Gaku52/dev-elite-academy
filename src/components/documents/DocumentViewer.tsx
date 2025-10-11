@@ -63,10 +63,10 @@ export default function DocumentViewer({ documentId, config }: DocumentViewerPro
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-dark-bg">
         <Header />
         <div className="flex justify-center items-center h-64">
-          <div className="flex items-center space-x-3 text-[#6F6F6F]">
+          <div className="flex items-center space-x-3 text-gray-600 dark:text-dark-secondary">
             <Loader2 className="w-6 h-6 animate-spin" />
             <span>読み込んでいます...</span>
           </div>
@@ -77,15 +77,15 @@ export default function DocumentViewer({ documentId, config }: DocumentViewerPro
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-dark-bg">
         <Header />
         <div className="container-modern py-16">
-          <div className="card-modern p-6 border-red-200 bg-red-50 mb-6">
+          <div className="card-modern p-6 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 mb-6">
             <div className="flex items-center space-x-3 mb-4">
-              <FileText className="w-6 h-6 text-red-500" />
-              <h2 className="text-xl font-bold text-red-700">読み込みエラー</h2>
+              <FileText className="w-6 h-6 text-red-500 dark:text-red-400" />
+              <h2 className="text-xl font-bold text-red-700 dark:text-red-300">読み込みエラー</h2>
             </div>
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
             <button
               onClick={() => router.push(config.apiPath)}
               className="btn-secondary flex items-center space-x-2"
@@ -100,23 +100,23 @@ export default function DocumentViewer({ documentId, config }: DocumentViewerPro
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-dark-bg">
       <Header />
 
       {/* ナビゲーションヘッダー */}
-      <div className="bg-gray-50 border-b border-gray-200 sticky top-0 z-40">
+      <div className="bg-gray-50 dark:bg-dark-card border-b border-gray-200 dark:border-dark-border sticky top-0 z-40">
         <div className="container-modern py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => router.push(config.apiPath)}
-                className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors font-medium"
+                className="flex items-center space-x-2 text-gray-900 dark:text-dark-primary hover:text-gray-600 dark:hover:text-dark-secondary transition-colors font-medium"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>{config.backButtonText}</span>
               </button>
               {docInfo && (
-                <div className="flex items-center space-x-2 text-gray-900 font-medium">
+                <div className="flex items-center space-x-2 text-gray-900 dark:text-dark-primary font-medium">
                   <span>｜</span>
                   <FileText className="w-4 h-4" />
                   <span>{docInfo.displayName}</span>
@@ -162,6 +162,15 @@ export default function DocumentViewer({ documentId, config }: DocumentViewerPro
 
         .document-content a:hover {
           color: #764ba2;
+        }
+
+        /* ダークモード対応 */
+        .dark .document-content a {
+          color: #a78bfa;
+        }
+
+        .dark .document-content a:hover {
+          color: #c4b5fd;
         }
       `}</style>
     </div>

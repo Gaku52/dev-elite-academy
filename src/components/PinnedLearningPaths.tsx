@@ -37,13 +37,13 @@ const PinnedLearningPaths: React.FC<PinnedLearningPathsProps> = ({ categories })
   return (
     <div className="mb-12">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl sm:text-2xl font-bold text-black flex items-center">
-          <Pin className="w-6 h-6 mr-3 text-[#8E9C78]" />
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+          <Pin className="w-6 h-6 mr-3 text-primary" />
           ピン固定された学習パス
         </h3>
         <Link
           href="/learn"
-          className="text-[#8E9C78] hover:text-[#7a8a6a] transition-colors flex items-center text-sm"
+          className="text-primary hover:text-primary-hover transition-colors flex items-center text-sm"
         >
           すべて見る <ChevronRight className="w-4 h-4 ml-1" />
         </Link>

@@ -35,7 +35,7 @@ export default function QuizIndicator({
                 ? 'bg-green-500 text-white'
                 : hasAnswer
                 ? 'bg-yellow-500 text-white'
-                : 'bg-white text-gray-600 border border-gray-300'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600'
             }`}
           >
             {index + 1}

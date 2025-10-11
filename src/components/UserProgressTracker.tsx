@@ -109,16 +109,16 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg p-3 mb-4 border border-gray-200 shadow-sm">
+      <div className="bg-surface rounded-lg p-3 mb-4 border border-border shadow-sm">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-300 rounded w-1/3 mx-auto mb-2"></div>
-          <div className="h-3 bg-gray-300 rounded w-2/3 mx-auto mb-3"></div>
+          <div className="h-4 bg-muted rounded w-1/3 mx-auto mb-2"></div>
+          <div className="h-3 bg-muted rounded w-2/3 mx-auto mb-3"></div>
           <div className="grid grid-cols-4 gap-3">
             {[1,2,3,4].map(i => (
               <div key={i} className="text-center">
-                <div className="w-10 h-10 bg-gray-300 rounded-lg mx-auto mb-1"></div>
-                <div className="h-4 bg-gray-300 rounded w-6 mx-auto mb-1"></div>
-                <div className="h-3 bg-gray-300 rounded w-10 mx-auto"></div>
+                <div className="w-10 h-10 bg-muted rounded-lg mx-auto mb-1"></div>
+                <div className="h-4 bg-muted rounded w-6 mx-auto mb-1"></div>
+                <div className="h-3 bg-muted rounded w-10 mx-auto"></div>
               </div>
             ))}
           </div>
@@ -128,10 +128,10 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
   }
 
   return (
-    <div className="bg-white rounded-lg p-3 mb-4 border border-gray-200 shadow-sm">
+    <div className="bg-surface rounded-lg p-3 mb-4 border border-border shadow-sm">
       <div className="text-center mb-3">
-        <h3 className="text-sm font-semibold text-gray-800 mb-1">あなたの学習進捗</h3>
-        <p className="text-xs text-gray-600">{getMotivationalMessage()}</p>
+        <h3 className="text-sm font-semibold text-foreground mb-1">あなたの学習進捗</h3>
+        <p className="text-xs text-muted-foreground">{getMotivationalMessage()}</p>
         {progress.streak > 0 && (
           <p className="text-orange-500 text-xs flex items-center justify-center mt-1">
             <Zap className="w-3 h-3 mr-1" />
@@ -142,47 +142,47 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
       
       <div className="grid grid-cols-4 gap-3 mb-3">
         <div className="text-center">
-          <div className="w-10 h-10 mx-auto mb-1 bg-purple-100 rounded-lg flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-purple-600" />
+          <div className="w-10 h-10 mx-auto mb-1 bg-purple-100 dark:bg-purple-950/30 rounded-lg flex items-center justify-center">
+            <BookOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />
           </div>
-          <p className="text-lg font-bold text-black">{progress.completedLessons}</p>
-          <p className="text-gray-600 text-xs">完了レッスン</p>
+          <p className="text-lg font-bold text-foreground">{progress.completedLessons}</p>
+          <p className="text-muted-foreground text-xs">完了レッスン</p>
         </div>
 
         <div className="text-center">
-          <div className="w-10 h-10 mx-auto mb-1 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Target className="w-5 h-5 text-blue-600" />
+          <div className="w-10 h-10 mx-auto mb-1 bg-blue-100 dark:bg-blue-950/30 rounded-lg flex items-center justify-center">
+            <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           </div>
-          <p className="text-lg font-bold text-black">{progress.totalLessons}</p>
-          <p className="text-gray-600 text-xs">総レッスン数</p>
+          <p className="text-lg font-bold text-foreground">{progress.totalLessons}</p>
+          <p className="text-muted-foreground text-xs">総レッスン数</p>
         </div>
 
         <div className="text-center">
-          <div className="w-10 h-10 mx-auto mb-1 bg-green-100 rounded-lg flex items-center justify-center">
-            <Clock className="w-5 h-5 text-green-600" />
+          <div className="w-10 h-10 mx-auto mb-1 bg-green-100 dark:bg-green-950/30 rounded-lg flex items-center justify-center">
+            <Clock className="w-5 h-5 text-green-600 dark:text-green-400" />
           </div>
-          <p className="text-lg font-bold text-black">{Math.round(progress.completedHours)}</p>
-          <p className="text-gray-600 text-xs">学習時間</p>
+          <p className="text-lg font-bold text-foreground">{Math.round(progress.completedHours)}</p>
+          <p className="text-muted-foreground text-xs">学習時間</p>
         </div>
 
         <div className="text-center">
-          <div className="w-10 h-10 mx-auto mb-1 bg-orange-100 rounded-lg flex items-center justify-center">
-            <BarChart3 className="w-5 h-5 text-orange-600" />
+          <div className="w-10 h-10 mx-auto mb-1 bg-orange-100 dark:bg-orange-950/30 rounded-lg flex items-center justify-center">
+            <BarChart3 className="w-5 h-5 text-orange-600 dark:text-orange-400" />
           </div>
-          <p className="text-lg font-bold text-black">{progressPercentage}%</p>
-          <p className="text-gray-600 text-xs">完了率</p>
+          <p className="text-lg font-bold text-foreground">{progressPercentage}%</p>
+          <p className="text-muted-foreground text-xs">完了率</p>
         </div>
       </div>
       
       {/* Progress Bar */}
       <div className="mb-2">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-gray-600">全体の進捗</span>
-          <span className="text-xs text-gray-700">
+          <span className="text-xs text-muted-foreground">全体の進捗</span>
+          <span className="text-xs text-foreground">
             {progress.completedLessons} / {progress.totalLessons} 完了
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-muted rounded-full h-2">
           <div
             className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-500 ease-out"
             style={{width: `${progressPercentage}%`}}
@@ -197,7 +197,7 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
             {progress.achievements.map((achievement, index) => (
               <span
                 key={index}
-                className="inline-flex items-center px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded text-xs"
+                className="inline-flex items-center px-2 py-0.5 bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-400 rounded text-xs"
               >
                 <Star className="w-3 h-3 mr-1" />
                 {achievement}

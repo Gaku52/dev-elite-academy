@@ -84,16 +84,16 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header />
 
       <div className="max-w-5xl mx-auto px-4 py-2">
         {/* Welcome Section */}
         <div className="text-center mb-3">
-          <h2 className="text-lg font-bold text-black mb-1">
+          <h2 className="text-lg font-bold text-foreground mb-1">
             🏆 学習ダッシュボード
           </h2>
-          <p className="text-xs text-[#6F6F6F]">
+          <p className="text-xs text-muted">
             高年収エンジニアへの道のり
           </p>
         </div>
@@ -106,7 +106,7 @@ export default function Dashboard() {
 
         {/* Learning Resources Section */}
         <div className="mb-6">
-          <h3 className="text-base font-bold text-black flex items-center mb-3">
+          <h3 className="text-base font-bold text-foreground flex items-center mb-3">
             <FileText className="w-4 h-4 mr-2 text-[#4A90E2]" />
             学習資料
           </h3>
@@ -116,14 +116,14 @@ export default function Dashboard() {
               className="card-modern p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
             >
               <div className="flex items-start gap-3">
-                <div className="p-3 bg-[#4A90E2]/10 rounded-xl group-hover:bg-[#4A90E2]/20 transition-colors">
+                <div className="p-3 bg-[#4A90E2]/10 dark:bg-[#5da3ed]/20 rounded-xl group-hover:bg-[#4A90E2]/20 dark:group-hover:bg-[#5da3ed]/30 transition-colors">
                   <FileText className="w-6 h-6 text-[#4A90E2]" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-black mb-1 group-hover:text-[#4A90E2] transition-colors">
+                  <h4 className="text-sm font-semibold text-foreground mb-1 group-hover:text-[#4A90E2] transition-colors">
                     基本情報技術者試験 学習資料
                   </h4>
-                  <p className="text-xs text-[#6F6F6F] mb-2">
+                  <p className="text-xs text-muted mb-2">
                     GitHubから最新の学習資料をMarkdown形式で閲覧
                   </p>
                   <div className="flex items-center text-xs text-[#4A90E2]">
@@ -138,17 +138,17 @@ export default function Dashboard() {
               className="card-modern p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
             >
               <div className="flex items-start gap-3">
-                <div className="p-3 bg-[#8E9C78]/10 rounded-xl group-hover:bg-[#8E9C78]/20 transition-colors">
-                  <BookOpen className="w-6 h-6 text-[#8E9C78]" />
+                <div className="p-3 bg-[#8E9C78]/10 dark:bg-[#a8b899]/20 rounded-xl group-hover:bg-[#8E9C78]/20 dark:group-hover:bg-[#a8b899]/30 transition-colors">
+                  <BookOpen className="w-6 h-6 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-black mb-1 group-hover:text-[#8E9C78] transition-colors">
+                  <h4 className="text-sm font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
                     基本情報技術者試験
                   </h4>
-                  <p className="text-xs text-[#6F6F6F] mb-2">
+                  <p className="text-xs text-muted mb-2">
                     IT基礎知識を体系的に学習 | 科目A・科目B対策
                   </p>
-                  <div className="flex items-center text-xs text-[#8E9C78]">
+                  <div className="flex items-center text-xs text-primary">
                     <span>学習を始める</span>
                     <ChevronRight className="w-3 h-3 ml-1" />
                   </div>
@@ -161,13 +161,13 @@ export default function Dashboard() {
         {/* Learning Path Section */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-black flex items-center">
-              <BarChart3 className="w-4 h-4 mr-2 text-[#8E9C78]" />
+            <h3 className="text-base font-bold text-foreground flex items-center">
+              <BarChart3 className="w-4 h-4 mr-2 text-primary" />
               学習パス
             </h3>
-            <Link 
+            <Link
               href="/learn"
-              className="text-[#8E9C78] hover:text-[#7a8a6a] transition-colors flex items-center text-sm"
+              className="text-primary hover:text-primary transition-colors flex items-center text-sm"
             >
               すべて見る <ChevronRight className="w-4 h-4 ml-1" />
             </Link>
@@ -185,11 +185,11 @@ export default function Dashboard() {
         {/* Quick Start Section */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-black flex items-center">
+            <h3 className="text-base font-bold text-foreground flex items-center">
               <PlayCircle className="w-4 h-4 mr-2 text-green-500" />
               今すぐ始める
             </h3>
-            <p className="text-[#6F6F6F] text-sm">最新の学習コンテンツから選択</p>
+            <p className="text-muted text-sm">最新の学習コンテンツから選択</p>
           </div>
           {learningContents.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -201,8 +201,8 @@ export default function Dashboard() {
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center space-x-1">
-                      <BookOpen className="w-3 h-3 text-[#8E9C78]" />
-                      <span className="text-[#8E9C78] text-xs capitalize">
+                      <BookOpen className="w-3 h-3 text-primary" />
+                      <span className="text-primary text-xs capitalize">
                         {content.content_type}
                       </span>
                     </div>
@@ -211,22 +211,22 @@ export default function Dashboard() {
                     </span>
                   </div>
 
-                  <h4 className="text-sm font-semibold text-black mb-1 group-hover:text-[#8E9C78] transition-colors">
+                  <h4 className="text-sm font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
                     {content.title}
                   </h4>
 
-                  <p className="text-[#6F6F6F] text-xs mb-2 line-clamp-2">
+                  <p className="text-muted text-xs mb-2 line-clamp-2">
                     {content.description}
                   </p>
-                  
-                  <div className="flex items-center justify-between text-xs text-[#6F6F6F]">
+
+                  <div className="flex items-center justify-between text-xs text-muted">
                     <div className="flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
                       <span>{content.estimated_time}分</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {(content.tags || []).slice(0, 2).map((tag: string) => (
-                        <span key={tag} className="px-2 py-1 bg-[#8E9C78]/10 text-[#8E9C78] rounded-full">
+                        <span key={tag} className="px-2 py-1 bg-[#8E9C78]/10 dark:bg-[#a8b899]/20 text-primary rounded-full">
                           {tag}
                         </span>
                       ))}
@@ -237,17 +237,17 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="card-modern p-6 text-center">
-              <p className="text-sm text-[#6F6F6F]">学習コンテンツが見つかりません</p>
+              <p className="text-sm text-muted">学習コンテンツが見つかりません</p>
             </div>
           )}
         </div>
 
         {/* Motivation Section */}
-        <div className="mt-4 text-center bg-[#8E9C78]/10 rounded-lg p-4 border border-[#8E9C78]/20">
-          <h3 className="text-sm font-bold text-black mb-2">
+        <div className="mt-4 text-center bg-[#8E9C78]/10 dark:bg-[#a8b899]/20 rounded-lg p-4 border border-[#8E9C78]/20 dark:border-[#a8b899]/30">
+          <h3 className="text-sm font-bold text-foreground mb-2">
             ✨ 高年収エンジニアへの挑戦
           </h3>
-          <p className="text-xs text-[#6F6F6F] mb-3">
+          <p className="text-xs text-muted mb-3">
             技術力を向上させ、市場価値を高める学習を始めましょう
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
