@@ -1776,7 +1776,7 @@ export default function ComputerSystemsPage() {
 
                 {/* 問題エリア */}
                 <div className="border-t border-border pt-6">
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-4 lg:p-6 mb-6 border border-border">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/90 dark:to-indigo-900/90 rounded-lg p-4 lg:p-6 mb-6 border border-blue-200 dark:border-blue-700">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
                       <h3 className="font-semibold text-foreground flex items-center text-lg mb-2 lg:mb-0">
                         <span className="text-2xl mr-2">🎯</span>
@@ -1784,7 +1784,7 @@ export default function ComputerSystemsPage() {
                       </h3>
                       <div className="flex items-center space-x-2">
                         <span className="text-sm text-muted-foreground">問題</span>
-                        <span className="px-2 py-1 bg-background rounded-lg text-sm font-medium text-foreground border border-border">
+                        <span className="px-2 py-1 bg-white dark:bg-slate-800 rounded-lg text-sm font-medium text-foreground border border-border">
                           {currentQuizIndex + 1} / {currentSection.quizzes.length}
                         </span>
                       </div>
