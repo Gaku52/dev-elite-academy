@@ -205,10 +205,10 @@ export default function SecurityPage() {
                     <h2 className="text-xl lg:text-2xl font-bold text-foreground">{currentSection.title}</h2>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
-                    <span className="px-3 py-1 bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-full">
+                    <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-200 rounded-full border border-orange-200 dark:border-orange-700">
                       {currentModule.title}
                     </span>
-                    <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full">
+                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full border border-slate-200 dark:border-slate-700">
                       {sectionQuizProgress}/{currentSection.quizzes.length} 問完了
                     </span>
                   </div>
@@ -225,7 +225,7 @@ export default function SecurityPage() {
 
                 {/* 問題エリア */}
                 <div className="border-t border-border pt-6">
-                  <div className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20 rounded-lg p-4 lg:p-6 mb-6 border border-border">
+                  <div className="bg-gradient-to-r from-orange-50 to-indigo-50 dark:from-orange-900/60 dark:to-indigo-900/60 rounded-lg p-4 lg:p-6 mb-6 border border-orange-200 dark:border-orange-700">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
                       <h3 className="font-semibold text-foreground flex items-center text-lg mb-2 lg:mb-0">
                         <span className="text-2xl mr-2">🔒</span>
@@ -233,7 +233,7 @@ export default function SecurityPage() {
                       </h3>
                       <div className="flex items-center space-x-2">
                         <span className="text-sm text-muted-foreground">問題</span>
-                        <span className="px-2 py-1 bg-background rounded-lg text-sm font-medium text-foreground border border-border">
+                        <span className="px-2 py-1 bg-white dark:bg-slate-800 rounded-lg text-sm font-medium text-foreground border border-border">
                           {currentQuizIndex + 1} / {currentSection.quizzes.length}
                         </span>
                       </div>

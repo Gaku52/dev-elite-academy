@@ -200,10 +200,10 @@ export default function DatabasePage() {
                     <h2 className="text-xl lg:text-2xl font-bold text-foreground">{currentSection.title}</h2>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
-                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 rounded-full">
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-full border border-blue-200 dark:border-blue-700">
                       {currentModule.title}
                     </span>
-                    <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full">
+                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full border border-slate-200 dark:border-slate-700">
                       {sectionQuizProgress}/{currentSection.quizzes.length} 問完了
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export default function DatabasePage() {
 
                 {/* 問題エリア */}
                 <div className="border-t border-border pt-6">
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-4 lg:p-6 mb-6 border border-border">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/60 dark:to-indigo-900/60 rounded-lg p-4 lg:p-6 mb-6 border border-blue-200 dark:border-blue-700">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
                       <h3 className="font-semibold text-foreground flex items-center text-lg mb-2 lg:mb-0">
                         <span className="text-2xl mr-2">🎯</span>

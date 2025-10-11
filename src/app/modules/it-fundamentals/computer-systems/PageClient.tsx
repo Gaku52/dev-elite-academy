@@ -1610,7 +1610,7 @@ export default function ComputerSystemsPage() {
                 <div className="flex items-center gap-3">
                   <h1 className="text-3xl font-bold text-foreground">コンピュータシステム</h1>
                   {currentCycle > 1 && (
-                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold">
+                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-200 rounded-full text-sm font-semibold border border-purple-200 dark:border-purple-700">
                       第{currentCycle}周目
                     </span>
                   )}
