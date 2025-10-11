@@ -1817,7 +1817,7 @@ export default function ComputerSystemsPage() {
                       })}
                     </div>
 
-                    <p className="text-foreground mb-6 text-sm lg:text-base font-medium">
+                    <p className="text-gray-900 dark:text-gray-100 mb-6 text-sm lg:text-base font-medium">
                       {currentQuiz.question}
                     </p>
 
