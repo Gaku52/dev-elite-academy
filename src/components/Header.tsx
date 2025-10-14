@@ -243,6 +243,13 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-card">
         <div className="container-modern py-4 space-y-2">
+          {/* ダークモードトグル（モバイル用） */}
+          <div className="flex items-center justify-between text-muted py-3 px-4 rounded-xl">
+            <span className="text-sm font-medium">ダークモード</span>
+            <DarkModeToggle />
+          </div>
+          <div className="border-t border-border my-2"></div>
+
           <Link
             href="/"
             className="flex items-center text-muted hover:text-primary transition-colors py-3 px-4 rounded-xl hover:bg-card"
