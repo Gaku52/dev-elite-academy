@@ -30,18 +30,22 @@
 
 ### モデル別性能比較
 
-| モデル | CPU | GPU | メモリ | ストレージ | 重量 | 価格 | Claude Code並列処理 | 推奨度 |
-|--------|-----|-----|--------|-----------|------|------|-----------------|---------|
-| **MacBook Pro 14" (M4)** | 10コア | 10コア | 16GB | 512GB | 1.55kg | ¥248,800 | ⚠️ 不足の可能性 | ⭐⭐ |
-| **MacBook Pro 14" (M4 Pro / 24GB)** ⭐ | 12コア | 18コア | 24GB | 1TB | 1.55kg | ¥370,800 | ✅ 実用的 | ⭐⭐⭐⭐ |
-| **MacBook Pro 14" (M4 Pro / 36GB)** ⭐⭐ | 12コア | 18コア | 36GB | 1TB | 1.55kg | ¥448,800 | ✅✅ 完璧 | ⭐⭐⭐⭐⭐ |
-| **MacBook Pro 16" (M4 Pro)** | 12コア | 18コア | 24GB | 1TB | 2.14kg | ¥420,800 | ✅ 実用的 | ⭐⭐⭐⭐ |
-| **MacBook Pro 16" (M4 Max)** | 16コア | 40コア | 48GB | 1TB | 2.15kg | ¥600,800〜 | ✅✅ 完璧 | ⭐⭐⭐ |
+| モデル | CPU | GPU | メモリ | ストレージ | 重量 | 価格 | Claude Code並列処理 | 推奨度 | 購入リンク |
+|--------|-----|-----|--------|-----------|------|------|-----------------|---------|---------|
+| **MacBook Pro 14" (M4)** | 10コア | 10コア | 16GB | 512GB | 1.55kg | ¥248,800 | ⚠️ 不足の可能性 | ⭐⭐ | [詳細](https://www.apple.com/jp/shop/buy-mac/macbook-pro/14%E3%82%A4%E3%83%B3%E3%83%81-m4) |
+| **MacBook Pro 14" (M4 Pro / 24GB)** ⭐ | 12コア | 18コア | 24GB | 1TB | 1.55kg | ¥370,800 | ✅ 実用的 | ⭐⭐⭐⭐ | [詳細](https://www.apple.com/jp/shop/buy-mac/macbook-pro/14%E3%82%A4%E3%83%B3%E3%83%81-m4-pro) |
+| **MacBook Pro 14" (M4 Pro / 36GB)** ⭐⭐ | 12コア | 18コア | 36GB | 1TB | 1.55kg | ¥448,800 | ✅✅ 完璧 | ⭐⭐⭐⭐⭐ | [詳細](https://www.apple.com/jp/shop/buy-mac/macbook-pro/14%E3%82%A4%E3%83%B3%E3%83%81-m4-pro) |
+| **MacBook Pro 16" (M4 Pro)** | 12コア | 18コア | 24GB | 1TB | 2.14kg | ¥420,800 | ✅ 実用的 | ⭐⭐⭐⭐ | [詳細](https://www.apple.com/jp/shop/buy-mac/macbook-pro/16%E3%82%A4%E3%83%B3%E3%83%81-m4-pro) |
+| **MacBook Pro 16" (M4 Max)** | 16コア | 40コア | 48GB | 1TB | 2.15kg | ¥600,800〜 | ✅✅ 完璧 | ⭐⭐⭐ | [詳細](https://www.apple.com/jp/shop/buy-mac/macbook-pro/16%E3%82%A4%E3%83%B3%E3%83%81-m4-max) |
 
 **凡例**:
 - ⭐ = コストパフォーマンス重視の推奨
 - ⭐⭐ = 性能重視・予算に余裕がある場合の最推奨
 - 価格は2025年10月時点のApple公式価格（税込）
+
+**公式リンク集**:
+- [MacBook Pro 全モデル比較 | Apple公式](https://www.apple.com/jp/macbook-pro/)
+- [MacBook Pro 技術仕様 | Apple公式](https://support.apple.com/kb/SP889?locale=ja_JP)
 
 ---
 
@@ -116,6 +120,7 @@
 
 **MacBook Pro 14" (M4ベース / 16GB / 512GB)**
 - **価格**: ¥248,800（Apple公式価格・2025年10月時点）
+- **Apple公式**: [こちらから購入・詳細確認](https://www.apple.com/jp/shop/buy-mac/macbook-pro/14%E3%82%A4%E3%83%B3%E3%83%81-m4)
 - トレードオフ:
   - **メモリ16GBは開発+DJ同時使用時にやや厳しい**
   - Claude Code並列処理使用時、メモリ不足が発生する可能性が高い
@@ -126,6 +131,8 @@
 
 **MacBook Pro 14" (M4 Pro / 36GB / 1TB)**
 - **価格**: ¥448,800（Apple公式価格・2025年10月時点）
+- **Apple公式**: [こちらから購入・詳細確認](https://www.apple.com/jp/shop/buy-mac/macbook-pro/14%E3%82%A4%E3%83%B3%E3%83%81-m4-pro)
+- ※購入時にメモリを36GBにカスタマイズしてください
 - メリット:
   - **36GBメモリでClaude Code並列処理が完全に余裕**
   - 複数エージェント + Docker + DAW + 仮想環境を全て同時実行可能
@@ -138,6 +145,7 @@
 
 **MacBook Pro 16" (M4 Pro / 24GB / 1TB)**
 - **価格**: ¥420,800（Apple公式価格・2025年10月時点）
+- **Apple公式**: [こちらから購入・詳細確認](https://www.apple.com/jp/shop/buy-mac/macbook-pro/16%E3%82%A4%E3%83%B3%E3%83%81-m4-pro)
 - メリット:
   - 大画面でコーディング・波形編集が快適
   - バッテリー持続時間が14インチより長い
@@ -152,6 +160,7 @@
 ### 推奨1位: MacBook Pro 14インチ (M4 Pro / 24GB / 1TB)
 
 **価格**: ¥370,800（Apple公式価格・2025年10月時点）
+**Apple公式**: [こちらから購入・詳細確認](https://www.apple.com/jp/shop/buy-mac/macbook-pro/14%E3%82%A4%E3%83%B3%E3%83%81-m4-pro)
 
 #### コストパフォーマンス最優先の選択
 
@@ -174,6 +183,8 @@
 ### 推奨2位（予算に余裕がある場合）: MacBook Pro 14インチ (M4 Pro / 36GB / 1TB)
 
 **価格**: ¥448,800（Apple公式価格・2025年10月時点）
+**Apple公式**: [こちらから購入・詳細確認](https://www.apple.com/jp/shop/buy-mac/macbook-pro/14%E3%82%A4%E3%83%B3%E3%83%81-m4-pro)
+※購入時にメモリを36GBにカスタマイズしてください
 
 #### 長期的な快適性を重視する選択
 
