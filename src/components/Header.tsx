@@ -123,9 +123,6 @@ export default function Header() {
 
           {/* モバイルメニューとユーザーメニュー */}
           <div className="flex items-center gap-4">
-            {/* ダークモードトグル */}
-            <DarkModeToggle />
-
             {/* モバイルメニューボタン */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -271,6 +268,7 @@ export default function Header() {
             <Settings className="w-5 h-5 mr-3" />
             使用状況
           </Link>
+          <div className="border-t border-border my-2"></div>
           <Link
             href="/admin/categories"
             className="flex items-center text-muted hover:text-primary transition-colors py-3 px-4 rounded-xl hover:bg-card"
@@ -285,6 +283,11 @@ export default function Header() {
             <Database className="w-5 h-5 mr-3" />
             コンテンツ管理
           </Link>
+          {/* ダークモードトグル（モバイル用） */}
+          <div className="flex items-center justify-between text-muted py-3 px-4 rounded-xl">
+            <span className="text-sm font-medium">ダークモード</span>
+            <DarkModeToggle />
+          </div>
         </div>
       </div>
       )}
