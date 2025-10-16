@@ -37,8 +37,17 @@ export default function CategoriesPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/admin/categories');
+      const token = localStorage.getItem('supabase-auth-token');
+      const response = await fetch('/api/admin/categories', {
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {}
+      });
       const data = await response.json();
+      if (response.status === 401) {
+        console.error('Authentication required');
+        return;
+      }
       setCategories(data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -49,17 +58,21 @@ export default function CategoriesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
+      const token = localStorage.getItem('supabase-auth-token');
       const url = '/api/admin/categories';
       const method = editingCategory ? 'PUT' : 'POST';
-      const body = editingCategory 
+      const body = editingCategory
         ? { ...formData, id: editingCategory.id }
         : formData;
 
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(body)
       });
 
@@ -89,8 +102,12 @@ export default function CategoriesPage() {
     if (!confirm('このカテゴリを削除してもよろしいですか？')) return;
 
     try {
+      const token = localStorage.getItem('supabase-auth-token');
       const response = await fetch(`/api/admin/categories?id=${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {}
       });
 
       if (response.ok) {
@@ -117,16 +134,20 @@ export default function CategoriesPage() {
   const updateSortOrder = async (category: Category, direction: 'up' | 'down') => {
     const currentIndex = categories.findIndex(c => c.id === category.id);
     const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    
+
     if (targetIndex < 0 || targetIndex >= categories.length) return;
 
     const targetCategory = categories[targetIndex];
-    
+
     try {
+      const token = localStorage.getItem('supabase-auth-token');
       await Promise.all([
         fetch('/api/admin/categories', {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
           body: JSON.stringify({
             id: category.id,
             sortOrder: targetCategory.sort_order
@@ -134,14 +155,17 @@ export default function CategoriesPage() {
         }),
         fetch('/api/admin/categories', {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
           body: JSON.stringify({
             id: targetCategory.id,
             sortOrder: category.sort_order
           })
         })
       ]);
-      
+
       fetchCategories();
     } catch (error) {
       console.error('Error updating sort order:', error);

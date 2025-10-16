@@ -85,7 +85,12 @@ export default function ContentsPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/admin/categories');
+      const token = localStorage.getItem('supabase-auth-token');
+      const response = await fetch('/api/admin/categories', {
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {}
+      });
       const data = await response.json();
       setCategories(data);
     } catch (error) {
@@ -95,12 +100,17 @@ export default function ContentsPage() {
 
   const fetchContents = async () => {
     try {
+      const token = localStorage.getItem('supabase-auth-token');
       let url = `/api/admin/contents?page=${pagination.page}&limit=${pagination.limit}`;
       if (selectedCategory) {
         url += `&categoryId=${selectedCategory}`;
       }
-      
-      const response = await fetch(url);
+
+      const response = await fetch(url, {
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {}
+      });
       const data = await response.json();
       setContents(data.contents);
       setPagination(data.pagination);
@@ -113,17 +123,21 @@ export default function ContentsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
+      const token = localStorage.getItem('supabase-auth-token');
       const url = '/api/admin/contents';
       const method = editingContent ? 'PUT' : 'POST';
-      const body = editingContent 
+      const body = editingContent
         ? { ...formData, id: editingContent.id }
         : formData;
 
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(body)
       });
 
@@ -156,8 +170,12 @@ export default function ContentsPage() {
     if (!confirm('このコンテンツを削除してもよろしいですか？')) return;
 
     try {
+      const token = localStorage.getItem('supabase-auth-token');
       const response = await fetch(`/api/admin/contents?id=${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {}
       });
 
       if (response.ok) {

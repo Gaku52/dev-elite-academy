@@ -38,10 +38,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state change:', event, session?.user?.email);
-      
+
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // 認証トークンをlocalStorageに保存
+      if (session?.access_token) {
+        localStorage.setItem('supabase-auth-token', session.access_token);
+      } else {
+        localStorage.removeItem('supabase-auth-token');
+      }
 
       // 認証状態が変更された場合の処理
       if (event === 'SIGNED_IN') {
