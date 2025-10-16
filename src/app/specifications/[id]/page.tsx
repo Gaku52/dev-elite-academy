@@ -1,29 +1,18 @@
-'use client';
+import { notFound } from 'next/navigation';
+import { getSpecificationById } from '@/data/specifications';
+import PageClient from './PageClient';
 
-import { useState, useEffect } from 'react';
-import DocumentViewer from '@/components/documents/DocumentViewer';
-import { specificationsConfig } from '@/config/documents';
-
-interface SpecificationViewerProps {
+interface SpecificationPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function SpecificationViewerPage({ params }: SpecificationViewerProps) {
-  const [specId, setSpecId] = useState<string>('');
+export default async function SpecificationPage({ params }: SpecificationPageProps) {
+  const { id } = await params;
+  const document = getSpecificationById(id);
 
-  useEffect(() => {
-    params.then(resolved => {
-      setSpecId(resolved.id);
-    });
-  }, [params]);
-
-  if (!specId) {
-    return (
-      <div className="min-h-screen bg-background flex justify-center items-center">
-        <div className="text-muted-foreground">読み込み中...</div>
-      </div>
-    );
+  if (!document) {
+    notFound();
   }
 
-  return <DocumentViewer documentId={specId} config={specificationsConfig} />;
+  return <PageClient document={document} />;
 }
