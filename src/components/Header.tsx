@@ -123,6 +123,11 @@ export default function Header() {
 
           {/* モバイルメニューとユーザーメニュー */}
           <div className="flex items-center gap-4">
+            {/* ダークモードトグル（デスクトップ用） */}
+            <div className="hidden md:block">
+              <DarkModeToggle />
+            </div>
+
             {/* モバイルメニューボタン */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
