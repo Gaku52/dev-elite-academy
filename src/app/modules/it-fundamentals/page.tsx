@@ -113,6 +113,24 @@ interface LearningProgressItem {
 }
 
 export default function ITFundamentalsPage() {
+  const [hasCache, setHasCache] = useState<boolean>(() => {
+    // キャッシュの有無を確認
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('it-fundamentals-progress');
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < 5 * 60 * 1000) {
+            return true;
+          }
+        }
+      } catch (e) {
+        // エラーは無視
+      }
+    }
+    return false;
+  });
+
   const [progressData, setProgressData] = useState<{[key: number]: number}>(() => {
     // 初期値をローカルストレージから即座に読み込み（0.001秒レベル）
     if (typeof window !== 'undefined') {
@@ -132,26 +150,35 @@ export default function ITFundamentalsPage() {
     return {};
   });
   const [allProgress, setAllProgress] = useState<LearningProgressItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(!hasCache);
 
   useEffect(() => {
     // 全モジュールの進捗データを取得
     const fetchAllProgress = async () => {
       try {
         const { data: { user } } = await (await import('@/lib/supabase')).supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
 
         const url = new URL('/api/learning-progress', window.location.origin);
         url.searchParams.set('userId', user.id);
 
         const response = await fetch(url.toString());
-        if (!response.ok) return;
+        if (!response.ok) {
+          setIsLoading(false);
+          return;
+        }
 
         const data = await response.json();
         if (data.progress) {
           setAllProgress(data.progress);
         }
+        setIsLoading(false);
       } catch (err) {
         console.error('Error fetching all progress:', err);
+        setIsLoading(false);
       }
     };
 
@@ -259,23 +286,47 @@ export default function ITFundamentalsPage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {fundamentalTopics.map((topic) => {
-            const currentProgress = progressData[topic.id] || 0;
-            return (
-              <ModuleCard
-                key={topic.id}
-                id={topic.id}
-                title={topic.title}
-                description={topic.description}
-                category={topic.category}
-                icon={topic.icon}
-                topics={topic.topics}
-                color={topic.color}
-                progress={currentProgress}
-                href={topic.href}
-              />
-            );
-          })}
+          {isLoading && !hasCache ? (
+            // スケルトンローディング（キャッシュがない初回のみ）
+            fundamentalTopics.map((topic) => (
+              <div key={topic.id} className="card-modern p-6 animate-pulse">
+                <div className="flex items-start mb-4">
+                  <div className="w-12 h-12 bg-gray-300 dark:bg-gray-700 rounded-xl mr-4"></div>
+                  <div className="flex-1">
+                    <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-1"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+                  </div>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+                  <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+                  <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                </div>
+                <div className="h-2 bg-gray-300 dark:bg-gray-700 rounded-full w-full mb-2"></div>
+                <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+              </div>
+            ))
+          ) : (
+            // 実際のカード（キャッシュがあれば即座に表示）
+            fundamentalTopics.map((topic) => {
+              const currentProgress = progressData[topic.id] || 0;
+              return (
+                <ModuleCard
+                  key={topic.id}
+                  id={topic.id}
+                  title={topic.title}
+                  description={topic.description}
+                  category={topic.category}
+                  icon={topic.icon}
+                  topics={topic.topics}
+                  color={topic.color}
+                  progress={currentProgress}
+                  href={topic.href}
+                />
+              );
+            })
+          )}
         </div>
 
         <div className="mt-12 card-modern p-6">
