@@ -37,11 +37,17 @@ export default function CategoryContentCount({ categoryName, fallbackCount }: Ca
     fetchContentCount();
   }, [categoryName]);
 
-  if (loading) {
-    return <span className="text-xs text-olive-600 dark:text-olive-400 animate-pulse">{fallbackCount} コンテンツ</span>;
+  // データ取得中で、キャッシュデータもなく、fallbackCountも0の場合のみローディング表示
+  if (loading && !contentData && fallbackCount === 0) {
+    return <span className="text-xs text-olive-600 dark:text-olive-400 animate-pulse">読込中...</span>;
   }
 
+  // データがない場合はfallbackCountを表示（0でない値があればそれを表示）
   if (!contentData) {
+    // fallbackCountが0の場合は表示しない
+    if (fallbackCount === 0) {
+      return null;
+    }
     return <span className="text-xs text-olive-600 dark:text-olive-400">{fallbackCount} コンテンツ</span>;
   }
 
