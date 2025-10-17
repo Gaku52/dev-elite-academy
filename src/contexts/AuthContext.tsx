@@ -17,6 +17,33 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * すべてのSWRキャッシュをクリアする関数
+ * ログアウト時にLocalStorageに保存されたユーザー固有のキャッシュを削除
+ */
+function clearAllCaches() {
+  if (typeof window === 'undefined') return;
+
+  try {
+    // LocalStorageから swr-cache- で始まるすべてのキーを削除
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('swr-cache-')) {
+        keysToRemove.push(key);
+      }
+    }
+
+    keysToRemove.forEach(key => {
+      localStorage.removeItem(key);
+    });
+
+    console.log(`🗑️ Cleared ${keysToRemove.length} cache entries from localStorage`);
+  } catch (error) {
+    console.error('Failed to clear caches:', error);
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -55,6 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('User signed in:', session?.user?.email);
       } else if (event === 'SIGNED_OUT') {
         console.log('User signed out');
+        // ログアウト時にすべてのSWRキャッシュをクリア
+        clearAllCaches();
       }
     });
 
@@ -104,6 +133,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut: async () => {
       setLoading(true);
       await auth.signOut();
+      // ログアウト時にすべてのSWRキャッシュをクリア
+      clearAllCaches();
       setUser(null);
       setSession(null);
       setLoading(false);
