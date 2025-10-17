@@ -31,7 +31,7 @@ export default function NetworkPage() {
       const answersMap: {[key: string]: number} = {};
       const resultsMap: {[key: string]: boolean} = {};
 
-      progress.forEach((p) => {
+      progress.forEach((p: { section_key: string; is_completed: boolean }) => {
         const sectionKey = p.section_key;
         if (p.is_completed) {
           completedSet.add(sectionKey);
@@ -132,7 +132,7 @@ export default function NetworkPage() {
   // データベースの進捗データを使用して正確な進捗率を計算
   // 重複を排除してユニークなsection_keyのみをカウント
   const uniqueCompletedSections = new Set(
-    progress.filter(p => p.is_completed).map(p => p.section_key)
+    progress.filter((p: { is_completed: boolean }) => p.is_completed).map((p: { section_key: string }) => p.section_key)
   );
   const dbCompletedCount = uniqueCompletedSections.size;
   const quizProgress = totalQuizzes > 0 ? Math.floor((dbCompletedCount / totalQuizzes) * 100) : 0;

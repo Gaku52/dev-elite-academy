@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // 画像最適化設定
+  images: {
+    formats: ['image/avif', 'image/webp'], // 最新フォーマットを優先
+    minimumCacheTTL: 60 * 60 * 24 * 365, // 1年間キャッシュ
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840], // レスポンシブ対応
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // アイコンサイズ
+  },
+
   // セキュリティ強化: 本番環境でconsole.logを自動除去 (一時的に無効化)
   // compiler: {
   //   removeConsole: process.env.NODE_ENV === 'production' ? {

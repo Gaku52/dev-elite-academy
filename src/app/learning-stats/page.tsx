@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ArrowLeft, TrendingUp, RotateCcw, Database, Calculator, Code, Network, Shield, Users, FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import DailyProgressChart from '@/components/analytics/DailyProgressChart';
@@ -8,28 +8,8 @@ import LearningStreakCard from '@/components/analytics/LearningStreakCard';
 import LearningHeatmap from '@/components/analytics/LearningHeatmap';
 import ResetConfirmationDialog from '@/components/ResetConfirmationDialog';
 import CycleStatistics from '@/components/CycleStatistics';
-
-interface CycleHistoryItem {
-  cycle_number: number;
-  totalQuestions: number;
-  completedQuestions: number;
-  correctRate: number;
-  completionRate: number;
-}
-
-interface LearningStats {
-  totalQuestions: number;
-  completedQuestions: number;
-  correctRate: number;
-  moduleStats: {
-    [key: string]: {
-      total: number;
-      completed: number;
-    };
-  };
-  currentCycle: number;
-  cycleHistory: CycleHistoryItem[];
-}
+import { useDailyProgress, useLearningStreak, useCycleData } from '@/hooks/useLearningStats';
+import { useLearningProgress } from '@/hooks/useLearningProgress';
 
 interface ModuleInfo {
   key: string;
@@ -126,129 +106,18 @@ const modules: ModuleInfo[] = [
 ];
 
 export default function LearningStatsPage() {
-  const [stats, setStats] = useState<LearningStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
-  const [cycleData, setCycleData] = useState<{
-    currentCycle: number;
-    nextCycle: number;
-    cycleStats: {
-      cycle_number: number;
-      total_questions: number;
-      completed_questions: number;
-      correct_questions: number;
-      completion_rate: number;
-      cycle_start_date: string;
-      cycle_last_update: string;
-    }[];
-    resetPreview: {
-      preservedData: string[];
-      resetData: string[];
-      benefits: string[];
-    };
-  } | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'cycles'>('overview');
-  interface DailyProgressData {
-    date: string;
-    totalQuestions: number;
-    correctQuestions: number;
-    correctRate: number;
-    timeSpent: number;
-    sectionsCompleted: number;
-  }
-
-  interface StreakData {
-    current_streak: number;
-    longest_streak: number;
-    last_activity_date: string | null;
-    total_days_learned: number;
-  }
-
-  const [dailyProgress, setDailyProgress] = useState<DailyProgressData[]>([]);
-  const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [chartType, setChartType] = useState<'line' | 'bar' | 'area'>('line');
   const [dateRange, setDateRange] = useState(30); // デフォルト30日
 
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+  // SWRフックを使用してデータを取得（自動キャッシュ）
+  const { stats, loading, error } = useLearningProgress();
+  const { dailyProgress, isLoading: dailyLoading } = useDailyProgress(dateRange);
+  const { streakData, isLoading: streakLoading } = useLearningStreak();
+  const { cycleData, isLoading: cycleLoading } = useCycleData();
 
-      if (!user) {
-        setError('ログインが必要です');
-        return;
-      }
-
-      // 既存の統計データ取得
-      const url = new URL('/api/learning-progress/reset', window.location.origin);
-      url.searchParams.set('userId', user.id);
-      url.searchParams.set('action', 'stats');
-
-      const response = await fetch(url.toString());
-      if (!response.ok) {
-        throw new Error(`Failed to fetch stats: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      console.log('[FRONTEND DEBUG] Fetched stats data:', data);
-      console.log('[FRONTEND DEBUG] Cycle history:', data.stats?.cycleHistory);
-      console.log('[FRONTEND DEBUG] Current cycle:', data.stats?.currentCycle);
-
-      setStats(data.stats);
-
-      // 日次進捗データの取得
-      const dailyUrl = new URL('/api/learning-analytics/daily-progress', window.location.origin);
-      dailyUrl.searchParams.set('userId', user.id);
-      dailyUrl.searchParams.set('days', dateRange.toString());
-
-      const dailyResponse = await fetch(dailyUrl.toString());
-      if (dailyResponse.ok) {
-        const dailyData = await dailyResponse.json();
-        setDailyProgress(dailyData.dailyProgress || []);
-      }
-
-      // ストリークデータの取得
-      const streakUrl = new URL('/api/learning-analytics/streak', window.location.origin);
-      streakUrl.searchParams.set('userId', user.id);
-
-      const streakResponse = await fetch(streakUrl.toString());
-      if (streakResponse.ok) {
-        const streakData = await streakResponse.json();
-        setStreakData(streakData);
-      }
-    } catch (err) {
-      console.error('Error fetching stats:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCycleData = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const params = new URLSearchParams({
-        userId: user.id,
-        action: 'cycles'
-      });
-
-      const response = await fetch(`/api/learning-progress/reset?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setCycleData(data);
-      }
-    } catch (err) {
-      console.error('Error fetching cycle data:', err);
-    }
-  };
 
   const handleResetProgress = async (resetType: 'safe' | 'complete') => {
     try {
@@ -277,9 +146,8 @@ export default function LearningStatsPage() {
       const result = await response.json();
       alert(result.message);
 
-      // データを再取得
-      await fetchStats();
-      await fetchCycleData();
+      // SWRキャッシュを更新（自動的に最新データを再取得）
+      window.location.reload(); // 簡易的にリロードで全データ更新
     } catch (error) {
       console.error('Failed to reset progress:', error);
       alert('進捗のリセットに失敗しました');
@@ -288,11 +156,6 @@ export default function LearningStatsPage() {
     }
   };
 
-  useEffect(() => {
-    fetchStats();
-    fetchCycleData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateRange]);
 
   if (loading) {
     return (
@@ -309,9 +172,9 @@ export default function LearningStatsPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-destructive mb-4">エラー: {error}</p>
+          <p className="text-destructive mb-4">エラー: {error?.message || 'データの取得に失敗しました'}</p>
           <button
-            onClick={fetchStats}
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
             再試行
@@ -454,7 +317,13 @@ export default function LearningStatsPage() {
                 console.log('[RENDER DEBUG] Cycle history data:', stats?.cycleHistory);
                 return null;
               })()}
-              {stats?.cycleHistory?.map((cycle) => (
+              {stats?.cycleHistory?.map((cycle: {
+                cycle_number: number;
+                totalQuestions: number;
+                completedQuestions: number;
+                correctRate: number;
+                completionRate: number;
+              }) => (
                 <div
                   key={cycle.cycle_number}
                   className={`bg-card rounded-lg shadow-sm border-2 p-4 sm:p-6 ${
@@ -611,7 +480,7 @@ export default function LearningStatsPage() {
               <div>
                 <p className="text-foreground mb-2"><strong>学習パターン:</strong></p>
                 <p className="text-muted-foreground">
-                  {dailyProgress.filter(d => d.totalQuestions > 0).length > 0
+                  {dailyProgress.filter((d: { totalQuestions: number }) => d.totalQuestions > 0).length > 0
                     ? '継続的に学習を進めています'
                     : 'まずは定期的な学習習慣を作りましょう'}
                 </p>
@@ -627,8 +496,9 @@ export default function LearningStatsPage() {
               <div>
                 <p className="text-foreground mb-2"><strong>強化ポイント:</strong></p>
                 <p className="text-muted-foreground">
-                  {Object.entries(stats?.moduleStats || {}).reduce((min, [key, value]) => {
-                    const progress = value.completed / Math.max(value.total, 1);
+                  {Object.entries(stats?.moduleStats || {}).reduce<{ key: string; progress: number }>((min, [key, value]) => {
+                    const v = value as { completed: number; total: number };
+                    const progress = v.completed / Math.max(v.total, 1);
                     return progress < min.progress ? { key, progress } : min;
                   }, { key: '', progress: 1 }).key || '全体的にバランスよく学習しています'}
                 </p>

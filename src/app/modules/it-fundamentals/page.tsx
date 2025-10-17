@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { BookOpen, ArrowLeft, Code, Database, Network, Shield, Calculator, Users, FileText, TrendingUp } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { moduleQuizCounts, moduleNameMapping } from '@/lib/moduleQuizCounts';
+import ModuleCard from '@/components/ModuleCard';
 
 const fundamentalTopics = [
   {
@@ -140,38 +141,43 @@ export default function ITFundamentalsPage() {
     fetchAllProgress();
   }, []);
 
-  useEffect(() => {
-    if (allProgress && allProgress.length > 0) {
-      const calculatedProgress: {[key: number]: number} = {};
+  // useMemoで進捗計算をメモ化 - allProgressが変わった時のみ再計算
+  const calculatedProgress = useMemo(() => {
+    if (!allProgress || allProgress.length === 0) return {};
 
-      // 各モジュールの進捗率を計算（個々のページと完全に同じロジックを使用）
-      Object.entries(moduleNameMapping).forEach(([topicId, moduleName]) => {
-        const totalQuizzes = moduleQuizCounts[moduleName] || 0;
+    const progressMap: {[key: number]: number} = {};
 
-        if (totalQuizzes > 0) {
-          // answer_count > 0 のレコードを「完了」として判定
-          // ユニークなmodule::section_keyのみをカウント（重複を排除）
-          const uniqueSections = new Set(
-            allProgress
-              .filter(p => p.module_name === moduleName && (p.answer_count || 0) > 0)
-              .map(p => `${p.module_name}::${p.section_key}`)
-          );
-          const completedCount = uniqueSections.size;
+    // 各モジュールの進捗率を計算（個々のページと完全に同じロジックを使用）
+    Object.entries(moduleNameMapping).forEach(([topicId, moduleName]) => {
+      const totalQuizzes = moduleQuizCounts[moduleName] || 0;
 
-          // 個別ページと完全に同じ計算方法を使用
-          const progressPercentage = Math.floor((completedCount / totalQuizzes) * 100);
+      if (totalQuizzes > 0) {
+        // answer_count > 0 のレコードを「完了」として判定
+        // ユニークなmodule::section_keyのみをカウント（重複を排除）
+        const uniqueSections = new Set(
+          allProgress
+            .filter(p => p.module_name === moduleName && (p.answer_count || 0) > 0)
+            .map(p => `${p.module_name}::${p.section_key}`)
+        );
+        const completedCount = uniqueSections.size;
 
-          console.log(`📊 Module ${moduleName}: ${completedCount}/${totalQuizzes} = ${progressPercentage}%`);
-          calculatedProgress[parseInt(topicId)] = progressPercentage;
-        } else {
-          calculatedProgress[parseInt(topicId)] = 0;
-        }
-      });
+        // 個別ページと完全に同じ計算方法を使用
+        const progressPercentage = Math.floor((completedCount / totalQuizzes) * 100);
 
-      console.log('📊 Calculated module progress:', calculatedProgress);
-      setProgressData(calculatedProgress);
-    }
+        console.log(`📊 Module ${moduleName}: ${completedCount}/${totalQuizzes} = ${progressPercentage}%`);
+        progressMap[parseInt(topicId)] = progressPercentage;
+      } else {
+        progressMap[parseInt(topicId)] = 0;
+      }
+    });
+
+    console.log('📊 Calculated module progress:', progressMap);
+    return progressMap;
   }, [allProgress]);
+
+  useEffect(() => {
+    setProgressData(calculatedProgress);
+  }, [calculatedProgress]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -225,55 +231,20 @@ export default function ITFundamentalsPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {fundamentalTopics.map((topic) => {
-            const Icon = topic.icon;
             const currentProgress = progressData[topic.id] || 0;
             return (
-              <div key={topic.id} className="card-modern p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="flex items-start mb-4">
-                  <div className={`inline-flex items-center justify-center w-12 h-12 ${topic.color} rounded-xl mr-4`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-1">
-                      {topic.title}
-                    </h3>
-                    <p className="text-sm text-muted mb-1">
-                      {topic.description}
-                    </p>
-                    <div className="text-xs text-muted bg-card px-2 py-1 rounded-full inline-block">
-                      {topic.category}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  {topic.topics.map((item, index) => (
-                    <div key={index} className="flex items-center text-sm">
-                      <span className="w-2 h-2 bg-border rounded-full mr-2"></span>
-                      <span className="text-muted">{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">進捗</span>
-                    <span className="text-muted">{currentProgress}%</span>
-                  </div>
-                  <div className="w-full bg-border rounded-full h-2">
-                    <div
-                      className={`${topic.color} h-2 rounded-full transition-all duration-300`}
-                      style={{ width: `${currentProgress}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                <Link href={topic.href || '#'} className="mt-4 w-full block">
-                  <button className="w-full py-2 px-4 bg-card hover:bg-card/80 text-foreground rounded-lg transition-colors text-sm font-medium">
-                    学習を開始 ({topic.category})
-                  </button>
-                </Link>
-              </div>
+              <ModuleCard
+                key={topic.id}
+                id={topic.id}
+                title={topic.title}
+                description={topic.description}
+                category={topic.category}
+                icon={topic.icon}
+                topics={topic.topics}
+                color={topic.color}
+                progress={currentProgress}
+                href={topic.href}
+              />
             );
           })}
         </div>
