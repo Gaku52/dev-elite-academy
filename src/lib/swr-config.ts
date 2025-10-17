@@ -1,5 +1,36 @@
 import { SWRConfiguration } from 'swr';
 
+// ローカルストレージからキャッシュを即座に読み込み
+const loadFromCache = (key: string) => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const cached = localStorage.getItem(`swr-cache-${key}`);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      // 5分以内のキャッシュのみ使用
+      if (Date.now() - timestamp < 5 * 60 * 1000) {
+        return data;
+      }
+    }
+  } catch (e) {
+    // キャッシュ読み込みエラーは無視
+  }
+  return null;
+};
+
+// ローカルストレージにキャッシュを保存
+const saveToCache = (key: string, data: unknown) => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(`swr-cache-${key}`, JSON.stringify({
+      data,
+      timestamp: Date.now()
+    }));
+  } catch (e) {
+    // キャッシュ保存エラーは無視（容量制限など）
+  }
+};
+
 /**
  * SWR グローバル設定
  * データキャッシュと自動再検証の動作を定義
@@ -21,13 +52,8 @@ export const swrConfig: SWRConfiguration = {
   errorRetryCount: 3, // 最大3回リトライ
   errorRetryInterval: 5000, // 5秒間隔でリトライ
 
-  // キャッシュの保持時間（ミリ秒）
-  // デフォルトではブラウザを閉じるまでキャッシュを保持
-
   // ローディング状態の処理
   shouldRetryOnError: true,
-
-  // フェッチャーのデフォルト設定は各コンポーネントで定義
 };
 
 /**
@@ -50,5 +76,31 @@ export const authenticatedFetcher = async (url: string) => {
     throw error;
   }
 
-  return response.json();
+  const data = await response.json();
+
+  // データをローカルストレージに保存（次回の即座表示用）
+  saveToCache(url, data);
+
+  return data;
+};
+
+/**
+ * キャッシュ優先フェッチャー（超高速表示用）
+ * ローカルストレージから即座にキャッシュを返し、バックグラウンドで更新
+ */
+export const cachedFetcher = async (url: string) => {
+  // まずキャッシュを確認（0.001秒レベル）
+  const cached = loadFromCache(url);
+
+  if (cached) {
+    // キャッシュがあれば即座に返す
+    // バックグラウンドで最新データを取得して更新
+    authenticatedFetcher(url).catch(() => {
+      // バックグラウンド更新のエラーは無視
+    });
+    return cached;
+  }
+
+  // キャッシュがない場合は通常のフェッチ
+  return authenticatedFetcher(url);
 };

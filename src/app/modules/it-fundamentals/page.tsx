@@ -113,7 +113,24 @@ interface LearningProgressItem {
 }
 
 export default function ITFundamentalsPage() {
-  const [progressData, setProgressData] = useState<{[key: number]: number}>({});
+  const [progressData, setProgressData] = useState<{[key: number]: number}>(() => {
+    // 初期値をローカルストレージから即座に読み込み（0.001秒レベル）
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('it-fundamentals-progress');
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          // 5分以内のキャッシュを使用
+          if (Date.now() - timestamp < 5 * 60 * 1000) {
+            return data;
+          }
+        }
+      } catch (e) {
+        // エラーは無視
+      }
+    }
+    return {};
+  });
   const [allProgress, setAllProgress] = useState<LearningProgressItem[]>([]);
 
   useEffect(() => {
@@ -177,6 +194,18 @@ export default function ITFundamentalsPage() {
 
   useEffect(() => {
     setProgressData(calculatedProgress);
+
+    // 計算結果をローカルストレージに保存（次回の即座表示用）
+    if (Object.keys(calculatedProgress).length > 0) {
+      try {
+        localStorage.setItem('it-fundamentals-progress', JSON.stringify({
+          data: calculatedProgress,
+          timestamp: Date.now()
+        }));
+      } catch (e) {
+        // エラーは無視
+      }
+    }
   }, [calculatedProgress]);
 
   return (
