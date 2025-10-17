@@ -187,7 +187,7 @@ export default function ITFundamentalsPage() {
 
   // useMemoで進捗計算をメモ化 - allProgressが変わった時のみ再計算
   const calculatedProgress = useMemo(() => {
-    if (!allProgress || allProgress.length === 0) return {};
+    if (!allProgress || allProgress.length === 0) return null; // nullを返して空であることを明示
 
     const progressMap: {[key: number]: number} = {};
 
@@ -220,10 +220,12 @@ export default function ITFundamentalsPage() {
   }, [allProgress]);
 
   useEffect(() => {
-    setProgressData(calculatedProgress);
+    // calculatedProgressがnull（データ未取得）の場合は更新しない
+    // キャッシュから読み込んだ値を保持
+    if (calculatedProgress !== null) {
+      setProgressData(calculatedProgress);
 
-    // 計算結果をローカルストレージに保存（次回の即座表示用）
-    if (Object.keys(calculatedProgress).length > 0) {
+      // 計算結果をローカルストレージに保存（次回の即座表示用）
       try {
         localStorage.setItem('it-fundamentals-progress', JSON.stringify({
           data: calculatedProgress,
