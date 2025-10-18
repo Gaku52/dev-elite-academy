@@ -18,6 +18,7 @@ interface ProgressData {
   completedHours: number;
   streak: number;
   achievements: string[];
+  currentCycle?: number;
 }
 
 export default function UserProgressTracker({ totalContents }: { totalContents: number }) {
@@ -28,7 +29,8 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
     totalHours: 0,
     completedHours: 0,
     streak: 0,
-    achievements: []
+    achievements: [],
+    currentCycle: 1
   });
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +46,8 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
             totalHours: data.total_estimated_hours || 60,
             completedHours: data.completed_hours || 0,
             streak: data.learning_streak || 0,
-            achievements: data.achievements || []
+            achievements: data.achievements || [],
+            currentCycle: data.current_cycle || 1
           });
         }
       } catch (error) {
@@ -130,7 +133,14 @@ export default function UserProgressTracker({ totalContents }: { totalContents: 
   return (
     <div className="bg-surface rounded-lg p-3 mb-4 border border-border shadow-sm">
       <div className="text-center mb-3">
-        <h3 className="text-sm font-semibold text-foreground mb-1">あなたの学習進捗</h3>
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <h3 className="text-sm font-semibold text-foreground">あなたの学習進捗</h3>
+          {progress.currentCycle && progress.currentCycle > 1 && (
+            <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold">
+              第{progress.currentCycle}周目
+            </span>
+          )}
+        </div>
         <p className="text-xs text-muted-foreground">{getMotivationalMessage()}</p>
         {progress.streak > 0 && (
           <p className="text-orange-500 text-xs flex items-center justify-center mt-1">

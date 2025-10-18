@@ -101,7 +101,8 @@ export async function GET(request: Request) {
       achievements,
       progress_percentage: targetTotalSections > 0 ? Math.round((completedSections / targetTotalSections) * 100) : 0,
       modules_studied: uniqueModules.length,
-      total_modules: 8 // 基本情報技術者試験の8分野
+      total_modules: 8, // 基本情報技術者試験の8分野
+      current_cycle: currentCycle // 現在の周回数を追加
     });
 
   } catch (error) {
