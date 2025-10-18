@@ -205,10 +205,10 @@ export default function SecurityPage() {
                     <h2 className="text-xl lg:text-2xl font-bold text-foreground">{currentSection.title}</h2>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
-                    <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-200 rounded-full border border-orange-200 dark:border-orange-700">
+                    <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-900 dark:text-orange-200 rounded-full border border-orange-200 dark:border-orange-700">
                       {currentModule.title}
                     </span>
-                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full border border-slate-200 dark:border-slate-700">
+                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-full border border-slate-200 dark:border-slate-700">
                       {sectionQuizProgress}/{currentSection.quizzes.length} 問完了
                     </span>
                   </div>

@@ -1610,7 +1610,7 @@ export default function ComputerSystemsPage() {
                 <div className="flex items-center gap-3">
                   <h1 className="text-3xl font-bold text-foreground">コンピュータシステム</h1>
                   {currentCycle > 1 && (
-                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-200 rounded-full text-sm font-semibold border border-purple-200 dark:border-purple-700">
+                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-900 dark:text-purple-200 rounded-full text-sm font-semibold border border-purple-200 dark:border-purple-700">
                       第{currentCycle}周目
                     </span>
                   )}
@@ -1682,7 +1682,7 @@ export default function ComputerSystemsPage() {
                             >
                               <span className="flex items-center">
                                 {sectionCompletedCount === section.quizzes.length ? (
-                                  <CheckCircle className="w-3 h-3 mr-2 text-green-500 dark:text-green-400" />
+                                  <CheckCircle className="w-3 h-3 mr-2 text-green-600 dark:text-green-400" />
                                 ) : (
                                   <Circle className="w-3 h-3 mr-2" />
                                 )}
@@ -1710,7 +1710,7 @@ export default function ComputerSystemsPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">完了済み</span>
-                    <span className="font-medium text-green-600 dark:text-green-400">{completedQuizzes.size}問</span>
+                    <span className="font-medium text-green-700 dark:text-green-400">{completedQuizzes.size}問</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">正答率</span>
@@ -1940,7 +1940,7 @@ export default function ComputerSystemsPage() {
                 </div>
                 <div>
                   <span className="text-muted-foreground">セクション完了: </span>
-                  <span className="font-medium text-green-600 dark:text-green-400">{sectionQuizProgress}/{currentSection.quizzes.length}</span>
+                  <span className="font-medium text-green-700 dark:text-green-400">{sectionQuizProgress}/{currentSection.quizzes.length}</span>
                 </div>
               </div>
             </div>

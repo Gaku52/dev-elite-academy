@@ -57,7 +57,7 @@ export default function ModuleSidebar({
                     >
                       <span className="flex items-center">
                         {sectionCompletedCount === section.quizzes.length ? (
-                          <CheckCircle className="w-3 h-3 mr-2 text-green-500 dark:text-green-400" />
+                          <CheckCircle className="w-3 h-3 mr-2 text-green-600 dark:text-green-400" />
                         ) : (
                           <Circle className="w-3 h-3 mr-2" />
                         )}
@@ -85,7 +85,7 @@ export default function ModuleSidebar({
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">完了済み</span>
-            <span className="font-medium text-green-600 dark:text-green-400">{completedQuizzes.size}問</span>
+            <span className="font-medium text-green-700 dark:text-green-400">{completedQuizzes.size}問</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">正答率</span>

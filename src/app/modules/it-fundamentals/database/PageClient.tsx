@@ -200,10 +200,10 @@ export default function DatabasePage() {
                     <h2 className="text-xl lg:text-2xl font-bold text-foreground">{currentSection.title}</h2>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
-                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-full border border-blue-200 dark:border-blue-700">
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200 rounded-full border border-blue-200 dark:border-blue-700">
                       {currentModule.title}
                     </span>
-                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full border border-slate-200 dark:border-slate-700">
+                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-full border border-slate-200 dark:border-slate-700">
                       {sectionQuizProgress}/{currentSection.quizzes.length} 問完了
                     </span>
                   </div>
@@ -282,7 +282,7 @@ export default function DatabasePage() {
                 </div>
                 <div>
                   <span className="text-muted-foreground">セクション完了: </span>
-                  <span className="font-medium text-green-600 dark:text-green-400">{sectionQuizProgress}/{currentSection.quizzes.length}</span>
+                  <span className="font-medium text-green-700 dark:text-green-400">{sectionQuizProgress}/{currentSection.quizzes.length}</span>
                 </div>
               </div>
             </div>
