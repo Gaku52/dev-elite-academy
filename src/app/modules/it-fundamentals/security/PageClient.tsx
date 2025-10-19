@@ -225,7 +225,7 @@ export default function SecurityPage() {
 
                 {/* 問題エリア */}
                 <div className="border-t border-border pt-6">
-                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4 lg:p-6 mb-6 border border-orange-200 dark:border-orange-700">
+                  <div className="bg-white dark:bg-[#1e293b] rounded-lg p-4 lg:p-6 mb-6 border border-orange-200 dark:border-orange-700">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
                       <h3 className="font-semibold text-foreground flex items-center text-lg mb-2 lg:mb-0">
                         <span className="text-2xl mr-2">🔒</span>
