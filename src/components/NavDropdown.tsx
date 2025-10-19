@@ -19,6 +19,7 @@ interface NavDropdownProps {
 
 export default function NavDropdown({ label, icon, items }: NavDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [alignRight, setAlignRight] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -29,12 +30,27 @@ export default function NavDropdown({ label, icon, items }: NavDropdownProps) {
       }
     };
 
+    // 画面端の検出
+    const checkPosition = () => {
+      if (dropdownRef.current) {
+        const rect = dropdownRef.current.getBoundingClientRect();
+        const dropdownWidth = 256; // w-64 = 16rem = 256px
+        const rightEdge = rect.left + dropdownWidth;
+
+        // 画面右端に近い場合は右寄せ
+        setAlignRight(rightEdge > window.innerWidth - 20);
+      }
+    };
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      checkPosition();
+      window.addEventListener('resize', checkPosition);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', checkPosition);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -73,7 +89,9 @@ export default function NavDropdown({ label, icon, items }: NavDropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-card border border-border rounded-2xl shadow-lg overflow-hidden z-50">
+        <div className={`absolute top-full mt-2 w-56 sm:w-64 bg-card border border-border rounded-2xl shadow-lg overflow-hidden z-50 ${
+          alignRight ? 'right-0' : 'left-0'
+        }`}>
           <div className="py-2">
             {items.map((item, index) => (
               <Link
