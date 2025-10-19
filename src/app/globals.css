@@ -472,6 +472,8 @@ button, a, input, textarea, select {
 .markdown-body {
   color: var(--foreground);
   line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .markdown-body h1,
@@ -550,10 +552,35 @@ button, a, input, textarea, select {
   color: var(--muted);
 }
 
+/* 表のコンテナ - 横スクロール対応 */
 .markdown-body table {
-  border-collapse: collapse;
+  display: block;
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-collapse: collapse;
   margin: 1em 0;
+}
+
+.markdown-body table {
+  display: table;
+  width: max-content;
+  min-width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .markdown-body table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .markdown-body table table {
+    display: table;
+    width: max-content;
+    min-width: 100%;
+  }
 }
 
 .markdown-body th,
@@ -561,11 +588,23 @@ button, a, input, textarea, select {
   border: 1px solid var(--border);
   padding: 0.75em;
   text-align: left;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .markdown-body th,
+  .markdown-body td {
+    padding: 0.5em;
+    font-size: 0.9em;
+  }
 }
 
 .markdown-body th {
   background-color: rgba(142, 156, 120, 0.1);
   font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .dark .markdown-body pre {
@@ -578,4 +617,60 @@ button, a, input, textarea, select {
 
 .dark .markdown-body th {
   background-color: rgba(168, 184, 153, 0.1);
+}
+
+/* 表を囲むラッパーでスクロール対応 */
+.markdown-body > table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.markdown-body > table > * {
+  display: table;
+  width: 100%;
+}
+
+/* コードブロックのレスポンシブ対応 */
+.markdown-body pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .markdown-body pre code {
+    font-size: 0.8em;
+  }
+
+  .markdown-body h1 {
+    font-size: 1.75em;
+  }
+
+  .markdown-body h2 {
+    font-size: 1.5em;
+  }
+
+  .markdown-body h3 {
+    font-size: 1.25em;
+  }
+}
+
+/* スクロールバーのスタイリング */
+.markdown-body table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.markdown-body table::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.markdown-body table::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+.markdown-body table::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }

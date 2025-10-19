@@ -74,6 +74,7 @@ export default function KnowledgeBasePage() {
   const [markdownContent, setMarkdownContent] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['application-types']));
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     // Load README.md by default
@@ -83,6 +84,7 @@ export default function KnowledgeBasePage() {
   const loadMarkdown = async (path: string) => {
     setIsLoading(true);
     setSelectedDoc(path);
+    setMobileNavOpen(false); // モバイルナビを閉じる
 
     try {
       const response = await fetch(`/api/knowledge-base?path=${encodeURIComponent(path)}`);
@@ -157,23 +159,35 @@ export default function KnowledgeBasePage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-white" />
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        {/* ヘッダー部分 */}
+        <div className="mb-6 md:mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-primary rounded-2xl flex items-center justify-center">
+                <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-white" />
+              </div>
+              <h1 className="text-2xl md:text-4xl font-bold text-foreground">開発ナレッジベース</h1>
             </div>
-            <h1 className="text-4xl font-bold text-foreground">開発ナレッジベース</h1>
+
+            {/* モバイル用ナビゲーショントグル */}
+            <button
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              className="lg:hidden px-4 py-2 bg-primary text-white rounded-xl flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              <span className="text-sm">目次</span>
+            </button>
           </div>
-          <p className="text-muted ml-15">
+          <p className="text-muted text-sm md:text-base ml-0 md:ml-15">
             アプリケーション開発のための総合的なドキュメントとベストプラクティス
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-card border border-border rounded-2xl p-4 sticky top-24">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 relative">
+          {/* Sidebar - デスクトップ */}
+          <div className="hidden lg:block lg:col-span-1">
+            <div className="bg-card border border-border rounded-2xl p-4 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
               <h2 className="text-lg font-semibold text-foreground mb-4">目次</h2>
               <nav className="space-y-1">
                 <button
@@ -192,15 +206,49 @@ export default function KnowledgeBasePage() {
             </div>
           </div>
 
+          {/* Sidebar - モバイル（オーバーレイ） */}
+          {mobileNavOpen && (
+            <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setMobileNavOpen(false)}>
+              <div
+                className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-card border-r border-border overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="p-4 border-b border-border flex items-center justify-between sticky top-0 bg-card">
+                  <h2 className="text-lg font-semibold text-foreground">目次</h2>
+                  <button
+                    onClick={() => setMobileNavOpen(false)}
+                    className="p-2 hover:bg-border rounded-lg"
+                  >
+                    <ChevronRight className="w-5 h-5 rotate-180" />
+                  </button>
+                </div>
+                <nav className="space-y-1 p-4">
+                  <button
+                    onClick={() => loadMarkdown('README')}
+                    className={`flex items-center w-full text-left py-2 px-3 hover:bg-card rounded-lg transition-colors ${
+                      selectedDoc === 'README' ? 'bg-card border-l-2 border-primary' : ''
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4 mr-2 text-primary" />
+                    <span className={`text-sm font-medium ${selectedDoc === 'README' ? 'text-primary' : 'text-foreground'}`}>
+                      ホーム
+                    </span>
+                  </button>
+                  {renderFileTree(knowledgeBaseStructure)}
+                </nav>
+              </div>
+            </div>
+          )}
+
           {/* Content */}
           <div className="lg:col-span-3">
-            <div className="bg-card border border-border rounded-2xl p-8">
+            <div className="bg-card border border-border rounded-2xl p-4 md:p-8">
               {isLoading ? (
                 <div className="flex items-center justify-center h-96">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                 </div>
               ) : (
-                <div className="prose prose-slate dark:prose-invert max-w-none">
+                <div className="prose prose-slate dark:prose-invert max-w-none overflow-x-hidden">
                   <MarkdownRenderer content={markdownContent} />
                 </div>
               )}
