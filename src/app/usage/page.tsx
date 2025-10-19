@@ -141,18 +141,18 @@ export default async function UsagePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-background">
       <Header />
       <div className="container-modern py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             📊 Supabase使用状況モニター
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted">
             無料プラン制限の監視と有料プラン移行タイミングの判断
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-sm text-muted mt-2">
             対象期間: {currentMonth} | 最終更新: {usageStats?.last_updated ? new Date(usageStats.last_updated).toLocaleString('ja-JP') : '取得中'}
           </p>
         </div>
@@ -163,7 +163,7 @@ export default async function UsagePage() {
             ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
             : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
         }`}>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center">
             {usageStats?.partial_data ? (
               <AlertTriangle className="w-6 h-6 mr-2 text-yellow-500 dark:text-yellow-400" />
             ) : (
@@ -179,19 +179,19 @@ export default async function UsagePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
             <div>
               <p className={usageStats?.partial_data ? 'text-yellow-700 dark:text-yellow-400' : 'text-green-700 dark:text-green-400'}>監視中テーブル</p>
-              <p className="text-gray-900 dark:text-white font-mono">{usageStats?.monitored_tables_count || 0} / {usageStats?.active_tables_count || 11}</p>
+              <p className="text-foreground font-mono">{usageStats?.monitored_tables_count || 0} / {usageStats?.active_tables_count || 11}</p>
             </div>
             <div>
               <p className={usageStats?.partial_data ? 'text-yellow-700 dark:text-yellow-400' : 'text-green-700 dark:text-green-400'}>総レコード数</p>
-              <p className="text-gray-900 dark:text-white font-mono">{usageStats?.total_records?.toLocaleString() || 0}</p>
+              <p className="text-foreground font-mono">{usageStats?.total_records?.toLocaleString() || 0}</p>
             </div>
             <div>
               <p className={usageStats?.partial_data ? 'text-yellow-700 dark:text-yellow-400' : 'text-green-700 dark:text-green-400'}>DB使用量</p>
-              <p className="text-gray-900 dark:text-white font-mono">{usageStats?.estimated_db_size_mb?.toFixed(2) || '0.00'} MB</p>
+              <p className="text-foreground font-mono">{usageStats?.estimated_db_size_mb?.toFixed(2) || '0.00'} MB</p>
             </div>
             <div>
               <p className={usageStats?.partial_data ? 'text-yellow-700 dark:text-yellow-400' : 'text-green-700 dark:text-green-400'}>最終更新</p>
-              <p className="text-gray-900 dark:text-white font-mono text-xs">{usageStats?.last_updated ? new Date(usageStats.last_updated).toLocaleTimeString('ja-JP') : '取得中'}</p>
+              <p className="text-foreground font-mono text-xs">{usageStats?.last_updated ? new Date(usageStats.last_updated).toLocaleTimeString('ja-JP') : '取得中'}</p>
             </div>
           </div>
 
@@ -213,26 +213,26 @@ export default async function UsagePage() {
 
         {/* 無料プラン概要 */}
         <div className="card-modern p-6 mb-8 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center">
             <AlertTriangle className="w-6 h-6 mr-2 text-blue-500 dark:text-blue-400" />
             Supabase無料プラン制限
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
               <p className="text-blue-700 dark:text-blue-400">データベース容量</p>
-              <p className="text-gray-900 dark:text-white font-mono">{FREE_PLAN_LIMITS.database_size_mb}MB</p>
+              <p className="text-foreground font-mono">{FREE_PLAN_LIMITS.database_size_mb}MB</p>
             </div>
             <div>
               <p className="text-blue-700 dark:text-blue-400">月間リクエスト</p>
-              <p className="text-gray-900 dark:text-white font-mono">{FREE_PLAN_LIMITS.monthly_requests.toLocaleString()}</p>
+              <p className="text-foreground font-mono">{FREE_PLAN_LIMITS.monthly_requests.toLocaleString()}</p>
             </div>
             <div>
               <p className="text-blue-700 dark:text-blue-400">同時接続数</p>
-              <p className="text-gray-900 dark:text-white font-mono">{FREE_PLAN_LIMITS.concurrent_connections}</p>
+              <p className="text-foreground font-mono">{FREE_PLAN_LIMITS.concurrent_connections}</p>
             </div>
             <div>
               <p className="text-blue-700 dark:text-blue-400">月間帯域幅</p>
-              <p className="text-gray-900 dark:text-white font-mono">{FREE_PLAN_LIMITS.monthly_bandwidth_gb}GB</p>
+              <p className="text-foreground font-mono">{FREE_PLAN_LIMITS.monthly_bandwidth_gb}GB</p>
             </div>
           </div>
         </div>
@@ -264,8 +264,8 @@ export default async function UsagePage() {
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{item.description}</p>
+                      <h3 className="text-lg font-semibold text-foreground">{item.name}</h3>
+                      <p className="text-sm text-muted">{item.description}</p>
                     </div>
                   </div>
                   <div className={`px-3 py-1 rounded-full text-sm ${
@@ -279,7 +279,7 @@ export default async function UsagePage() {
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-900 dark:text-white">
+                    <span className="text-foreground">
                       {item.current.toLocaleString()} / {item.limit.toLocaleString()} {item.unit}
                     </span>
                     <span className={`font-mono ${
@@ -311,7 +311,7 @@ export default async function UsagePage() {
 
         {/* 成長予測と制限到達予測 */}
         <div className="card-modern p-6 mb-8 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center">
             <TrendingUp className="w-6 h-6 mr-2 text-purple-600 dark:text-purple-400" />
             成長予測とタイムライン
           </h2>
@@ -320,7 +320,7 @@ export default async function UsagePage() {
 
         {/* 有料プラン移行判断 */}
         <div className="card-modern p-6 mb-8 bg-primary/10 border-primary/20">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center">
             <AlertTriangle className="w-6 h-6 mr-2 text-primary" />
             有料プラン移行判断
           </h2>
@@ -336,7 +336,7 @@ export default async function UsagePage() {
                     <div className="flex items-center space-x-3 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-2xl">
                       <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
                       <div>
-                        <p className="text-gray-900 dark:text-white font-semibold">🚨 有料プラン移行推奨</p>
+                        <p className="text-foreground font-semibold">🚨 有料プラン移行推奨</p>
                         <p className="text-red-700 dark:text-red-400 text-sm">データベース使用率が{dbUsage.toFixed(1)}%に達しています</p>
                       </div>
                     </div>
@@ -346,7 +346,7 @@ export default async function UsagePage() {
                     <div className="flex items-center space-x-3 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-2xl">
                       <AlertTriangle className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
                       <div>
-                        <p className="text-gray-900 dark:text-white font-semibold">⚠️ 監視強化期間</p>
+                        <p className="text-foreground font-semibold">⚠️ 監視強化期間</p>
                         <p className="text-yellow-700 dark:text-yellow-400 text-sm">使用量増加を注意深く監視してください</p>
                       </div>
                     </div>
@@ -356,7 +356,7 @@ export default async function UsagePage() {
                     <div className="flex items-center space-x-3 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-2xl">
                       <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                       <div>
-                        <p className="text-gray-900 dark:text-white font-semibold">✅ 無料プランで問題なし</p>
+                        <p className="text-foreground font-semibold">✅ 無料プランで問題なし</p>
                         <p className="text-green-700 dark:text-green-400 text-sm">現在の使用量なら無料プランで継続可能です</p>
                       </div>
                     </div>
@@ -369,8 +369,8 @@ export default async function UsagePage() {
           {/* 推奨アクション */}
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card-modern p-4">
-              <h4 className="text-gray-900 dark:text-white font-semibold mb-2">📈 Pro Plan (月$25)</h4>
-              <ul className="text-gray-600 dark:text-gray-400 text-sm space-y-1">
+              <h4 className="text-foreground font-semibold mb-2">📈 Pro Plan (月$25)</h4>
+              <ul className="text-muted text-sm space-y-1">
                 <li>• データベース: 8GB</li>
                 <li>• 月間帯域幅: 250GB</li>
                 <li>• 同時接続: 200</li>
@@ -379,8 +379,8 @@ export default async function UsagePage() {
             </div>
 
             <div className="card-modern p-4">
-              <h4 className="text-gray-900 dark:text-white font-semibold mb-2">🚀 Team Plan (月$599)</h4>
-              <ul className="text-gray-600 dark:text-gray-400 text-sm space-y-1">
+              <h4 className="text-foreground font-semibold mb-2">🚀 Team Plan (月$599)</h4>
+              <ul className="text-muted text-sm space-y-1">
                 <li>• データベース: 500GB</li>
                 <li>• 月間帯域幅: 2.5TB</li>
                 <li>• 同時接続: 1,500</li>
