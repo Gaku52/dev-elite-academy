@@ -33,12 +33,12 @@ export default function QuizComponent({
               className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all text-sm lg:text-base ${
                 showResult
                   ? isCorrect
-                    ? 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600 text-green-900 dark:text-green-300'
+                    ? 'bg-green-50 dark:bg-green-900/10 border-green-400 dark:border-green-500 text-green-900 dark:text-green-200'
                     : isSelected
-                    ? 'bg-red-50 dark:bg-red-900/20 border-red-400 dark:border-red-600 text-red-900 dark:text-red-300'
+                    ? 'bg-red-50 dark:bg-red-900/10 border-red-400 dark:border-red-500 text-red-900 dark:text-red-200'
                     : 'bg-gray-50 dark:bg-dark-card border-gray-200 dark:border-dark-border text-gray-700 dark:text-dark-secondary'
                   : isSelected
-                  ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-400 dark:border-purple-600 text-purple-900 dark:text-purple-300'
+                  ? 'bg-purple-50 dark:bg-purple-900/10 border-purple-400 dark:border-purple-500 text-purple-900 dark:text-purple-200'
                   : 'hover:bg-gray-50 dark:hover:bg-dark-card border-gray-200 dark:border-dark-border text-gray-800 dark:text-dark-primary hover:border-gray-300 dark:hover:border-dark-border'
               }`}
             >
@@ -62,8 +62,8 @@ export default function QuizComponent({
       {showResult && (
         <div className={`mt-6 p-4 rounded-lg ${
           selectedAnswer === quiz.correct
-            ? 'bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-200 border border-green-300 dark:border-green-600'
-            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 border border-yellow-300 dark:border-yellow-600'
+            ? 'bg-green-100 dark:bg-green-900/15 text-green-900 dark:text-green-100 border border-green-300 dark:border-green-500'
+            : 'bg-yellow-100 dark:bg-yellow-900/15 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-500'
         }`}>
           <div className="flex items-start">
             <span className="text-xl mr-2">
