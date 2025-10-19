@@ -16,9 +16,14 @@ import {
   FolderOpen,
   FileText,
   Menu,
-  X
+  X,
+  GraduationCap,
+  Library,
+  TrendingUp,
+  MessageCircleQuestion
 } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
+import NavDropdown from './NavDropdown';
 
 export default function Header() {
   const { user, signOut, loading } = useAuth();
@@ -98,34 +103,46 @@ export default function Header() {
               <Home className="w-4 h-4 mr-2" />
               ホーム
             </Link>
-            <Link
-              href="/dashboard"
-              className="flex items-center text-muted hover:text-primary transition-colors font-medium"
-            >
-              <BarChart3 className="w-4 h-4 mr-2" />
-              学習ダッシュボード
-            </Link>
-            <Link
-              href="/knowledge-base"
-              className="flex items-center text-muted hover:text-primary transition-colors font-medium"
-            >
-              <BookOpen className="w-4 h-4 mr-2" />
-              ナレッジベース
-            </Link>
-            <Link
-              href="/specifications"
-              className="flex items-center text-muted hover:text-primary transition-colors font-medium"
-            >
-              <FileText className="w-4 h-4 mr-2" />
-              仕様書・設計書
-            </Link>
-            <Link
-              href="/usage"
-              className="flex items-center text-muted hover:text-primary transition-colors font-medium"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              使用状況
-            </Link>
+
+            {/* 学習メニュー */}
+            <NavDropdown
+              label="学習"
+              icon={<GraduationCap className="w-4 h-4" />}
+              items={[
+                {
+                  label: '学習ダッシュボード',
+                  href: '/dashboard',
+                  icon: <BarChart3 className="w-4 h-4" />,
+                  description: '学習進捗と統計'
+                },
+                {
+                  label: '使用状況',
+                  href: '/usage',
+                  icon: <Settings className="w-4 h-4" />,
+                  description: 'アカウント使用状況'
+                }
+              ]}
+            />
+
+            {/* リソースメニュー */}
+            <NavDropdown
+              label="リソース"
+              icon={<Library className="w-4 h-4" />}
+              items={[
+                {
+                  label: 'ナレッジベース',
+                  href: '/knowledge-base',
+                  icon: <BookOpen className="w-4 h-4" />,
+                  description: '技術ドキュメント'
+                },
+                {
+                  label: '仕様書・設計書',
+                  href: '/specifications',
+                  icon: <FileText className="w-4 h-4" />,
+                  description: 'プロジェクト仕様書'
+                }
+              ]}
+            />
           </nav>
 
           {/* モバイルメニューとユーザーメニュー */}
@@ -259,34 +276,52 @@ export default function Header() {
             <Home className="w-5 h-5 mr-3" />
             ホーム
           </Link>
-          <Link
-            href="/dashboard"
-            className="flex items-center text-muted hover:text-primary transition-colors py-3 px-4 rounded-xl hover:bg-card"
-          >
-            <BarChart3 className="w-5 h-5 mr-3" />
-            学習ダッシュボード
-          </Link>
-          <Link
-            href="/knowledge-base"
-            className="flex items-center text-muted hover:text-primary transition-colors py-3 px-4 rounded-xl hover:bg-card"
-          >
-            <BookOpen className="w-5 h-5 mr-3" />
-            ナレッジベース
-          </Link>
-          <Link
-            href="/specifications"
-            className="flex items-center text-muted hover:text-primary transition-colors py-3 px-4 rounded-xl hover:bg-card"
-          >
-            <FileText className="w-5 h-5 mr-3" />
-            仕様書・設計書
-          </Link>
-          <Link
-            href="/usage"
-            className="flex items-center text-muted hover:text-primary transition-colors py-3 px-4 rounded-xl hover:bg-card"
-          >
-            <Settings className="w-5 h-5 mr-3" />
-            使用状況
-          </Link>
+
+          {/* 学習セクション */}
+          <div className="px-4 py-2">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
+              学習
+            </div>
+            <div className="space-y-1">
+              <Link
+                href="/dashboard"
+                className="flex items-center text-muted hover:text-primary transition-colors py-2 px-3 rounded-lg hover:bg-background"
+              >
+                <BarChart3 className="w-4 h-4 mr-3" />
+                学習ダッシュボード
+              </Link>
+              <Link
+                href="/usage"
+                className="flex items-center text-muted hover:text-primary transition-colors py-2 px-3 rounded-lg hover:bg-background"
+              >
+                <Settings className="w-4 h-4 mr-3" />
+                使用状況
+              </Link>
+            </div>
+          </div>
+
+          {/* リソースセクション */}
+          <div className="px-4 py-2">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
+              リソース
+            </div>
+            <div className="space-y-1">
+              <Link
+                href="/knowledge-base"
+                className="flex items-center text-muted hover:text-primary transition-colors py-2 px-3 rounded-lg hover:bg-background"
+              >
+                <BookOpen className="w-4 h-4 mr-3" />
+                ナレッジベース
+              </Link>
+              <Link
+                href="/specifications"
+                className="flex items-center text-muted hover:text-primary transition-colors py-2 px-3 rounded-lg hover:bg-background"
+              >
+                <FileText className="w-4 h-4 mr-3" />
+                仕様書・設計書
+              </Link>
+            </div>
+          </div>
           <div className="border-t border-border my-2"></div>
           <Link
             href="/admin/categories"
