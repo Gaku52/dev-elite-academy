@@ -223,7 +223,7 @@ export default function StrategyPage() {
                 <div className="border-t border-border pt-6">
                   <div className="bg-slate-50 dark:bg-slate-300 rounded-lg p-4 lg:p-6 mb-6 border border-green-200 dark:border-green-700">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
-                      <h3 className="font-semibold text-foreground flex items-center text-lg mb-2 lg:mb-0">
+                      <h3 className="font-semibold text-gray-900 flex items-center text-lg mb-2 lg:mb-0">
                         <span className="text-2xl mr-2">🎯</span>
                         理解度チェック
                       </h3>
